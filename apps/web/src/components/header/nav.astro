@@ -1,0 +1,33 @@
+---
+const navItems = [
+  {
+    title: 'Github',
+    path: 'https://github.com/yhoungdev/potatoe-squeezy'
+  },
+
+];
+---
+
+<nav class=" mx-auto mt-4 container">
+  <div class="flex items-center justify-between w-full  gap-4">
+    <div>
+      <h1 className="font-black" style={
+          {
+            fontSize: '30px',
+          }
+      }>🍟</h1>
+    </div>
+    <div class="flex items-center gap-8">
+      {navItems.map((item) => (
+          <a
+              href={item.path}
+              class={`hover:text-yellow-600 hover:underline ${
+                  Astro.url.pathname === item.path ? 'text-yellow-600 underline' : ''
+              }`}
+          >
+            {item.title}
+          </a>
+      ))}
+    </div>
+  </div>
+</nav>

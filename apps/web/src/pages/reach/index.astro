@@ -1,0 +1,74 @@
+---
+import Header from '../../components/header/index.astro';
+import '../../style/index.css';
+import { Content as ReachNote } from '../../data/contact.md';
+
+const personal_urls = [
+  {
+    title: 'Github',
+    url: 'https://github.com/yhoungdev',
+    description: '🐙 My code’s playground, where bugs are squashed and dreams come to life.',
+  },
+  {
+    title: 'LinkedIn',
+    url: 'https://www.linkedin.com/in/emmanuel-obiabo-5a66371aa/',
+    description: '📇 A place where I pretend to be fancy, but it’s mostly just “let’s connect.”',
+  },
+  {
+    title: 'Twitter',
+    url: 'https://x.com/obiabo_immanuel',
+    description: '🐦 Reposting nonsense with the occasional brilliant thought. A place where I repost what nerds post.',
+  },
+  {
+    title: 'Email',
+    url: 'mailto:theobiabo@gmail.com', 
+    description: '📧 "As Psalm said, you shall dine with kings!" But before we feast, shoot me an email. No more sending messages by pigeon – we’ve upgraded to the heavenly art of email! 🦸‍♂️'
+},
+  {
+    title: 'Nostr',
+    url: 'https://snort.social/nprofile1qqs2c3g85ck4qwpakm9nxzlhfved8yykqylcwdu34ge8whkcxeqx4dqka3xww',
+    description: '🔗 A decentralized dream where I post just for the blockchain of it. ( Speaking of decentralized, is Nostr really decentralized ? We shall find out in my little internet note 😂) ',
+  },
+  {
+    title: 'Farcaster',
+    url: 'https://warpcast.com/obiabo',
+    description: '🚀 A decentralized social space where I cast my thoughts into the void, hoping someone catches them. (Same as this also is it really decentralize ? Paying $3 to signup dosnt make it decentralize, but we would find out in my little note as well 😂)',
+  },
+];
+---
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📮 Reach Out</title>
+</head>
+<body>
+    <Header/>
+
+    <div class="max-w-2xl mx-auto px-4 py-8 font-serif">
+        <div>
+     
+            <p>
+                <ReachNote/>
+            </p>
+            
+            
+        </div>
+        
+
+        <section id="reach" class="mt-4">
+            <h4 class="my-4">📬 Find Me Online</h4>
+            <ul>
+                {personal_urls.map((item) => (
+                    <li class="my-2">
+                        <a href={item.url} target="_blank" class="text-yellow-600 underline ">
+                            {item.title}
+                        </a>: {item.description}
+                    </li>
+                ))}
+            </ul>
+        </section>
+    </div>
+</body>
+</html>
