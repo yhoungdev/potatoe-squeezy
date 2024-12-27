@@ -111,6 +111,20 @@ body {
   font-style: italic;
 }
 
+.modal {
+  border: none !important;
+  border: 3em !important;
+  background: #212121 !important;
+  box-shadow: 0px 3px 20px 4px #1c1c1ccf !important;
+}
+
+#my_modal_1 {
+  border: none;
+  border: 3em;
+  background: #292d31;
+  box-shadow: 0px 3px 20px 4px #1c1c1ccf;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
