@@ -1,0 +1,34 @@
+---
+import '../../src/style/index.css'
+import Hero from "../components/sections/hero.astro";
+import Auth from "../components/sections/auth.astro";
+
+
+const metaData = {
+    description: `Turn potatoes into something extraordinary with Potato Squeezy! 
+    Receive github sponsorship as tips.`,
+    title: 'Potatoe Squeezy',
+    url: 'https://potatoesqueezy.xyz/'
+
+}
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={metaData.description} />
+    <title> Potatoe Squeezy</title>
+    <meta property="og:title" content={metaData.title} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={metaData.url} />
+    <meta property="og:description" content={metaData.description} />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:alt" content="">
+</head>
+<body >
+<Auth/>
+</body>
+</html>
