@@ -9,7 +9,6 @@ if (document.location.hostname === "github.com") {
   const formElement = document.querySelector(ID);
   if (formElement) {
     const App = () => {
-      const open = () => toast.success("User Profile");
       return <TipGithubUser />;
     };
 
@@ -21,7 +20,7 @@ if (document.location.hostname === "github.com") {
       <>
         <App />
         <Toaster position="top-center" expand={true} richColors={true} />
-      </>,
+      </>
     );
   } else {
     console.error(`Element with ID "${ID}" not found.`);

@@ -4,5 +4,5 @@ import initializeSupabase from "../../../libs/supabase";
 const env = import.meta.env;
 export const supabaseObject = initializeSupabase(
   env.VITE_APP_PROJECT_URL,
-  env.VITE_APP_PRIVATE_KEY,
+  env.VITE_APP_PRIVATE_KEY
 );

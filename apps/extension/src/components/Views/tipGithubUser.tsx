@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { defaultAxios } from "../../../../../config/axios";
 
 const TipGithubUser = () => {
   const [isOpen, setIsOpen] = useState(false);

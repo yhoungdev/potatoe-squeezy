@@ -7,5 +7,5 @@ ReactDOM.createRoot(document.body).render(
   <React.StrictMode>
     {/*<Welcome />*/}
     <SignIn />
-  </React.StrictMode>,
+  </React.StrictMode>
 );
