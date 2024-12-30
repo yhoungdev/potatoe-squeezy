@@ -9,7 +9,7 @@
     "96": "icon/96.png",
     "128": "icon/128.png"
   },
-  "permissions": ["sidePanel"],
+  "permissions": ["sidePanel" , "identity"],
   "{{chrome}}.action": {
     "default_popup": "src/popup.html"
   },
@@ -28,5 +28,9 @@
   ],
   "{{chrome}}.side_panel": {
     "default_path": "src/popup.html"
-  }
+  },
+  "host_permissions": [
+    "https://pfmkbskebuzgtlpyppcj.supabase.co/*"
+  ]
+
 }
