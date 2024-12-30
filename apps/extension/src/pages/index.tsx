@@ -10,7 +10,7 @@ function SignIn() {
       const { data, error } = await supabaseObject.auth.signInWithOAuth({
         provider: "github",
         options: {
-          redirectTo: browser.identity.getRedirectURL(), // Redirect URL for the extension
+          redirectTo: browser.identity.getRedirectURL(),
         },
       });
 
@@ -20,7 +20,6 @@ function SignIn() {
       }
 
       if (data?.url) {
-        // Open the Supabase authentication URL in a new tab
         await browser.tabs.create({ url: data.url });
         console.log("GitHub sign-in initiated, redirected to:", data.url);
       }
@@ -29,7 +28,7 @@ function SignIn() {
     }
   };
 
-  // Fetches the currently logged-in user from Supabase
+
   const getUser = async () => {
     try {
       const {
@@ -69,12 +68,12 @@ function SignIn() {
             Sign in with GitHub
           </button>
 
-          <button
-              className="w-full bg-gray-700 py-2 px-2 flex items-center justify-center gap-4 text-white mt-4"
-              onClick={getUser}
-          >
-            Get Current User
-          </button>
+          {/*<button*/}
+          {/*    className="w-full bg-gray-700 py-2 px-2 flex items-center justify-center gap-4 text-white mt-4"*/}
+          {/*    onClick={getUser}*/}
+          {/*>*/}
+          {/*  Get Current User*/}
+          {/*</button>*/}
         </div>
       </div>
   );

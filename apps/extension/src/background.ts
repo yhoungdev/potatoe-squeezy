@@ -3,7 +3,6 @@ import { supabaseObject } from "../libs/supabase";
 
 console.log("Extension background script initialized.");
 
-// Listen for tab updates to detect Supabase OAuth redirect
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     const redirectURL = browser.identity.getRedirectURL();
     if (changeInfo.url?.startsWith(redirectURL)) {
@@ -12,7 +11,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
 });
 
-// Handle Supabase OAuth callback
+
 async function finishUserOAuth(url: string, tabId: number) {
     try {
         console.log("Handling user OAuth callback...");
@@ -26,7 +25,7 @@ async function finishUserOAuth(url: string, tabId: number) {
             throw new Error("No Supabase tokens found in URL hash");
         }
 
-        // Set the session using Supabase
+
         const { data, error } = await supabase.auth.setSession({
             access_token,
             refresh_token,
@@ -46,7 +45,7 @@ async function finishUserOAuth(url: string, tabId: number) {
     }
 }
 
-// Parse URL hash to extract tokens
+
 function parseUrlHash(url: string): Map<string, string> {
     try {
         const hashParts = new URL(url).hash.slice(1).split("&");
