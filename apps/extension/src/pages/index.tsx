@@ -1,34 +1,59 @@
 import React from "react";
 import { supabaseObject } from "../../libs/supabase";
-import Button from "../components/ui/button";
-//@ts-ignore
 import { FaGithub } from "react-icons/fa";
+import browser from "webextension-polyfill";
 
 function SignIn() {
+  // Initiates the GitHub OAuth sign-in process
   const signInWithGithub = async () => {
-    const { data, error } = await supabaseObject.auth.signInWithOAuth({
-      provider: 'github'
+    try {
+      const { data, error } = await supabaseObject.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo: browser.identity.getRedirectURL(), // Redirect URL for the extension
+        },
+      });
 
-    });
-    window.open(data?.url);
-  }
+      if (error) {
+        console.error("Error during GitHub sign-in:", error.message);
+        throw error;
+      }
 
+      if (data?.url) {
+        // Open the Supabase authentication URL in a new tab
+        await browser.tabs.create({ url: data.url });
+        console.log("GitHub sign-in initiated, redirected to:", data.url);
+      }
+    } catch (err) {
+      console.error("Failed to sign in with GitHub:", err);
+    }
+  };
 
-  const getUser =  async () => {
+  // Fetches the currently logged-in user from Supabase
+  const getUser = async () => {
+    try {
+      const {
+        data: { user },
+        error,
+      } = await supabaseObject.auth.getUser();
 
-    const { data: { user } } = await supabaseObject.auth.getUser();
-    console.log(user);
+      if (error) {
+        console.error("Error fetching user:", error.message);
+        throw error;
+      }
 
-  }
-
-
+      console.log("Logged-in user:", user);
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
+  };
 
   return (
       <div
           className={`
-            container flex flex-col items-center justify-center h-[100vh]
-            bg-gradient-to-b  px-[2em]from-black to-orange-600/10
-        `}
+        container flex flex-col items-center justify-center h-[100vh]
+        bg-gradient-to-b px-[2em] from-black to-orange-600/10
+      `}
       >
         <div className="w-full max-w-md p-8 space-y-6 rounded-lg ">
           <div className="space-y-2 text-center">
@@ -37,14 +62,19 @@ function SignIn() {
           </div>
 
           <button
-              className="w-full
-        bg-gray-800 py-2 px-2  flex items-center justify-center gap-4 text-white"
+              className="w-full bg-gray-800 py-2 px-2 flex items-center justify-center gap-4 text-white"
               onClick={signInWithGithub}
           >
             <FaGithub className="w-5 h-5 mr-2" />
             Sign in with GitHub
           </button>
 
+          <button
+              className="w-full bg-gray-700 py-2 px-2 flex items-center justify-center gap-4 text-white mt-4"
+              onClick={getUser}
+          >
+            Get Current User
+          </button>
         </div>
       </div>
   );

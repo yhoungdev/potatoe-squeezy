@@ -9,7 +9,7 @@
     "96": "icon/96.png",
     "128": "icon/128.png"
   },
-  "permissions": ["sidePanel" , "identity" , "cookies" , "activeTab" , "storage"],
+  "permissions": ["sidePanel" , "identity" , "cookies" , "activeTab" , "storage" , "tabs"],
   "{{chrome}}.action": {
     "default_popup": "src/popup.html"
   },
