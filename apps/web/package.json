@@ -19,6 +19,7 @@
     "astro": "^5.0.5",
     "astro-icon": "^1.1.4",
     "integration": "^0.3.1",
+    "js-cookie": "^3.0.5",
     "prettier": "^3.4.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
