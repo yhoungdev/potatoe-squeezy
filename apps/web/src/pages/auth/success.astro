@@ -1,5 +1,7 @@
 ---
 import '../../../src/style/index.css';
+import Cookies from 'js-cookie';
+import React from 'react';
 ---
 
 <html>
@@ -37,6 +39,7 @@ import '../../../src/style/index.css';
 
         if (accessToken) {
             localStorage.setItem("access_token", accessToken);
+            document.cookie = `access_token=${accessToken}; path=/;`;
         } else {
             console.error("Access Token not found in URL.");
         }
