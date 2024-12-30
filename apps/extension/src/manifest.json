@@ -9,7 +9,7 @@
     "96": "icon/96.png",
     "128": "icon/128.png"
   },
-  "permissions": ["sidePanel" , "identity"],
+  "permissions": ["sidePanel" , "identity" , "cookies" , "activeTab" , "storage"],
   "{{chrome}}.action": {
     "default_popup": "src/popup.html"
   },
@@ -30,7 +30,8 @@
     "default_path": "src/popup.html"
   },
   "host_permissions": [
-    "https://pfmkbskebuzgtlpyppcj.supabase.co/*"
+    "https://www.potatoesqueezy.xyz/*",
+     "http://localhost:4321/*"
   ]
 
 }
