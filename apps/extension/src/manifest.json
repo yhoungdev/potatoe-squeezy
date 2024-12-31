@@ -32,6 +32,9 @@
   "host_permissions": [
     "https://www.potatoesqueezy.xyz/*",
      "http://localhost:4321/*"
-  ]
-
+  ],
+  "oauth2": {
+    "client_id": "Ov23liATCckJVguF3n2G",
+    "scopes": ["read:user"]
+  }
 }
