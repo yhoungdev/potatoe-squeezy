@@ -1,15 +1,17 @@
 import browser from "webextension-polyfill";
 import { supabaseObject } from "../libs/supabase";
 
-console.log("Extension background script initialized.");
+console.log("Potatoe 🍟  background script initialized.");
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     console.log("Tab updated:", { tabId, changeInfo, tab });
-    console.log('get tab url' , tab?.url);
+    const param = parseUrlParams(tab?.url);
+   const getToken = param.get("access_token");
+   console.log(param);
+
+
 
     const redirectURL = browser.identity.getRedirectURL();
-    console.log("Redirect URL:", redirectURL);
-
     if (changeInfo.url?.startsWith(redirectURL)) {
         console.log("OAuth redirect detected:", changeInfo.url);
         finishUserOAuth(changeInfo.url, tabId);

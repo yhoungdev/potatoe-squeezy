@@ -4,7 +4,6 @@ import { FaGithub } from "react-icons/fa";
 import browser from "webextension-polyfill";
 
 function SignIn() {
-  // Initiates the GitHub OAuth sign-in process
   const signInWithGithub = async () => {
     try {
       const { data, error } = await supabaseObject.auth.signInWithOAuth({
