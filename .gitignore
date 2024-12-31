@@ -3,3 +3,5 @@ node_modules
 apps/extension/node_modules
 apps/*/node_modules
 .env
+
+bun.lockb
