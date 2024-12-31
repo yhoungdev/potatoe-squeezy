@@ -1,13 +1,20 @@
 import browser from "webextension-polyfill";
 import { supabaseObject } from "../libs/supabase";
 
+
 console.log("Potatoe 🍟  background script initialized.");
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     console.log("Tab updated:", { tabId, changeInfo, tab });
     const param = parseUrlParams(tab?.url);
    const getToken = param.get("access_token");
-   console.log(param);
+   browser.storage.local.set({
+     access_token: getToken
+   }).then( ( response ) => {
+     console.log( 'token saved to localStorage' );
+   }).catch( ( err ) => {
+     console.error( 'an error occured saving to storage' );
+   })
 
 
 
