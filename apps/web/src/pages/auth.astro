@@ -1,15 +1,16 @@
 ---
 import '../../src/style/index.css'
 import DefaultAuth from "../components/sections/auth.astro";
-
+import initializeSupabase from "../../../../libs/supabase";
+import {supabaseObject} from "potato-squeezy/libs/supabase";
 
 const metaData = {
     description: `Turn potatoes into something extraordinary with Potato Squeezy! 
     Receive github sponsorship as tips.`,
     title: 'Potatoe Squeezy',
     url: 'https://potatoesqueezy.xyz/'
-
 }
+
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -29,5 +30,9 @@ const metaData = {
 </head>
 <body >
 <DefaultAuth/>
+
+<script>
+
+</script>
 </body>
 </html>
