@@ -1,8 +1,7 @@
 ---
 import '../../src/style/index.css'
 import DefaultAuth from "../components/sections/auth.astro";
-import initializeSupabase from "../../../../libs/supabase";
-import {supabaseObject} from "potato-squeezy/libs/supabase";
+import AuthButton from "../components/../components/button/auth";
 
 const metaData = {
     description: `Turn potatoes into something extraordinary with Potato Squeezy! 
@@ -30,9 +29,7 @@ const metaData = {
 </head>
 <body >
 <DefaultAuth/>
+<AuthButton/>
 
-<script>
-
-</script>
 </body>
 </html>
