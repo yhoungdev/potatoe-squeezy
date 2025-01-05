@@ -9,7 +9,14 @@
     "96": "icon/96.png",
     "128": "icon/128.png"
   },
-  "permissions": ["sidePanel" , "identity" , "cookies" , "activeTab" , "storage" , "tabs"],
+  "permissions": [
+    "sidePanel",
+    "identity",
+    "cookies",
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
   "{{chrome}}.action": {
     "default_popup": "src/popup.html"
   },
@@ -31,7 +38,7 @@
   },
   "host_permissions": [
     "https://www.potatoesqueezy.xyz/*",
-     "http://localhost:4321/*"
+    "http://localhost:4321/*"
   ],
   "oauth2": {
     "client_id": "Ov23liATCckJVguF3n2G",

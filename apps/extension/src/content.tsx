@@ -5,7 +5,7 @@ import TipGithubUser from "./components/Views/tipGithubUser";
 
 const ID = ".user-profile-bio";
 
-console.log("Potatoe squeezed communicating successfully with Github")
+console.log("Potatoe squeezed communicating successfully with Github");
 if (document.location.hostname === "github.com") {
   const formElement = document.querySelector(ID);
   if (formElement) {

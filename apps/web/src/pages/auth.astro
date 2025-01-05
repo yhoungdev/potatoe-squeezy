@@ -1,7 +1,6 @@
 ---
 import '../../src/style/index.css'
 import DefaultAuth from "../components/sections/auth.astro";
-import AuthButton from "../components/../components/button/auth";
 
 const metaData = {
     description: `Turn potatoes into something extraordinary with Potato Squeezy! 
@@ -28,8 +27,6 @@ const metaData = {
     <meta property="og:image:alt" content="">
 </head>
 <body >
-<DefaultAuth/>
-<AuthButton/>
-
+<DefaultAuth client:load/>
 </body>
 </html>

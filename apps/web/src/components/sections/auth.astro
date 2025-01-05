@@ -1,6 +1,7 @@
 ---
 import Nav from '../../components/header/nav.astro';
 import {webSupabase} from "../../../libs/supabase";
+import AuthButton from "../button/auth";
 
 
 ---
@@ -20,6 +21,8 @@ import {webSupabase} from "../../../libs/supabase";
                 <p class="my-5">When life gives you potatoes, don’t make chips—squeeze
                     out Bitcoin instead! With PotatoSqueezy, get zapped for your awesome projects and make your birthdays even cooler!</p>
             </div>
+
+            <AuthButton client:load/>
 
 
         </div>
