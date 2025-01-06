@@ -1,40 +1,43 @@
-import React from 'react';
-import {DASHBOARDNAV} from "../../data/dashboardData.ts";
+import React from "react";
+import { DASHBOARDNAV } from "../../data/dashboardData.ts";
 import useAuth from "../../hooks/useAuth.ts";
-import '../../style/index.css'
-
+import "../../style/index.css";
+import type { IGithubUserData } from "../../../../../interface/index.interface.ts";
 
 function DashboardHeader() {
-    const {session , user} = useAuth();
-    const { user_metadata} = user;
+  const { session, user } = useAuth();
+  const { user_metadata } = user;
 
-    const { } = user_metadata || {}
+  const { email, avatar_url, user_name, provider_id } =
+    user_metadata<IGithubUserData> || {};
 
-   // if (!session) {
-   //    if (typeof  window !== "undefined") {
-   //        window.location.href = '/'
-   //    }
-   // }
-    return (
-        <div className={' w-full mx-auto flex items-center gap-2 justify-between'}>
+  // if (!session) {
+  //    if (typeof  window !== "undefined") {
+  //        window.location.href = '/'
+  //    }
+  // }
 
-            <div>
-                <a href={'/app'}>
-                    <h1 className="text-xl text-red-50">
-                        <img src={'public/logo/logo.png'}
-                             width={80} alt={'logo'}/>
-                    </h1>
-                </a>
-            </div>
+  console.log(user_metadata);
+  return (
+    <div className={" w-full  mx-auto flex items-center gap-2 justify-between"}>
+      <div>
+        <a href={"/app"}>
+          <h1 className="text-xl text-red-50">
+            <img src={"public/logo/logo.png"} width={80} alt={"logo"} />
+          </h1>
+        </a>
+      </div>
 
-            <div>
-                <div className={'bg-gray-500  w-10 h-10 rounded-full'}>
+      <div className={"flex gap-2 items-center justify-center"}>
+        <div
+          className="w-10 h-10 rounded-full bg-no-repeat bg-center bg-cover bg-gray-500"
+          style={{ backgroundImage: `url(${avatar_url})` }}
+        ></div>
 
-                </div>
-            </div>
-
-        </div>
-    );
+        <h4>{user_name}</h4>
+      </div>
+    </div>
+  );
 }
 
 export default DashboardHeader;

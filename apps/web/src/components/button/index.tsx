@@ -18,7 +18,7 @@ const DefaultButton: React.FC<IProps> = ({
   onClick,
   type = "button",
   disabled = false,
-}): React.ReactNode=> {
+}): React.ReactNode => {
   const variantStyles: Record<string, string> = {
     primary: "bg-orange-500 text-white hover:bg-orange-600",
     secondary: "bg-gray-500 text-white hover:bg-gray-600",
