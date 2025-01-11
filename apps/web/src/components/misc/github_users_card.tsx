@@ -9,17 +9,16 @@ interface IGithubUserCardProps {
 function GithubUsersCard({ user_name, user_avatar_url }: IGithubUserCardProps) {
   return (
     <div
-      className={` w-full lg:w-[250px]
-        bg-[#1b1b1b2b] rounded-lg px-2 py-2 shadow-sm 
-        border-1 border-gray-600 
+      className={` w-full lg:w-[230px]
+        bg-[#1b1b1b2b] rounded-lg px-4 shadow-sm 
+        border-1 border-gray-600 flex flex-col items-center justify-center
         `}
     >
-        <div className={'flex items-center gap-2'}>
-            <div className={'h-14 w-14 bg-gray-800 rounded-xl'}></div>
-            <div>
-                <p>Sudo Whoami</p>
-            </div>
-        </div>
+      <div className={"h-20 w-20 bg-gray-800 rounded-xl"}></div>
+      <div>
+        <p>Sudo Whoami</p>
+      </div>
+
       <button
         style={{
           padding: "5px 16px",

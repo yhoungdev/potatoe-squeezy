@@ -5,7 +5,7 @@ function DashboardBottomTab() {
   return (
     <div
       className={`
-            flex items-center justify-center gap-4 w-full xl:w-fit px-4
+            flex items-center justify-center gap-4 w-fit px-4
              rounded-full py-4 mx-auto 
              bg-gradient-to-r 
              from-gray-600 to-[#2f8c3405]

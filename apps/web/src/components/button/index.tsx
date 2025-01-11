@@ -1,6 +1,12 @@
 import React from "react";
 
-type TVariant = "primary" | "secondary" | "danger";
+type TVariant =
+  | "primary"
+  | "secondary"
+  | "danger"
+  | "default"
+  | "success"
+  | "warning";
 
 interface IProps {
   children: React.ReactNode;
@@ -23,6 +29,8 @@ const DefaultButton: React.FC<IProps> = ({
     primary: "bg-orange-500 text-white hover:bg-orange-600",
     secondary: "bg-gray-500 text-white hover:bg-gray-600",
     danger: "bg-red-500 text-white hover:bg-red-600",
+    default:
+      "bg-[#212830] border-[#80808054] border text-white hover:bg-red-600",
   };
 
   return (
@@ -30,7 +38,7 @@ const DefaultButton: React.FC<IProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded my-2 px-4 py-1 transition-all duration-300 ${
+      className={`rounded-full my-2 px-4 py-1 transition-all duration-300 ${
         variantStyles[variant]
       } ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
     >

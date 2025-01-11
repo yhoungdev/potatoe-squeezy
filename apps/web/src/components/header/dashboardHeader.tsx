@@ -23,7 +23,7 @@ function DashboardHeader() {
       <div>
         <a href={"/app"}>
           <h1 className="text-xl text-red-50">
-            <img src={"public/logo/logo.png"} width={80} alt={"logo"} />
+            {/*<img src={"public/logo/logo.png"} width={80} alt={"logo"} />*/}
           </h1>
         </a>
       </div>

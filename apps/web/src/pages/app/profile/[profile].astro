@@ -1,0 +1,23 @@
+---
+import '../../../style/index.css'
+ import DefaultDashboard from "../../../layout/dashboard";
+import UserProfileCard from "../../../components/pages/profile/userProfileCard";
+
+
+export async function getStaticPaths () {
+       return [{
+           params: {
+               profile: 'user'
+           }
+       }]
+
+   }
+
+   const { params } = Astro.props;
+---
+
+<div>
+    <DefaultDashboard  >
+        <UserProfileCard />
+    </DefaultDashboard>
+</div>
