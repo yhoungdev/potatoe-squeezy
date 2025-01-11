@@ -30,7 +30,7 @@ const DefaultButton: React.FC<IProps> = ({
     secondary: "bg-gray-500 text-white hover:bg-gray-600",
     danger: "bg-red-500 text-white hover:bg-red-600",
     default:
-      "bg-[#212830] border-[#80808054] border text-white hover:bg-red-600",
+      "bg-[#212830]  border-[#80808054] border text-white hover:bg-red-600",
   };
 
   return (
@@ -38,7 +38,7 @@ const DefaultButton: React.FC<IProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-full my-2 px-4 py-1 transition-all duration-300 ${
+      className={`rounded-xl my-2 px-4 py-2 transition-all duration-300 ${
         variantStyles[variant]
       } ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
     >
