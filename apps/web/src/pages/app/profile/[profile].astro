@@ -15,7 +15,8 @@ export async function getStaticPaths () {
 
    const { params } = Astro.props;
 ---
-
+<meta name="viewport" content="width=device-width" />
+<meta charset="UTF-8">
 <div>
     <DefaultDashboard  >
         <UserProfileCard client:load/>

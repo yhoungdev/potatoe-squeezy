@@ -1,14 +1,13 @@
 export const DASHBOARDNAV = [
   {
     title: "Dashboard",
-    icon: "dashboard",
-  },
-  {
-    title: "Users",
-    icon: "users",
+    icon: "🛖",
+    path: "/app/dashboard",
   },
   {
     title: "Explore",
-    icon: "Explore",
+    icon: "🌍",
+    path: "/app/explore",
   },
+
 ];

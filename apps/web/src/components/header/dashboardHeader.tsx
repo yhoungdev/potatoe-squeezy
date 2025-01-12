@@ -22,8 +22,8 @@ function DashboardHeader() {
     <div className={" w-full  mx-auto flex items-center gap-2 justify-between"}>
       <div>
         <a href={"/app"}>
-          <h1 className="text-xl text-red-50">
-            {/*<img src={"public/logo/logo.png"} width={80} alt={"logo"} />*/}
+          <h1 className="text-4xl text-red-50">
+            🍟
           </h1>
         </a>
       </div>

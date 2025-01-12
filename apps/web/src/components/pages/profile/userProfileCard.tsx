@@ -11,7 +11,7 @@ function UserProfileCard({ id, name }: IUserProfile) {
   const [quantity, setQuantity] = useState<number>(0);
   const predefinedAmount = [5, 10, 15, 20];
   return (
-    <div className={"flex gap-4   justify-center flex-col lg:flex-row"}>
+    <div className={"flex gap-4 mt-[2em]  justify-center flex-col lg:flex-row"}>
       <div
         className={
           " h-fit text-center w-full justify-center lg:w-[300px] rounded-xl px-4 py-4"
@@ -23,7 +23,7 @@ function UserProfileCard({ id, name }: IUserProfile) {
           <small className={"text-gray-600"}>@yhoungdev</small>
         </div>
 
-        <Button variant={'default'}>Github Profile</Button>
+        <Button variant={"default"}>Github Profile</Button>
       </div>
 
       <div
@@ -57,11 +57,12 @@ function UserProfileCard({ id, name }: IUserProfile) {
           </div>
         </div>
 
-          <div>
-              <textarea
-                  placeholder={'Hey i just squashed potatoe to sol, enjoy'}
-                  className={`w-full p-2 text-sm bg-transparent border-2 border-white/20 rounded-xl`}/>
-          </div>
+        <div>
+          <textarea
+            placeholder={"Hey i just squashed potatoe to sol, enjoy"}
+            className={`w-full p-2 text-sm bg-transparent border-2 border-white/20 rounded-xl`}
+          />
+        </div>
 
         <Button variant={"danger"} className={"w-full"}>
           Zap
