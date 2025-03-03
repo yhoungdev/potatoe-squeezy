@@ -1,0 +1,12 @@
+---
+import Layout from './Layout.astro';
+import DefaultDashboard from './typescript/dashboard';
+
+const { title } = Astro.props;
+---
+
+<Layout title={title}>
+  <DefaultDashboard client:load>
+    <slot />
+  </DefaultDashboard>
+</Layout>

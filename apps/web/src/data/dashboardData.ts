@@ -2,12 +2,11 @@ export const DASHBOARDNAV = [
   {
     title: "Dashboard",
     icon: "🛖",
-    path: "/app/dashboard",
+    path: "/app",
   },
   {
     title: "Explore",
     icon: "🌍",
     path: "/app/explore",
   },
-
 ];

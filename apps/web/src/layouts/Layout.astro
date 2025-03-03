@@ -1,0 +1,38 @@
+---
+import '../style/index.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  url?: string;
+  image?: string;
+}
+
+const {
+  title = 'Potatoe Squeezy',
+  description = 'Turn potatoes into something extraordinary with Potato Squeezy! Receive github sponsorship as tips.',
+  url = 'https://potatoesqueezy.xyz/',
+  image = '/og-image.png'
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <meta property="og:title" content={title} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:alt" content={title}>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

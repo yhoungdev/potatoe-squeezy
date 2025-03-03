@@ -1,11 +1,12 @@
 ---
 import '../../style/index.css';
-import DefaultDashboard from "../../layout/dashboard";
-import UsersPage from "../../components/pages/usersPage";
+import DefaultDashboard from "../../layouts/typescript/dashboard";
+import IndexDashboardPage from "../../components/pages/main";
 ---
 <meta name="viewport" content="width=device-width" />
+<meta charset="utf-8" />
 <section class="dashboard ">
     <DefaultDashboard client:load>
-        <UsersPage client:load />
+        <IndexDashboardPage />
     </DefaultDashboard>
 </section>

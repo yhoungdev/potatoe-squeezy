@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { DASHBOARDNAV } from "../../data/dashboardData.ts";
-import GithubUsersCard from "../misc/github_users_card.tsx";
 
 function DashboardBottomTab() {
+  const [currentPath, setCurrentPath] = useState("");
+
+  useEffect(() => {
+    setCurrentPath(window.location.pathname);
+  }, []);
+
   return (
     <div
       className={`
@@ -14,16 +19,24 @@ function DashboardBottomTab() {
         `}
     >
       {DASHBOARDNAV.map((item) => {
+        const isActive = currentPath === item.path;
+
         return (
-          <div className={`flex items-center 
-          cursor-pointer flex-col  px-[2em]`}>
-              <h1 className={'text-2xl'}>{item.icon}</h1>
-              <p className={"text-sm "}>{item.title}</p>
-          </div>
+          <a
+            key={item.path}
+            href={item.path}
+            className={`flex items-center 
+              cursor-pointer flex-col px-[2em]
+              transition-all duration-200
+              ${isActive ? "text-red-500 scale-110" : "text-white hover:text-red-300"}`}
+          >
+            <h1 className={"text-2xl"}>{item.icon}</h1>
+            <p className={"text-sm "}>{item.title}</p>
+          </a>
         );
       })}
     </div>
-  );GithubUsersCard
+  );
 }
 
 export default DashboardBottomTab;

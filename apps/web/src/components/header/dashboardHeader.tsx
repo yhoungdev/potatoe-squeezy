@@ -3,6 +3,7 @@ import { DASHBOARDNAV } from "../../data/dashboardData.ts";
 import useAuth from "../../hooks/useAuth.ts";
 import "../../style/index.css";
 import type { IGithubUserData } from "../../../../../interface/index.interface.ts";
+import { SettingsIcon } from "@/assets/svg.tsx";
 
 function DashboardHeader() {
   const { session, user } = useAuth();
@@ -17,18 +18,16 @@ function DashboardHeader() {
   //    }
   // }
 
-  console.log(user_metadata);
   return (
     <div className={" w-full  mx-auto flex items-center gap-2 justify-between"}>
       <div>
         <a href={"/app"}>
-          <h1 className="text-4xl text-red-50">
-            🍟
-          </h1>
+          <h1 className="text-4xl text-red-50">🍟</h1>
         </a>
       </div>
 
       <div className={"flex gap-2 items-center justify-center"}>
+        <SettingsIcon />
         <div
           className="w-10 h-10 rounded-full bg-no-repeat bg-center bg-cover bg-gray-500"
           style={{ backgroundImage: `url(${avatar_url})` }}

@@ -1,0 +1,11 @@
+---
+
+import DefaultDashboard from '@/layouts/typescript/dashboard';
+import UsersPage from '@/components/pages/usersPage';
+---
+<meta name="viewport" content="width=device-width" />
+<section class="dashboard ">
+    <DefaultDashboard client:load>
+        <UsersPage client:load />
+    </DefaultDashboard>
+</section>
