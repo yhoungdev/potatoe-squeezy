@@ -28,8 +28,8 @@ function CelebrateUser({ username }: CelebrateUserProps) {
         'confirmed'
       );
 
-      // For demo, using a fixed recipient address. In production, this should come from your backend
-      const recipientAddress = new PublicKey('YOUR_RECIPIENT_WALLET_ADDRESS');
+    //i would get receivers address and add here
+      const recipientAddress = new PublicKey('');
       
       const transaction = new Transaction().add(
         SystemProgram.transfer({
