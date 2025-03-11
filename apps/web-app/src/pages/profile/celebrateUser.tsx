@@ -1,3 +1,4 @@
+import 'rpc-websockets/dist/lib/client';
 import React, { useState } from "react";
 import Button from "../../button";
 import { useWallet } from '@solana/wallet-adapter-react';
