@@ -1,7 +1,7 @@
-import AuthComponent from "../auth"
+import AuthComponent from "../auth";
 
-const Homepage =() => {
-    return  <AuthComponent/>
-}
+const Homepage = () => {
+  return <AuthComponent />;
+};
 
 export default Homepage;

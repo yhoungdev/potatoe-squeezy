@@ -1,13 +1,12 @@
-import React from "react";
-import WalletProfilePanel from "../../wallet/walletProfilePanel..tsx";
-import WalletTransactionTable from "@/components/table/walletTransactionTable..tsx";
-
+import WalletTransactionTable from "@/components/tables/transactionTable.tsx";
+import DefaultDashboard from "@/layouts/dashboard.tsx";
+import WalletProfilePanel from "@/components/wallet/walletProfilePanel.";
 function IndexDashboardPage() {
   return (
-    <div>
+    <DefaultDashboard>
       <WalletProfilePanel />
       <WalletTransactionTable />
-    </div>
+    </DefaultDashboard>
   );
 }
 

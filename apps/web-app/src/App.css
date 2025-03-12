@@ -17,8 +17,6 @@ body {
 
 * {
   font-family: "IBM Plex Mono", monospace !important;
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
   line-height: 2em;
 }
@@ -133,7 +131,6 @@ body {
   animation: fadeIn 0.3s ease-out forwards;
 }
 
-
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -168,6 +165,9 @@ body {
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --default-color: #ee4543;
+  --primary-red: oklch(0.577 0.245 27.325); 
+  --primary-red-foreground: oklch(0.985 0 0);
 }
 
 .dark {

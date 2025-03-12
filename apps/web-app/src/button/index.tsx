@@ -38,7 +38,7 @@ const DefaultButton: React.FC<IProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-xl my-2 px-4 py-2 transition-all duration-300 ${
+      className={`rounded-xl my-2 !px-4 !py-2 transition-all duration-300 ${
         variantStyles[variant]
       } ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
     >

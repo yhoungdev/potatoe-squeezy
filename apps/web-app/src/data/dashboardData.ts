@@ -4,6 +4,7 @@ export const DASHBOARDNAV = [
     icon: "🛖",
     path: "/app",
   },
+
   {
     title: "Explore",
     icon: "🌍",

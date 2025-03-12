@@ -13,8 +13,9 @@ const Auth = () => {
 
           <div className="flex items-center gap-2 justify-center">
             <p className="my-5">
-              When life gives you potatoes, don't make chips—squeeze
-              out Bitcoin instead! With PotatoSqueezy, get zapped for your awesome projects and make your birthdays even cooler!
+              When life gives you potatoes, don't make chips—squeeze out Bitcoin
+              instead! With PotatoSqueezy, get zapped for your awesome projects
+              and make your birthdays even cooler!
             </p>
           </div>
 

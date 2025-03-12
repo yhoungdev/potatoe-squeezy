@@ -15,7 +15,6 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import { ReactNode } from "@tanstack/react-router";
 
-
 const WalletAdapterProvider = ({ children }: { children: ReactNode }) => {
   const network = WalletAdapterNetwork.Mainnet;
 

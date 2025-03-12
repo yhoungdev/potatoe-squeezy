@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { webSupabase } from "../../libs/supabase";
+import supabase from "@/lib/supabase";
 
 const useAuth = () => {
+  const webSupabase = supabase;
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

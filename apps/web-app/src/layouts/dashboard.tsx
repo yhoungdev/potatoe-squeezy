@@ -9,13 +9,11 @@ interface IDashboardProps {
 
 const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
   return (
-    <WalletConnectProvider>
-      <div className={"container w-[95%]  md:w-[70%] mx-auto mt-4 "}>
-        <DashboardHeader />
-        <div className={"my-[2em]"}>{children}</div>
-        <DashboardBottomTab />
-      </div>
-    </WalletConnectProvider>
+    <div className={" !container !mx-auto !px-4"}>
+      <DashboardHeader />
+      <div className={"my-[2em] w-full lg:w-[700px] !mx-auto"}>{children}</div>
+      <DashboardBottomTab />
+    </div>
   );
 };
 export default DefaultDashboard;

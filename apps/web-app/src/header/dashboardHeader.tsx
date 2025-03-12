@@ -1,7 +1,4 @@
-import React from "react";
-import { DASHBOARDNAV } from "@/data/dashboardData.ts";
 import useAuth from "@/hooks/useAuth.ts";
-import "../../style/index.css";
 import { IGithubUserData } from "../../../../interface/index.interface";
 import { SettingsIcon } from "@/assets/svg.tsx";
 
@@ -19,7 +16,9 @@ function DashboardHeader() {
   // }
 
   return (
-    <div className={" w-full  mx-auto flex items-center gap-2 justify-between"}>
+    <div
+      className={"  w-full  mx-auto flex items-center gap-2 justify-between"}
+    >
       <div>
         <a href={"/app"}>
           <h1 className="text-4xl text-red-50">🍟</h1>

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import supabase from "@/lib/supabase";
 import useAuth from "@/hooks/useAuth";
 function AuthButton() {
-  const webSupabase  = supabase
+  const webSupabase = supabase;
   const { session, loading, error } = useAuth();
 
   useEffect(() => {
