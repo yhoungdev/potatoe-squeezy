@@ -3,6 +3,17 @@ import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Typography from "../typography";
 import { useSolanaTip } from "@/hooks/useSolanaTip";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { TipBadge } from "./TipBadge";
+import { toast } from "sonner";
+import { ChevronRight } from "lucide-react";
+import AddressAndBadge from "./addressAndBadge";
 
 interface ProfilePanelProps {
   name: string;
@@ -31,6 +42,12 @@ function ProfilePanel({
     }
   };
 
+  const copyBadgeCode = () => {
+    const badgeCode = `<iframe src="http://localhost:5134/embed/tip-badge?user=${username}" width="200" height="50" frameborder="0"></iframe>`;
+    navigator.clipboard.writeText(badgeCode);
+    toast.success("Badge code copied to clipboard!");
+  };
+
   return (
     <div>
       <motion.div
@@ -54,13 +71,27 @@ function ProfilePanel({
             <Typography className="text-xs">{userBio}</Typography>
 
             {withAction ? (
-              <Button className="mt-2" onClick={onUpdateAddress}>
-                Update Address
-              </Button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button className="mt-2">Manage Actions</Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle className="text-white">
+                      Profile Actions
+                    </SheetTitle>
+                  </SheetHeader>
+                  <AddressAndBadge
+                    username={username}
+                    onUpdateAddress={onUpdateAddress}
+                    onCopyBadge={copyBadgeCode}
+                  />
+                </SheetContent>
+              </Sheet>
             ) : (
               walletAddress && (
-                <Button 
-                  className="mt-2" 
+                <Button
+                  className="mt-2"
                   onClick={handleTip}
                   disabled={isSending || !isWalletConnected}
                 >

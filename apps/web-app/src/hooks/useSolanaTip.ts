@@ -1,5 +1,10 @@
 import { useWallet } from "@solana/wallet-adapter-react";
-import { LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
+import {
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Transaction,
+  SystemProgram,
+} from "@solana/web3.js";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -21,12 +26,12 @@ export function useSolanaTip() {
           fromPubkey: publicKey,
           toPubkey: recipientAddress,
           lamports: 0.1 * LAMPORTS_PER_SOL,
-        })
+        }),
       );
 
       const signature = await sendTransaction(transaction, connection);
       await connection.confirmTransaction(signature, "confirmed");
-      
+
       toast.success("Tip sent successfully! 🎉");
     } catch (error) {
       console.error("Error sending tip:", error);
@@ -39,6 +44,6 @@ export function useSolanaTip() {
   return {
     sendTip,
     isSending,
-    isWalletConnected: !!publicKey
+    isWalletConnected: !!publicKey,
   };
 }
