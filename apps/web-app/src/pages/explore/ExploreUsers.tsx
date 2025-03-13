@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Button from "../../button";
-import { GithubIcon, ExternalLinkIcon } from "lucide-react";
 import DefaultDashboard from "@/layouts/dashboard";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { GithubUserSearch } from "@/components/search/GithubUserSearch";
+import { GithubUserCard } from "@/components/github/GithubUserCard";
+import { GithubUserCardSkeleton } from "@/components/github/GithubUserCardSkeleton";
 
 interface GitHubUser {
   login: string;
@@ -15,7 +15,7 @@ interface GitHubUser {
 
 export default function ExploreUsers() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [user, setUser] = useState<GitHubUser | null>(null);
+  const [users, setUsers] = useState<GitHubUser[]>([]);
   const [loading, setLoading] = useState(false);
 
   const searchGithubUser = async () => {
@@ -27,19 +27,29 @@ export default function ExploreUsers() {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api.github.com/users/${searchQuery}`,
+        `https://api.github.com/search/users?q=${searchQuery}&per_page=10`,
       );
       const data = await response.json();
 
       if (response.ok) {
-        setUser(data);
-        toast.success("User found!");
+        // Fetch detailed information for each user
+        const detailedUsers = await Promise.all(
+          data.items.map(async (user: any) => {
+            const userResponse = await fetch(
+              `https://api.github.com/users/${user.login}`,
+            );
+            return userResponse.json();
+          }),
+        );
+
+        setUsers(detailedUsers);
+        toast.success(`Found ${detailedUsers.length} users!`);
       } else {
-        setUser(null);
-        toast.error("User not found");
+        setUsers([]);
+        toast.error("No users found");
       }
     } catch (error) {
-      toast.error("Error fetching GitHub user");
+      toast.error("Error fetching GitHub users");
       console.error("Error:", error);
     } finally {
       setLoading(false);
@@ -70,55 +80,19 @@ export default function ExploreUsers() {
             loading={loading}
           />
 
-          {user && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-black/20 backdrop-blur-xl rounded-2xl p-6 border border-white/10"
-            >
-              <div className="flex items-start gap-6">
-                <img
-                  src={user?.avatar_url || ""}
-                  alt={user?.login || ""}
-                  className="w-24 h-24 rounded-2xl ring-2 ring-purple-500/20"
-                />
-                <div className="flex-1 space-y-3">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">
-                      {user.name || user.login}
-                    </h2>
-                    <div className="flex items-center gap-2 text-gray-400">
-                      <GithubIcon size={16} />
-                      <a
-                        href={`https://github.com/${user.login}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-purple-400 transition-colors flex items-center gap-1"
-                      >
-                        @{user.login}
-                        <ExternalLinkIcon size={12} />
-                      </a>
-                    </div>
-                  </div>
-                  {user.bio && (
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      {user.bio}
-                    </p>
-                  )}
-                  <Button
-                    variant="default"
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 
-                      hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
-                    onClick={() => {
-                      window.location.href = `/tip/${user.login}`;
-                    }}
-                  >
-                    Tip User
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {loading ? (
+              <>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <GithubUserCardSkeleton key={index} />
+                ))}
+              </>
+            ) : (
+              users?.map((user) => (
+                <GithubUserCard key={user.login} user={user} />
+              ))
+            )}
+          </div>
         </div>
       </motion.div>
     </DefaultDashboard>

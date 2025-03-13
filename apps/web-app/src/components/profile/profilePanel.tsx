@@ -1,15 +1,17 @@
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
-import Avatar from "boring-avatars";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Typography from "../typography";
+import { useSolanaTip } from "@/hooks/useSolanaTip";
 
 interface ProfilePanelProps {
   name: string;
   username: string;
   withAction?: boolean;
   onUpdateAddress?: () => void;
-  avatarSeed?: string;
+  avatar: string;
   userBio?: string;
+  walletAddress?: string;
 }
 
 function ProfilePanel({
@@ -17,9 +19,18 @@ function ProfilePanel({
   username,
   onUpdateAddress,
   withAction = false,
-  avatarSeed = username,
+  avatar,
   userBio = "",
+  walletAddress,
 }: ProfilePanelProps) {
+  const { sendTip, isSending, isWalletConnected } = useSolanaTip();
+
+  const handleTip = () => {
+    if (walletAddress) {
+      sendTip(walletAddress);
+    }
+  };
+
   return (
     <div>
       <motion.div
@@ -28,13 +39,13 @@ function ProfilePanel({
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <div className="px-3 !mb-[3em]">
-          <div className="flex items-center justify-between flex-col">
-            <Avatar
-              size={70}
-              name={avatarSeed}
-              variant="beam"
-              colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
-            />
+          <div className="flex items-center justify-between flex-col gap-4">
+            <Avatar className="w-[70px] h-[70px]">
+              <AvatarImage src={avatar} alt={username} />
+              <AvatarFallback>
+                {username.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <Typography variant="h4">{name}</Typography>
             <Typography variant="caption" color="secondary">
               @{username}
@@ -42,13 +53,20 @@ function ProfilePanel({
 
             <Typography className="text-xs">{userBio}</Typography>
 
-            {withAction && (
-              <Button
-                className="mt-2"
-                onClick={onUpdateAddress}
-              >
+            {withAction ? (
+              <Button className="mt-2" onClick={onUpdateAddress}>
                 Update Address
-            </Button>
+              </Button>
+            ) : (
+              walletAddress && (
+                <Button 
+                  className="mt-2" 
+                  onClick={handleTip}
+                  disabled={isSending || !isWalletConnected}
+                >
+                  {isSending ? "Sending..." : "Tip 0.1 SOL 🍟"}
+                </Button>
+              )
             )}
           </div>
         </div>

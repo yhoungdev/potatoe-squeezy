@@ -166,7 +166,7 @@ body {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --default-color: #ee4543;
-  --primary-red: oklch(0.577 0.245 27.325); 
+  --primary-red: oklch(0.577 0.245 27.325);
   --primary-red-foreground: oklch(0.985 0 0);
 }
 

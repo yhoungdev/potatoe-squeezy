@@ -25,7 +25,7 @@ function DashboardHeader() {
         </a>
       </div>
 
-      <div className={"flex gap-2 items-center justify-center"}>
+      {/* <div className={"flex gap-2 items-center justify-center"}>
         <SettingsIcon />
         <div
           className="w-10 h-10 rounded-full bg-no-repeat bg-center bg-cover bg-gray-500"
@@ -33,7 +33,7 @@ function DashboardHeader() {
         ></div>
 
         <h4>{user_name}</h4>
-      </div>
+      </div> */}
     </div>
   );
 }

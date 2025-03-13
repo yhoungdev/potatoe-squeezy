@@ -1,11 +1,17 @@
 import { useState, useEffect } from "react";
 import CelebrateUser from "./celebrateUser";
 import { Skeleton } from "@/components/ui/skeleton";
-import mockUsers from "@/data/mockGithubUsers.json";
 import ProfilePanel from "@/components/profile/profilePanel";
 
+interface GitHubUser {
+  login: string;
+  name: string;
+  bio: string;
+  avatar_url: string;
+}
+
 function UserProfileCard() {
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<GitHubUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,20 +19,25 @@ function UserProfileCard() {
       const searchParams = new URLSearchParams(window.location.search);
       const username = searchParams.get("user");
 
-      if (!username) return;
+      if (!username) {
+        setLoading(false);
+        return;
+      }
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        const user = mockUsers.data.find(
-          (user) => user.login.toLowerCase() === username.toLowerCase(),
+        const response = await fetch(
+          `https://api.github.com/users/${username}`,
         );
+        const data = await response.json();
 
-        if (user) {
-          setUserData(user);
+        if (response.ok) {
+          setUserData(data);
+        } else {
+          setUserData(null);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
+        setUserData(null);
       } finally {
         setLoading(false);
       }
