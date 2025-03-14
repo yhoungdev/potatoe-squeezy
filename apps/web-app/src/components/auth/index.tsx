@@ -24,6 +24,10 @@ function AuthComponent() {
     }
   };
 
+  const handleGithubLogin = () => {
+    window.open('http://localhost:3000/auth/login', '_blank', 'width=600,height=700');
+  };
+
   return (
     <div className="flex items-center justify-center min-h-[80vh] px-4">
       <motion.div
@@ -69,9 +73,11 @@ function AuthComponent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Button className="w-fit bg-gray-800">
-            {" "}
-            <GithubIcon /> Coninue with Github
+          <Button 
+            className="w-fit bg-gray-800"
+            onClick={handleGithubLogin}
+          >
+            <GithubIcon /> Continue with Github
           </Button>
           {/* <ConnectWalletButton >
             Connect Wallet
