@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { authRouter } from "./routes/auth";
+import walletsRoute from "./routes/wallets";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import type { Env } from "./types/env";
@@ -47,5 +48,6 @@ app.get("/db-test", async (c) => {
 });
 
 app.route("/auth", authRouter);
+app.route("/wallets", walletsRoute);
 
 export default app;
