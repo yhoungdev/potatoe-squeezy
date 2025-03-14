@@ -2,11 +2,10 @@
   "name": "my-app",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "db:generate": "drizzle-kit generate:pg",
-    "push": "bun drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "push": "bun run scripts/push-db.ts",
     "db:studio": "drizzle-kit studio",
-    "db:migerate": "bun drizzle-kit migrate",
-    "db:pull": "bun drizzle-kit pull"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
