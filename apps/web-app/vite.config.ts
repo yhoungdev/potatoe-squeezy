@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 // https://vite.dev/config/
 export default defineConfig({
-  root: '.',
+  root: ".",
   plugins: [
     TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
     react({

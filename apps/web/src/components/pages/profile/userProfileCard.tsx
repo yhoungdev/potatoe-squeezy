@@ -9,18 +9,20 @@ function UserProfileCard() {
   useEffect(() => {
     const fetchUserData = async () => {
       const searchParams = new URLSearchParams(window.location.search);
-      const username = searchParams.get('user');
+      const username = searchParams.get("user");
 
       if (!username) return;
 
       try {
-        const response = await fetch(`https://api.github.com/users/${username}`);
+        const response = await fetch(
+          `https://api.github.com/users/${username}`,
+        );
         const data = await response.json();
         if (response.ok) {
           setUserData(data);
         }
       } catch (error) {
-        console.error('Failed to fetch user:', error);
+        console.error("Failed to fetch user:", error);
       } finally {
         setLoading(false);
       }
@@ -38,21 +40,25 @@ function UserProfileCard() {
   }
 
   const openGithubProfile = () => {
-    window.open(userData.html_url, '_blank');
+    window.open(userData.html_url, "_blank");
   };
 
   return (
     <div className={"flex gap-4 mt-[2em] justify-center flex-col lg:flex-row"}>
       <div className="h-fit text-center w-full justify-center lg:w-[300px] rounded-xl px-4 py-4">
-        <img 
-          src={userData.avatar_url} 
-          alt={userData.name} 
+        <img
+          src={userData.avatar_url}
+          alt={userData.name}
           className="w-20 h-20 mx-auto rounded-xl object-cover"
         />
         <div>
-          <h2 className="text-center font-semibold">{userData.name || userData.login}</h2>
+          <h2 className="text-center font-semibold">
+            {userData.name || userData.login}
+          </h2>
           <small className="text-gray-600">@{userData.login}</small>
-          {userData.bio && <p className="text-sm text-gray-400 mt-2">{userData.bio}</p>}
+          {userData.bio && (
+            <p className="text-sm text-gray-400 mt-2">{userData.bio}</p>
+          )}
         </div>
 
         <Button variant="default" onClick={openGithubProfile}>
