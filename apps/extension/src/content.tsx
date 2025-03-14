@@ -21,7 +21,7 @@ if (document.location.hostname === "github.com") {
       <>
         <App />
         <Toaster position="top-center" expand={true} richColors={true} />
-      </>
+      </>,
     );
   } else {
     console.error(`Element with ID "${ID}" not found.`);

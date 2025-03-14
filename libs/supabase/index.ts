@@ -7,11 +7,11 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
  */
 const initializeSupabase = (
   supabaseUrl: string,
-  supabaseAnonKey: string
+  supabaseAnonKey: string,
 ): SupabaseClient => {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      "Supabase URL and Anon Key are required to initialize the client."
+      "Supabase URL and Anon Key are required to initialize the client.",
     );
   }
   return createClient(supabaseUrl, supabaseAnonKey);

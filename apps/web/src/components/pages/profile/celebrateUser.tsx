@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import Button from "../../button";
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { useWallet } from "@solana/wallet-adapter-react";
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  SystemProgram,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
 import { toast } from "react-hot-toast";
 
 interface CelebrateUserProps {
@@ -24,29 +30,30 @@ function CelebrateUser({ username }: CelebrateUserProps) {
     setLoading(true);
     try {
       const connection = new Connection(
-        process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com',
-        'confirmed'
+        process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
+          "https://api.devnet.solana.com",
+        "confirmed",
       );
 
-    //i would get receivers address and add here
-      const recipientAddress = new PublicKey('');
-      
+      //i would get receivers address and add here
+      const recipientAddress = new PublicKey("");
+
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: recipientAddress,
-          lamports: quantity * LAMPORTS_PER_SOL
-        })
+          lamports: quantity * LAMPORTS_PER_SOL,
+        }),
       );
 
       const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, 'confirmed');
+      await connection.confirmTransaction(signature, "confirmed");
 
       toast.success(`Successfully tipped ${quantity} SOL to ${username}!`);
       setQuantity(0);
       setMessage("");
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       toast.error("Failed to send tip");
     } finally {
       setLoading(false);
@@ -89,9 +96,9 @@ function CelebrateUser({ username }: CelebrateUserProps) {
         />
       </div>
 
-      <Button 
-        variant="danger" 
-        className="w-full" 
+      <Button
+        variant="danger"
+        className="w-full"
         onClick={handleZap}
         disabled={loading || !publicKey || !quantity}
       >
