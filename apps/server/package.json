@@ -5,9 +5,10 @@
     "db:generate": "drizzle-kit generate",
     "push": "bun run scripts/push-db.ts",
     "db:studio": "drizzle-kit studio",
-    "db:push": "drizzle-kit push"
+    "db:push": "npx drizzle-kit push"
   },
   "dependencies": {
+    "@hono-dev/auth-github": "^0.0.1",
     "@neondatabase/serverless": "^0.10.4",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
