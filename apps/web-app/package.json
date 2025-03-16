@@ -25,6 +25,7 @@
     "@tailwindcss/vite": "^4.0.12",
     "@tanstack/react-query": "^5.67.2",
     "@tanstack/react-router": "^1.114.1",
+    "@vercel/analytics": "^1.5.0",
     "@walletconnect/solana-adapter": "^0.0.6",
     "avatar": "^0.1.0",
     "axios": "^1.8.2",
