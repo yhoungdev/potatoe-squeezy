@@ -7,6 +7,7 @@ import { sql } from "drizzle-orm";
 import type { Env } from "./types/env";
 import { logger } from 'hono/logger';
 import { prettyJSON } from "hono/pretty-json";
+import { userRoute } from "./routes/user";
 const app = new Hono<{ Bindings: Env }>();
 
 
@@ -52,8 +53,15 @@ app.get("/db-test", async (c) => {
   }
 });
 
-app.route("/auth", authRouter);
-app.route("/wallet", walletsRoute);
+const routes = [
+  { path: "/auth", handler: authRouter },
+  { path: "/wallet", handler: walletsRoute },
+  { path: "/user", handler: userRoute }
+];
+
+routes.forEach(({ path, handler }) => {
+  app.route(path, handler);
+});
 
 logger()
 
