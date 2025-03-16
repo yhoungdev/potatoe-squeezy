@@ -28,6 +28,28 @@ walletsRoute.post('/', async (c) => {
   }
 });
 
+walletsRoute.put ('/' , async (c) => {
+  try {
+    const { walletId, address } = await c.req.json();
+    if (!walletId || !address) {
+      return c.json({ error: 'Wallet ID and address are required' }, 400);
+    }
+    const updatedWallet = await db.update(wallets)
+      .set({
+        address,
+        updatedAt: new Date(),
+      })
+     .where(eq(wallets.id, walletId))
+     .returning();
+    return c.json(updatedWallet[0]);
+  } catch (error) {
+    console.error('Error updating wallet:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+})
+
+
+
 walletsRoute.get('/user/:userId', async (c) => {
   try {
     const userId = parseInt(c.req.param('userId'));

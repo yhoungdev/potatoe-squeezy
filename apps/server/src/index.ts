@@ -5,9 +5,13 @@ import walletsRoute from "./routes/wallets";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import type { Env } from "./types/env";
-
+import { logger } from 'hono/logger';
+import { prettyJSON } from "hono/pretty-json";
 const app = new Hono<{ Bindings: Env }>();
 
+
+app.use(logger());
+app.use(prettyJSON())
 app.use("*", async (c, next) => {
   c.env = {
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID!,
@@ -40,7 +44,8 @@ app.get("/db-test", async (c) => {
     return c.json(
       {
         status: "Error",
-        message: error.message,
+     
+        message: error instanceof Error ? error.message : 'An unknown error occurred',
       },
       500,
     );
@@ -48,6 +53,8 @@ app.get("/db-test", async (c) => {
 });
 
 app.route("/auth", authRouter);
-app.route("/wallets", walletsRoute);
+app.route("/wallet", walletsRoute);
+
+logger()
 
 export default app;
