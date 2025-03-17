@@ -4,6 +4,9 @@ import { useState } from "react";
 import ConnectWalletButton from "@/button/connectWalletButton";
 import { motion } from "framer-motion";
 import { GithubIcon } from "lucide-react";
+import { AuthService } from "@/services";
+import API_ENDPOINTS from "@/enums/API_ENUM";
+import { BASE_API_URL } from "@/constant";
 
 function AuthComponent() {
   const { publicKey, connect, disconnect } = useWallet();
@@ -24,12 +27,16 @@ function AuthComponent() {
     }
   };
 
-  const handleGithubLogin = () => {
-    window.open(
-      "http://localhost:3000/auth/login",
-      "_blank",
-      "width=600,height=700",
-    );
+  const handleGithubLogin = async () => {
+    try {
+      setIsLoading(true);
+      const loginUrl = `${BASE_API_URL}${API_ENDPOINTS.GITHUB_AUTH}`
+      window.open(loginUrl, "_blank", "width=600,height=700");
+    } catch (error) {
+      console.error("Failed to initiate GitHub login:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
