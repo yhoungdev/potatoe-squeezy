@@ -1,11 +1,11 @@
 import { Context, Next } from "hono";
-import { jwt } from "hono/jwt";
+import { verify } from "hono/jwt";
 import type { Env } from "../types/env";
 
-export async function authMiddleware(
+export const auth = async (
   c: Context<{ Bindings: Env }>,
   next: Next,
-) {
+) => {
   const authHeader = c.req.header("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -13,12 +13,16 @@ export async function authMiddleware(
   }
 
   const token = authHeader.split(" ")[1];
+  console.log('Received Token:', token);
 
   try {
-    const payload = await jwt.verify(token, c.env.JWT_SECRET);
+    const payload = await verify(token, c.env.JWT_SECRET);
+    console.log('Decoded Payload:', payload);
     c.set("user", payload);
+    c.set("userId", payload.userId || payload.sub); // Ensure userId is set correctly
     await next();
   } catch (error) {
-    return c.json({ error: "Invalid token" }, 401);
+    console.error('Token Verification Error:', error);
+    return c.json({ error: "Invalid token", details: error.message }, 401);
   }
-}
+};
