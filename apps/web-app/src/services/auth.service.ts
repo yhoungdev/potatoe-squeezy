@@ -3,7 +3,9 @@ import ApiClient from "@/util/api";
 
 class AuthService {
   static async signInWithGithub(): Promise<any> {
-    const response = await ApiClient.get<{ url: string }>(API_ENDPOINTS.GITHUB_AUTH);
+    const response = await ApiClient.get<{ url: string }>(
+      API_ENDPOINTS.GITHUB_AUTH,
+    );
     return response;
   }
 

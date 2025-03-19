@@ -1,37 +1,59 @@
-import { useState, useEffect } from "react";
-import supabase from "@/lib/supabase";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { useUserStore } from "@/store/user.store";
+import { useNavigate } from "@tanstack/react-router";
 
-const useAuth = () => {
-  const webSupabase = supabase;
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [user, setUser] = useState<Record<string, string>>({});
-
-  const checkIfIsAuthenticated = async () => {
-    try {
-      setLoading(true);
-      const {
-        data: { session },
-      } = await webSupabase.auth.getSession();
-
-      if (session) {
-        setSession(session);
-        setUser(session?.user);
-      }
-    } catch (err) {
-      console.error("Error checking authentication:", err);
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+function useAuth() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = Cookies.get("auth-token");
+    return !!token;
+  });
+  
+  const { user, clearUser } = useUserStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    checkIfIsAuthenticated();
-  }, []);
+    const token = Cookies.get("auth-token");
+    if (!token && isAuthenticated) {
+      handleLogout();
+    }
+  }, [isAuthenticated]);
 
-  return { session, loading, error, user };
-};
+  const handleLogin = (token: string) => {
+    Cookies.set("auth-token", token, {
+      secure: true,
+      sameSite: "lax",
+      expires: 7,
+    });
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    Cookies.remove("auth-token");
+    clearUser();
+    setIsAuthenticated(false);
+    navigate({ to: '/' });
+  };
+
+  const checkAuthStatus = () => {
+    const token = Cookies.get("auth-token");
+    const isValid = !!token;
+    setIsAuthenticated(isValid);
+    
+    if (!isValid) {
+      handleLogout();
+      return false;
+    }
+    return true;
+  };
+
+  return {
+    isAuthenticated,
+    user,
+    login: handleLogin,
+    logout: handleLogout,
+    checkAuthStatus,
+  };
+}
 
 export default useAuth;
