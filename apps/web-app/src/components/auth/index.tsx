@@ -1,13 +1,17 @@
 import { Button } from "../ui/button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useState } from "react";
-import ConnectWalletButton from "@/button/connectWalletButton";
 import { motion } from "framer-motion";
 import { GithubIcon } from "lucide-react";
+import API_ENDPOINTS from "@/enums/API_ENUM";
+import { BASE_API_URL } from "@/constant";
+import useAuth from "@/hooks/useAuth";
+import { Link } from "@tanstack/react-router";
 
 function AuthComponent() {
   const { publicKey, connect, disconnect } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated, fetchUserProfile } = useAuth();
 
   const handleWalletAction = async () => {
     try {
@@ -24,12 +28,16 @@ function AuthComponent() {
     }
   };
 
-  const handleGithubLogin = () => {
-    window.open(
-      "http://localhost:3000/auth/login",
-      "_blank",
-      "width=600,height=700",
-    );
+  const handleGithubLogin = async () => {
+    try {
+      setIsLoading(true);
+      const loginUrl = `${BASE_API_URL}${API_ENDPOINTS.GITHUB_AUTH}`;
+      window.location.href = loginUrl;
+    } catch (error) {
+      console.error("Failed to initiate GitHub login:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -77,9 +85,15 @@ function AuthComponent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Button className="w-fit bg-gray-800" onClick={handleGithubLogin}>
-            <GithubIcon /> Continue with Github
-          </Button>
+          {!isAuthenticated ? (
+            <Button className="w-fit bg-gray-800" onClick={handleGithubLogin}>
+              <GithubIcon /> Continue with Github
+            </Button>
+          ) : (
+            <Link to="/app">
+              <Button>Proceed to Dashboard</Button>
+            </Link>
+          )}
           {/* <ConnectWalletButton >
             Connect Wallet
           </ConnectWalletButton> */}

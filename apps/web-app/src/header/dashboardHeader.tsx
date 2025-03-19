@@ -3,11 +3,7 @@ import { IGithubUserData } from "../../../../interface/index.interface";
 import { SettingsIcon } from "@/assets/svg.tsx";
 
 function DashboardHeader() {
-  const { session, user } = useAuth();
-  const { user_metadata } = user;
-
-  const { email, avatar_url, user_name, provider_id } =
-    user_metadata<IGithubUserData> || {};
+  const {  } = useAuth();
 
   // if (!session) {
   //    if (typeof  window !== "undefined") {

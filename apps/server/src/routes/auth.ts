@@ -29,10 +29,7 @@ authRouter.get("/callback", async (c) => {
   const githubUser = c.get('github-user');
   const githubToken = c.get('github-token');
 
-  console.log('GitHub Authentication Data:', {
-    token: githubToken?.access_token?.slice(0, 8), 
-    user: githubUser?.login
-  });
+
 
   if (!githubUser || !githubToken) {
     console.error('Missing GitHub authentication data');
@@ -90,7 +87,6 @@ authRouter.get("/callback", async (c) => {
       c.env.JWT_SECRET,
     );
 
-    // When setting the cookie, use the actual token string
     setCookie(c, 'github-token', githubToken.access_token, {
       path: '/',
       secure: true,
@@ -98,7 +94,8 @@ authRouter.get("/callback", async (c) => {
       sameSite: 'Lax'
     });
 
-    return c.json({ token, user });
+
+    return c.redirect(`http://localhost:5173/?token=${token}`);
   } catch (error) {
     console.error('Database error:', error);
     return c.json({ error: "Database operation failed" }, 500);

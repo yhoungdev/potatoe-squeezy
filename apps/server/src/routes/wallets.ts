@@ -46,9 +46,7 @@ walletsRoute.put ('/' , async (c) => {
     console.error('Error updating wallet:', error);
     return c.json({ error: 'Internal server error' }, 500);
   }
-})
-
-
+});
 
 walletsRoute.get('/user/:userId', async (c) => {
   try {

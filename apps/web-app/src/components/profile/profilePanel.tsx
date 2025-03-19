@@ -60,7 +60,7 @@ function ProfilePanel({
             <Avatar className="w-[70px] h-[70px]">
               <AvatarImage src={avatar} alt={username} />
               <AvatarFallback>
-                {username.slice(0, 2).toUpperCase()}
+                {username?.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <Typography variant="h4">{name}</Typography>
