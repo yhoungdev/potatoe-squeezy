@@ -5,13 +5,14 @@ import { eq } from "drizzle-orm";
 import { users } from "../db/schema";
 import type { Env } from "../types/env";
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
+import { FRONTEND_APP_URL, GITHUB_CALLBACK_URL } from "../constants";
 
 export const authRouter = new Hono<{ Bindings: Env }>();
 
 const github = githubAuth({
   client_id: process.env.GITHUB_CLIENT_ID!,
   client_secret: process.env.GITHUB_CLIENT_SECRET!,
-  redirect_uri: "http://localhost:3000/auth/callback",
+  redirect_uri: `${GITHUB_CALLBACK_URL}/auth/callback`,
   scope: ['read:user', 'user:email']  
 });
 
@@ -95,7 +96,7 @@ authRouter.get("/callback", async (c) => {
     });
 
 
-    return c.redirect(`http://localhost:5173/?token=${token}`);
+    return c.redirect(`${FRONTEND_APP_URL}/?token=${token}`);
   } catch (error) {
     console.error('Database error:', error);
     return c.json({ error: "Database operation failed" }, 500);
