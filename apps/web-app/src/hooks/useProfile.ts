@@ -8,15 +8,15 @@ export function useProfile() {
   const token = Cookies.get("auth-token");
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['userProfile', token],
+    queryKey: ["userProfile", token],
     queryFn: async () => {
       const response = await UserService.fetchUserProfile();
       setUser(response);
-      
+
       return response;
     },
     enabled: !!token,
-    staleTime: 1000 * 60 * 5, 
+    staleTime: 1000 * 60 * 5,
     retry: 1,
   });
 

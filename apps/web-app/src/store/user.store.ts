@@ -37,22 +37,22 @@ export const useUserStore = create<UserState>()(
         user: null,
         wallet: null,
         isLoading: false,
-        setUser: (user) => set({ user }, false, 'setUser'),
-        setWallet: (wallet) => set({ wallet }, false, 'setWallet'),
-        clearUser: () => set({ user: null, wallet: null }, false, 'clearUser'),
-        setLoading: (status) => set({ isLoading: status }, false, 'setLoading'),
+        setUser: (user) => set({ user }, false, "setUser"),
+        setWallet: (wallet) => set({ wallet }, false, "setWallet"),
+        clearUser: () => set({ user: null, wallet: null }, false, "clearUser"),
+        setLoading: (status) => set({ isLoading: status }, false, "setLoading"),
       }),
       {
-        name: 'user-storage',
+        name: "user-storage",
         partialize: (state) => ({
           user: state.user,
           wallet: state.wallet,
         }),
-      }
+      },
     ),
     {
-      name: 'UserStore',
-      enabled: process.env.NODE_ENV === 'development',
-    }
-  )
+      name: "UserStore",
+      enabled: process.env.NODE_ENV === "development",
+    },
+  ),
 );

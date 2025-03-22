@@ -17,7 +17,7 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
   useEffect(() => {
     const isValid = checkAuthStatus();
     if (!isValid) {
-      navigate({ to: '/' });
+      navigate({ to: "/" });
     }
   }, []);
 

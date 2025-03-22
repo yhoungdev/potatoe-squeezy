@@ -7,7 +7,6 @@ const DEFAULT_AXIOS = axios.create({
   timeoutErrorMessage: "There was a timeout, try again",
 });
 
-
 DEFAULT_AXIOS.interceptors.request.use(
   (config) => {
     const token = Cookies.get("auth-token");
@@ -18,9 +17,8 @@ DEFAULT_AXIOS.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
-
 
 DEFAULT_AXIOS.interceptors.response.use(
   (response) => response,
@@ -30,7 +28,7 @@ DEFAULT_AXIOS.interceptors.response.use(
       window.location.href = "/";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default DEFAULT_AXIOS;

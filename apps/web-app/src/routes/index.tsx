@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
 
 function IndexRoute() {
   const { token } = Route.useSearch();
-  useProfile(); 
+  useProfile();
 
   useEffect(() => {
     if (token) {
