@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { NoDataFound } from "../fallbacks/noDataFound";
 
 function WalletTransactionTable() {
   const transactions = [
@@ -63,7 +64,7 @@ function WalletTransactionTable() {
           </Badge>
         </CardHeader>
         <CardContent>
-          <Table>
+          {/* <Table>
             <TableHeader>
               <TableRow className="border-white/10 hover:bg-transparent">
                 <TableHead className="text-gray-400">Type</TableHead>
@@ -116,7 +117,8 @@ function WalletTransactionTable() {
                 </motion.tr>
               ))}
             </TableBody>
-          </Table>
+          </Table> */}
+          <NoDataFound />
         </CardContent>
       </Card>
     </motion.div>
