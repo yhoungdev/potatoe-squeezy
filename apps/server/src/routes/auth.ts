@@ -12,7 +12,7 @@ export const authRouter = new Hono<{ Bindings: Env }>();
 const github = githubAuth({
   client_id: process.env.GITHUB_CLIENT_ID!,
   client_secret: process.env.GITHUB_CLIENT_SECRET!,
-  redirect_uri: `${GITHUB_CALLBACK_URL}/auth/callback`,
+  redirect_uri: `${GITHUB_CALLBACK_URL}`,
   scope: ['read:user', 'user:email']  
 });
 
