@@ -1,8 +1,8 @@
 import DEFAULT_AXIOS from "@/configs/axios";
+import { BASE_API_URL } from "@/constant";
 
 class ApiClient {
-  private static readonly baseUrl =
-    import.meta.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  private static readonly baseUrl = BASE_API_URL;
   private static readonly axiosInstance = DEFAULT_AXIOS;
 
   static async get<T>(
