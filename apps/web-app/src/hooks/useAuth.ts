@@ -8,7 +8,7 @@ function useAuth() {
     const token = Cookies.get("auth-token");
     return !!token;
   });
-  
+
   const { user, clearUser } = useUserStore();
   const navigate = useNavigate();
 
@@ -32,14 +32,14 @@ function useAuth() {
     Cookies.remove("auth-token");
     clearUser();
     setIsAuthenticated(false);
-    navigate({ to: '/' });
+    navigate({ to: "/" });
   };
 
   const checkAuthStatus = () => {
     const token = Cookies.get("auth-token");
     const isValid = !!token;
     setIsAuthenticated(isValid);
-    
+
     if (!isValid) {
       handleLogout();
       return false;
