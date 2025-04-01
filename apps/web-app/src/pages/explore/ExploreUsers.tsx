@@ -1,71 +1,26 @@
-import React, { useState } from "react";
 import DefaultDashboard from "@/layouts/dashboard";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
-import { GithubUserSearch } from "@/components/search/GithubUserSearch";
-import { GithubUserCard } from "@/components/github/GithubUserCard";
-import { GithubUserCardSkeleton } from "@/components/github/GithubUserCardSkeleton";
+import { TAB_STATE} from "@/constant/index";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import GeneralGithubUsers from "@/components/pages/explore/general-users";
+import PotatoeUsers from "@/components/pages/explore/potatoe-users";
 
-interface GitHubUser {
-  login: string;
-  avatar_url: string;
-  name: string;
-  bio: string;
-}
+const tabs = [
+  { value: "account", label: "Account", content: <PotatoeUsers/>},
+  { value: "general", label: "General", content: <GeneralGithubUsers /> },
+];
 
 export default function ExploreUsers() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [users, setUsers] = useState<GitHubUser[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const searchGithubUser = async () => {
-    if (!searchQuery) {
-      toast.error("Please enter a GitHub username");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.github.com/search/users?q=${searchQuery}&per_page=10`,
-      );
-      const data = await response.json();
-
-      if (response.ok) {
-        // Fetch detailed information for each user
-        const detailedUsers = await Promise.all(
-          data.items.map(async (user: any) => {
-            const userResponse = await fetch(
-              `https://api.github.com/users/${user.login}`,
-            );
-            return userResponse.json();
-          }),
-        );
-
-        setUsers(detailedUsers);
-        toast.success(`Found ${detailedUsers.length} users!`);
-      } else {
-        setUsers([]);
-        toast.error("No users found");
-      }
-    } catch (error) {
-      toast.error("Error fetching GitHub users");
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <DefaultDashboard>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-3xl mx-auto p-4"
+        className="max-w-3xl p-4 mx-auto"
       >
         <div className="space-y-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+          <div className="space-y-2 text-center">
+            <h1 className="text-3xl font-bold text-transparent bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text">
               Find GitHub Users
             </h1>
             <p className="text-gray-400">
@@ -73,26 +28,22 @@ export default function ExploreUsers() {
             </p>
           </div>
 
-          <GithubUserSearch
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onSearch={searchGithubUser}
-            loading={loading}
-          />
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {loading ? (
-              <>
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <GithubUserCardSkeleton key={index} />
-                ))}
-              </>
-            ) : (
-              users?.map((user) => (
-                <GithubUserCard key={user.login} user={user} />
-              ))
-            )}
-          </div>
+          <Tabs defaultValue="account" className="">
+            <TabsList className="bg-transparent   data-[state=inactive]:text-gray-400"> 
+              
+              {tabs.map((tab) => (
+                <TabsTrigger key={tab.value}
+                  className={` ${TAB_STATE}`} value={tab.value}>
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {tabs.map((tab) => (
+              <TabsContent key={tab.value} value={tab.value}>
+                {tab.content}
+              </TabsContent>
+            ))}
+          </Tabs>
         </div>
       </motion.div>
     </DefaultDashboard>
