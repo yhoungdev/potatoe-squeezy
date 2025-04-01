@@ -8,7 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "format": "prettier --write ./"
+    "format": "prettier --write ./",
+    "start": "concurrently \"cd apps/web-app && pnpm dev\" \"cd apps/server && pnpm dev\""
   },
   "private": true,
   "dependencies": {
@@ -16,5 +17,8 @@
     "dotenv": "^16.4.7",
     "lucid": "^2.21.0",
     "prettier": "^3.4.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }
