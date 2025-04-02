@@ -1,12 +1,12 @@
 import DefaultDashboard from "@/layouts/dashboard";
 import { motion } from "framer-motion";
-import { TAB_STATE} from "@/constant/index";
+import { TAB_STATE } from "@/constant/index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GeneralGithubUsers from "@/components/pages/explore/general-users";
 import PotatoeUsers from "@/components/pages/explore/potatoe-users";
 
 const tabs = [
-  { value: "account", label: "Account", content: <PotatoeUsers/>},
+  { value: "account", label: "Account", content: <PotatoeUsers /> },
   { value: "general", label: "General", content: <GeneralGithubUsers /> },
 ];
 
@@ -29,11 +29,13 @@ export default function ExploreUsers() {
           </div>
 
           <Tabs defaultValue="account" className="">
-            <TabsList className="bg-transparent   data-[state=inactive]:text-gray-400"> 
-              
+            <TabsList className="bg-transparent   data-[state=inactive]:text-gray-400">
               {tabs.map((tab) => (
-                <TabsTrigger key={tab.value}
-                  className={` ${TAB_STATE}`} value={tab.value}>
+                <TabsTrigger
+                  key={tab.value}
+                  className={` ${TAB_STATE}`}
+                  value={tab.value}
+                >
                   {tab.label}
                 </TabsTrigger>
               ))}

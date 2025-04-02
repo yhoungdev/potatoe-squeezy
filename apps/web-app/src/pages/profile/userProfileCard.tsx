@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import CelebrateUser from "./celebrateUser";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProfilePanel from "@/components/profile/profilePanel";
+import WalletNotConnected from "@/components/fallbacks/wallet-no-connect";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface GitHubUser {
   login: string;
@@ -13,6 +15,8 @@ interface GitHubUser {
 function UserProfileCard() {
   const [userData, setUserData] = useState<GitHubUser | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const { wallet, connected } = useWallet();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -56,14 +60,18 @@ function UserProfileCard() {
 
   if (!userData) {
     return (
-      <div className="text-center mt-8 text-muted-foreground">
+      <div className="mt-8 text-center text-muted-foreground">
         User not found
       </div>
     );
   }
 
+  if (!connected) {
+    return <WalletNotConnected />;
+  }
+
   return (
-    <div className="flex gap-6 mt-8 justify-center flex-col lg:flex-row">
+    <div className="flex flex-col justify-center gap-6 mt-8 lg:flex-row">
       <ProfilePanel
         name={userData.name || userData.login}
         username={userData.login}
@@ -71,7 +79,10 @@ function UserProfileCard() {
         userBio={userData.bio}
         withAction={false}
       />
-      <CelebrateUser username={userData.login} />
+      <CelebrateUser
+        username={userData.login}
+        walletAddress={"HNtw7sn2taK8mUzyV5Bt1yoPU4nPjxFUuHBnZZPNLivR"}
+      />
     </div>
   );
 }

@@ -10,9 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { TipBadge } from "./TipBadge";
 import { toast } from "sonner";
-import { ChevronRight } from "lucide-react";
 import AddressAndBadge from "./addressAndBadge";
 
 interface ProfilePanelProps {
@@ -55,8 +53,8 @@ function ProfilePanel({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div className="px-3 !mb-[3em]">
-          <div className="flex items-center justify-between flex-col gap-4">
+        <div className="px-3 !mb-[em]">
+          <div className="flex flex-col items-center justify-between gap-4">
             <Avatar className="w-[70px] h-[70px]">
               <AvatarImage src={avatar} alt={username} />
               <AvatarFallback>

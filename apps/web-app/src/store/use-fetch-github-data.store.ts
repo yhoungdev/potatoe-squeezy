@@ -12,9 +12,9 @@ interface GithubUser {
 }
 
 interface GithubDataState {
-  githubUser: GithubUser | null; 
+  githubUser: GithubUser | null;
   setGithubUser: (user: GithubUser) => void;
-  clearGithubUser: () => void; 
+  clearGithubUser: () => void;
 }
 
 export const useFetchGithubDataStore = create<GithubDataState>()(
@@ -22,11 +22,13 @@ export const useFetchGithubDataStore = create<GithubDataState>()(
     persist(
       (set) => ({
         githubUser: null,
-        setGithubUser: (user) => set({ githubUser: user }, false, "setGithubUser"),
-        clearGithubUser: () => set({ githubUser: null }, false, "clearGithubUser"),
+        setGithubUser: (user) =>
+          set({ githubUser: user }, false, "setGithubUser"),
+        clearGithubUser: () =>
+          set({ githubUser: null }, false, "clearGithubUser"),
       }),
       {
-        name: "github-user-storage", 
+        name: "github-user-storage",
         partialize: (state) => ({
           githubUser: state.githubUser,
         }),
