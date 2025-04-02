@@ -39,7 +39,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         "confirmed",
       );
 
-      // Replace with the recipient's address
+
       const recipientAddress = new PublicKey(walletAddress);
 
       const transaction = new Transaction().add(
