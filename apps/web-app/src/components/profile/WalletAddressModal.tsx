@@ -32,11 +32,11 @@ export function WalletAddressModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update Wallet Address</DialogTitle>
+          <DialogTitle>Update Wallet Address.</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 pt-4">
+        <div className="pt-4 space-y-4">
           <Input
-            placeholder="Enter your Solana wallet address"
+            placeholder="Enter your Solana wallet address."
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
