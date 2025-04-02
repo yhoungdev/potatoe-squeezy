@@ -27,5 +27,17 @@ function IndexRoute() {
     }
   }, [token]);
 
-  return <Homepage />;
+  return (
+    <>
+      <div
+        className="py-2 text-center text-white "
+        style={{
+          background: "linear-gradient(64deg, #a43d3c, #ad4b4a, #e67271)",
+        }}
+      >
+        <h4 className="text-sm ">🎉 We’re live on product hunt!</h4>
+      </div>
+      <Homepage />
+    </>
+  );
 }

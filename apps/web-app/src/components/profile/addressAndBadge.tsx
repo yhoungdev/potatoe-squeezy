@@ -34,7 +34,6 @@ const AddressAndBadge = ({
   const { user } = useUserStore();
   const { id } = user?.users || {};
 
-
   const menuItems = [
     { title: " 💼 Add/Update Wallet Address", type: "address" },
     { title: "✨ Generate Badge", type: "badge" },
@@ -45,12 +44,12 @@ const AddressAndBadge = ({
     setModalType(null);
   };
 
- 
   const mutate = useMutation({
-    mutationFn: (address: string) => WalletService.addWallet({
-      userId: id,
-      address,
-    }),
+    mutationFn: (address: string) =>
+      WalletService.addWallet({
+        userId: id,
+        address,
+      }),
     onSuccess: () => {
       toast.success("Wallet address updated successfully.");
       setModalType(null);
@@ -102,8 +101,7 @@ const AddressAndBadge = ({
                 className="bg-gray-900/50 border-white/10 text-white !py-4"
               />
               <div className="flex flex-col justify-end gap-3">
-                <Button onClick={handleSaveAddress} className="w-full" 
-                  >
+                <Button onClick={handleSaveAddress} className="w-full">
                   Save
                 </Button>
                 <Button
