@@ -50,7 +50,7 @@
     "skeleton": "^0.1.2",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.1.0",
-    "tailwindcss": "3.4.1",
+    "tailwindcss": "4.1.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"

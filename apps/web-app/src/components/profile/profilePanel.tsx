@@ -1,3 +1,4 @@
+
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -53,7 +54,7 @@ function ProfilePanel({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div className="px-3 !mb-[em]">
+        <div className="px-3 ">
           <div className="flex flex-col items-center justify-between gap-4">
             <Avatar className="w-[70px] h-[70px]">
               <AvatarImage src={avatar} alt={username} />
@@ -71,7 +72,7 @@ function ProfilePanel({
             {withAction ? (
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button className="mt-2">Manage Actions</Button>
+                  <Button className="mt-2 mb-2 ">Manage Actions</Button>
                 </SheetTrigger>
                 <SheetContent>
                   <SheetHeader>
