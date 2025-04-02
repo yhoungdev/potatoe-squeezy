@@ -121,18 +121,18 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         />
       </div>
 
-      <Button
-        className="w-full bg-red-400"
-        onClick={handleZap}
-        disabled={loading || !publicKey || (!quantity && !customAmount)}
-      >
-        {loading ? "Processing..." : "Zap 🍟"}
-      </Button>
-
-      {!publicKey && (
-        <p className="mt-2 text-sm text-center text-gray-400">
-          Connect your wallet to tip
-        </p>
+      {!walletAddress ? (
+        <h3 className="font-semibold text-center text-red-500">
+          User has'nt added a SOL address yet
+        </h3>
+      ) : (
+        <Button
+          className="w-full bg-red-400"
+          onClick={handleZap}
+          disabled={loading || !publicKey || (!quantity && !customAmount)}
+        >
+          {loading ? "Processing..." : "Zap 🍟"}
+        </Button>
       )}
     </div>
   );
