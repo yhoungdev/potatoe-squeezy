@@ -31,8 +31,8 @@ const AddressAndBadge = ({
   const [modalType, setModalType] = useState<"address" | "badge" | null>(null);
   const [address, setAddress] = useState(currentAddress);
 
-  const { user } = useUserStore();
-  const { id } = user?.users || {};
+  const { user } = useUserStore() || {};
+  const { id } = user?.users || {}; 
 
   const menuItems = [
     { title: " 💼 Add/Update Wallet Address", type: "address" },
