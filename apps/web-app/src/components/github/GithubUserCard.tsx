@@ -3,7 +3,6 @@ import { GithubIcon, ExternalLinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { truncateText } from "@/util/content-utils";
-import { useFetchGithubDataStore } from "@/store/use-fetch-github-data.store";
 interface GitHubUser {
   login: string;
   avatar_url: string;
@@ -16,8 +15,6 @@ interface GithubUserCardProps {
 }
 
 export function GithubUserCard({ user }: GithubUserCardProps) {
-  const setGithubUser = useFetchGithubDataStore((state) => state.setUser);
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -33,7 +30,7 @@ export function GithubUserCard({ user }: GithubUserCardProps) {
         </Avatar>
         <div className="w-full space-y-3">
           <div>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-lg font-bold text-white">
               {user.name || user.login}
             </h2>
             <div className="flex items-center justify-center gap-2 text-gray-400">
@@ -57,9 +54,9 @@ export function GithubUserCard({ user }: GithubUserCardProps) {
           <Button
             className="w-full py-5 border-2 border-gray-700 cursor-pointer"
             onClick={() => {
-              setGithubUser(user);
-              const currentUrl = window.location.origin; 
-              window.location.href = `${currentUrl}/app/profile?user=${user.login}`; // Redirect using the current URL
+              const currentUrl = window.location.origin;
+              window.location.href = `${currentUrl}/app/profile?user=${user.login}`;
+              console.log(currentUrl);
             }}
           >
             Tip User 🍟

@@ -1,5 +1,4 @@
-
-import  { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
@@ -10,49 +9,53 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { toast } from "react-hot-toast";
-import { Client } from 'rpc-websockets';
 
 interface CelebrateUserProps {
   username: string;
+  walletAddress: string;
 }
 
-function CelebrateUser({ username }: CelebrateUserProps) {
+function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
   const { publicKey, sendTransaction } = useWallet();
   const [quantity, setQuantity] = useState<number>(0);
+  const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const predefinedAmount = [5, 10, 15, 20];
 
   const handleZap = async () => {
-    if (!publicKey || !quantity) {
-      toast.error("Please connect your wallet and select an amount");
+    const amountToSend = customAmount ? parseFloat(customAmount) : quantity;
+
+    if (!publicKey || !amountToSend || isNaN(amountToSend)) {
+      toast.error("Please connect your wallet and select or enter an amount");
       return;
     }
 
     setLoading(true);
     try {
       const connection = new Connection(
-        process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
+        import.meta.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
           "https://api.devnet.solana.com",
         "confirmed",
       );
 
-      //i would get receivers address and add here
-      const recipientAddress = new PublicKey("");
+
+      const recipientAddress = new PublicKey(walletAddress);
 
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: recipientAddress,
-          lamports: quantity * LAMPORTS_PER_SOL,
+          lamports: amountToSend * LAMPORTS_PER_SOL,
         }),
       );
 
       const signature = await sendTransaction(transaction, connection);
       await connection.confirmTransaction(signature, "confirmed");
 
-      toast.success(`Successfully tipped ${quantity} SOL to ${username}!`);
+      toast.success(`Successfully tipped ${amountToSend} SOL to ${username}!`);
       setQuantity(0);
+      setCustomAmount("");
       setMessage("");
     } catch (error) {
       console.error("Error:", error);
@@ -65,7 +68,9 @@ function CelebrateUser({ username }: CelebrateUserProps) {
   return (
     <div className="bg-gray-900 w-full lg:w-[450px] rounded-xl px-4 py-4">
       <div className="py-4">
-        <h2 className="font-semibold text-center">Select amount to zap</h2>
+        <h2 className="font-semibold text-center">
+          Select or Enter Amount to Zap
+        </h2>
 
         <div className="flex items-center gap-4 mx-4 my-4 justify-evenly">
           {predefinedAmount.map((amount) => {
@@ -77,9 +82,14 @@ function CelebrateUser({ username }: CelebrateUserProps) {
                   rounded-xl w-10 h-10 
                   flex items-center justify-center
                   border-[1px] border-white/20 
-                  ${isSelected && "!bg-[#fb8a2e]"}
+                  ${isSelected && "!bg-red-400"}
                   ${!publicKey && "opacity-50 cursor-not-allowed"}`}
-                onClick={() => publicKey && setQuantity(amount)}
+                onClick={() => {
+                  if (publicKey) {
+                    setQuantity(amount);
+                    setCustomAmount("");
+                  }
+                }}
               >
                 {amount}
               </div>
@@ -88,20 +98,34 @@ function CelebrateUser({ username }: CelebrateUserProps) {
         </div>
       </div>
 
+      <div className="my-4">
+        <input
+          type="number"
+          value={customAmount}
+          onChange={(e) => {
+            setCustomAmount(e.target.value);
+            setQuantity(0);
+          }}
+          placeholder="Enter custom amount (SOL)"
+          className="w-full p-2 text-sm bg-transparent border-2 border-white/20 rounded-xl"
+          disabled={!publicKey}
+        />
+      </div>
+
       <div>
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Hey i just squashed potatoe to sol, enjoy"
+          placeholder="Hey, I just squashed potato to SOL, enjoy!"
           className="w-full p-2 text-sm bg-transparent border-2 border-white/20 rounded-xl"
           disabled={!publicKey}
         />
       </div>
 
       <Button
-        className="w-full "
+        className="w-full bg-red-400"
         onClick={handleZap}
-        disabled={loading || !publicKey || !quantity}
+        disabled={loading || !publicKey || (!quantity && !customAmount)}
       >
         {loading ? "Processing..." : "Zap"}
       </Button>
