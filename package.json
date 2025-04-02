@@ -4,8 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "workspaces": [
-    "libs/*",
-    "packages/*"
+    
   ],
   "scripts": {
     "format": "prettier --write ./",
