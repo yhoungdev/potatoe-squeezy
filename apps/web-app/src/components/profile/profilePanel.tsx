@@ -46,6 +46,8 @@ function ProfilePanel({
     toast.success("Badge code copied to clipboard!");
   };
 
+  
+
   return (
     <div>
       <motion.div
@@ -83,6 +85,7 @@ function ProfilePanel({
                     username={username}
                     onUpdateAddress={onUpdateAddress}
                     onCopyBadge={copyBadgeCode}
+                    currentAddress={walletAddress}
                   />
                 </SheetContent>
               </Sheet>
