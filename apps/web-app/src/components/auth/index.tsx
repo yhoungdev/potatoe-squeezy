@@ -46,14 +46,14 @@ function AuthComponent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center space-y-8 lg:max-w-xl w-full"
+        className="w-full space-y-8 text-center lg:max-w-xl"
       >
         <div className="space-y-6">
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring" }}
-            className="text-7xl block hover:rotate-12 transition-transform cursor-pointer"
+            className="block transition-transform cursor-pointer text-7xl hover:rotate-12"
           >
             🍟
           </motion.span>
@@ -68,7 +68,7 @@ function AuthComponent() {
           </motion.h1>
 
           <motion.p
-            className="text-gray-400 text-md leading-relaxed"
+            className="leading-relaxed text-gray-400 text-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -80,13 +80,13 @@ function AuthComponent() {
         </div>
 
         <motion.div
-          className="pt-2 flex flex-col items-center gap-2"
+          className="flex flex-col items-center gap-2 pt-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
           {!isAuthenticated ? (
-            <Button className="w-fit bg-gray-800" onClick={handleGithubLogin}>
+            <Button className="bg-gray-800 w-fit" onClick={handleGithubLogin}>
               <GithubIcon /> Continue with Github
             </Button>
           ) : (

@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 const ConnectWalletButton = ({ children }: { children: ReactNode }) => {
-  
   const { connected } = useWallet();
   return (
     <WalletMultiButton
@@ -23,9 +22,13 @@ const ConnectWalletButton = ({ children }: { children: ReactNode }) => {
         gap: "0.4em",
       }}
     >
-      {
-        !connected ? <><Wallet2 />  Connect Wallet</>: "Connected"
-      }
+      {!connected ? (
+        <>
+          <Wallet2 /> Connect Wallet
+        </>
+      ) : (
+        "Connected"
+      )}
     </WalletMultiButton>
   );
 };

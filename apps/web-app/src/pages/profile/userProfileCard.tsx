@@ -70,8 +70,6 @@ function UserProfileCard() {
     return <WalletNotConnected />;
   }
 
-  
-
   return (
     <div className="flex flex-col items-center justify-center gap-6 mt-8 lg:flex-row">
       <ProfilePanel

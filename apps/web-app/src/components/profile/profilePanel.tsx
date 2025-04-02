@@ -46,8 +46,6 @@ function ProfilePanel({
     toast.success("Badge code copied to clipboard!");
   };
 
-  
-
   return (
     <div>
       <motion.div
@@ -73,7 +71,7 @@ function ProfilePanel({
             {withAction ? (
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button className="mt-2 mb-2 ">Manage Actions</Button>
+                  <Button className="mb-4 ">Manage Actions</Button>
                 </SheetTrigger>
                 <SheetContent>
                   <SheetHeader>
