@@ -4,6 +4,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ProfilePanel from "@/components/profile/profilePanel";
 import WalletNotConnected from "@/components/fallbacks/wallet-no-connect";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { extractWalletFromUser } from "@/util/extract-wallet-from-user";
+import useExtractUserWallet from "@/hooks/extract-user-wallet";
 
 interface GitHubUser {
   login: string;
@@ -16,7 +18,13 @@ function UserProfileCard() {
   const [userData, setUserData] = useState<GitHubUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const { wallet, connected } = useWallet();
+  const searchParams = new URLSearchParams(window.location.search);
+  const username = searchParams.get("user");
+
+  const { wallet } = useExtractUserWallet(username || "");
+  const { address } = wallet || {};
+
+  const { connected } = useWallet();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -79,10 +87,7 @@ function UserProfileCard() {
         userBio={userData.bio}
         withAction={false}
       />
-      <CelebrateUser
-        username={userData.login}
-        walletAddress={"HNtw7sn2taK8mUzyV5Bt1yoPU4nPjxFUuHBnZZPNLivR"}
-      />
+      <CelebrateUser username={userData.login} walletAddress={address} />
     </div>
   );
 }

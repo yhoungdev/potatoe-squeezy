@@ -3,8 +3,8 @@ import { useUserStore } from "@/store/user.store";
 
 function WalletProfilePanel() {
   const userStore = useUserStore();
-  const users = userStore?.user?.users ?? {}; 
-  const address = userStore?.user?.wallets?.address ?? ""; 
+  const users = userStore?.user?.users ?? {};
+  const address = userStore?.user?.wallets?.address ?? "";
 
   const { avatarUrl, username, name } = users;
 

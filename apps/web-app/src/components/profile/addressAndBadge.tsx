@@ -32,7 +32,7 @@ const AddressAndBadge = ({
   const [address, setAddress] = useState(currentAddress);
 
   const { user } = useUserStore() || {};
-  const { id } = user?.users || {}; 
+  const { id } = user?.users || {};
 
   const menuItems = [
     { title: " 💼 Add/Update Wallet Address", type: "address" },
