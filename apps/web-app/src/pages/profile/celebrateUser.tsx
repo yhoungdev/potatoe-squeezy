@@ -1,5 +1,5 @@
-import "rpc-websockets/dist/lib/client";
-import React, { useState } from "react";
+
+import  { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
@@ -10,6 +10,7 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { toast } from "react-hot-toast";
+import { Client } from 'rpc-websockets';
 
 interface CelebrateUserProps {
   username: string;
@@ -64,9 +65,9 @@ function CelebrateUser({ username }: CelebrateUserProps) {
   return (
     <div className="bg-gray-900 w-full lg:w-[450px] rounded-xl px-4 py-4">
       <div className="py-4">
-        <h2 className="text-center font-semibold">Select amount to zap</h2>
+        <h2 className="font-semibold text-center">Select amount to zap</h2>
 
-        <div className="flex mx-4 items-center gap-4 my-4 justify-evenly">
+        <div className="flex items-center gap-4 mx-4 my-4 justify-evenly">
           {predefinedAmount.map((amount) => {
             const isSelected = amount === quantity;
             return (
@@ -106,7 +107,7 @@ function CelebrateUser({ username }: CelebrateUserProps) {
       </Button>
 
       {!publicKey && (
-        <p className="text-center text-sm text-gray-400 mt-2">
+        <p className="mt-2 text-sm text-center text-gray-400">
           Connect your wallet to tip
         </p>
       )}
