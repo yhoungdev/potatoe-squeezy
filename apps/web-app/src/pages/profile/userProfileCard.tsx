@@ -70,12 +70,14 @@ function UserProfileCard() {
     return <WalletNotConnected />;
   }
 
+  
+
   return (
-    <div className="flex flex-col justify-center gap-6 mt-8 lg:flex-row">
+    <div className="flex flex-col items-center justify-center gap-6 mt-8 lg:flex-row">
       <ProfilePanel
         name={userData.name || userData.login}
         username={userData.login}
-        avatarSeed={userData.login}
+        avatar={userData.avatar_url}
         userBio={userData.bio}
         withAction={false}
       />

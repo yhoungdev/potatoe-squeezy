@@ -54,7 +54,6 @@ const PotatoeUsers = () => {
               login: users.username,
               email: users.email,
             };
-            
             return (
               <GithubUserCard
                 key={index}

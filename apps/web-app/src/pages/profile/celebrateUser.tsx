@@ -126,7 +126,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         onClick={handleZap}
         disabled={loading || !publicKey || (!quantity && !customAmount)}
       >
-        {loading ? "Processing..." : "Zap"}
+        {loading ? "Processing..." : "Zap 🍟"}
       </Button>
 
       {!publicKey && (
