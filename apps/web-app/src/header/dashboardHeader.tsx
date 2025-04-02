@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useUserStore } from "@/store/user.store";
 import Cookies from "js-cookie";
+import ConnectWalletButton from "@/button/connectWalletButton";
 
 function DashboardHeader() {
   const { checkAuth, logout } = useAuth();
@@ -27,7 +28,8 @@ function DashboardHeader() {
         </a>
       </div>
 
-      <div>
+      <div className="flex items-center gap-2">
+        <ConnectWalletButton>.</ConnectWalletButton>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant={"outline"} className="text-red-400 bg-red-200/10">

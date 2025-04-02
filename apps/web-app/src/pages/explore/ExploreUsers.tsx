@@ -6,7 +6,7 @@ import GeneralGithubUsers from "@/components/pages/explore/general-users";
 import PotatoeUsers from "@/components/pages/explore/potatoe-users";
 
 const tabs = [
-  { value: "account", label: "Account", content: <PotatoeUsers /> },
+  { value: "account", label: "Potatoe Users 🍟", content: <PotatoeUsers /> },
   { value: "general", label: "General", content: <GeneralGithubUsers /> },
 ];
 
