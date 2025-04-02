@@ -11,5 +11,10 @@ class UserService {
     const response = await ApiClient.get(API_ENDPOINTS.USER_WALLET);
     return response;
   }
+
+  static async fetchAllPotatoeUsers() {
+    const response = await ApiClient.get(API_ENDPOINTS.USER_ALL);
+    return response;
+  }
 }
 export default UserService;

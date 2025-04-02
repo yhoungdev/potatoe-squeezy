@@ -5,6 +5,7 @@ enum API_ENDPOINTS {
 
   //user
   USER_PROFILE = "/user/profile",
+  USER_ALL = "/user/all",
   USER_WALLET = "",
 }
 

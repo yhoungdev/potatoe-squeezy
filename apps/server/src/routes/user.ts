@@ -27,4 +27,21 @@ userRoute.get("/profile", auth, async (c) => {
   }
 });
 
+userRoute.get("/all" , async (c) => {
+  try {
+    const usersList = await db.select().from(users)
+      .leftJoin(wallets, eq(users.id, wallets.userId))
+      .execute();
+
+    if (!usersList || usersList.length === 0) {
+      return c.json({ error: "No users found" }, 404);
+    }
+
+    return c.json(usersList);
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    return c.json({ error: "Internal server error" }, 500);
+  }
+})
+
 export { userRoute };
