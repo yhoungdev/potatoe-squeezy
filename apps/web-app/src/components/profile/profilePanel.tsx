@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import AddressAndBadge from "./addressAndBadge";
 import ProductHuntBadge from "../misc/product-hunt-badge";
+import { useUserStore } from "@/store/user.store";
 
 interface ProfilePanelProps {
   name: string;
@@ -41,8 +42,22 @@ function ProfilePanel({
     }
   };
 
+  const { user } = useUserStore() || {};
+
+  const { username: profile_name } = user?.users || {};
+
   const copyBadgeCode = () => {
-    const badgeCode = `<iframe src="http://localhost:5134/embed/tip-badge?user=${username}" width="200" height="50" frameborder="0"></iframe>`;
+    const badgeCode = `
+      <a href="${window.location.origin}/profile?user=${profile_name}" target="_blank" rel="noopener noreferrer">
+        <img 
+          src="https://coffee-major-wallaby-86.mypinata.cloud/ipfs/bafkreiaskbvndui55ycmqdu6ui6arfkhxmqgjvjcaw26myp4y76mmqtbyi" 
+          width="350" 
+          height="54" 
+          style="width: 250px; height: 54px;" 
+          alt="Potatoe Squeezy - Support GitHub contributors with crypto | Product Hunt" 
+        />
+      </a>
+    `.trim();
     navigator.clipboard.writeText(badgeCode);
     toast.success("Badge code copied to clipboard!");
   };
