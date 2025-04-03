@@ -3,6 +3,7 @@ import Homepage from "@/components/pages/homepage";
 import { useEffect } from "react";
 import Cookies from "js-cookie";
 import { useProfile } from "@/hooks/useProfile";
+import ProductHuntBadge from "@/components/misc/product-hunt-badge";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -29,15 +30,16 @@ function IndexRoute() {
 
   return (
     <>
-      <div
+      {/* <div
         className="py-2 text-center text-white "
         style={{
           background: "linear-gradient(64deg, #a43d3c, #ad4b4a, #e67271)",
         }}
       >
         <h4 className="text-sm ">🎉 We’re live on product hunt!</h4>
-      </div>
+      </div> */}
       <Homepage />
+      <ProductHuntBadge />
     </>
   );
 }

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import AddressAndBadge from "./addressAndBadge";
+import ProductHuntBadge from "../misc/product-hunt-badge";
 
 interface ProfilePanelProps {
   name: string;
@@ -85,6 +86,10 @@ function ProfilePanel({
                     onCopyBadge={copyBadgeCode}
                     currentAddress={walletAddress}
                   />
+
+                  <div className="mt-[5em] fixed bottom-2">
+                    <ProductHuntBadge />
+                  </div>
                 </SheetContent>
               </Sheet>
             ) : (
