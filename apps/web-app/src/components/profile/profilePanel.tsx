@@ -48,7 +48,7 @@ function ProfilePanel({
 
   const copyBadgeCode = () => {
     const badgeCode = `
-      <a href="${window.location.origin}/profile?user=${profile_name}" target="_blank" rel="noopener noreferrer">
+      <a href="${window.location.origin}/app/profile?user=${profile_name}" target="_blank" rel="noopener noreferrer">
         <img 
           src="https://coffee-major-wallaby-86.mypinata.cloud/ipfs/bafkreiaskbvndui55ycmqdu6ui6arfkhxmqgjvjcaw26myp4y76mmqtbyi" 
           width="350" 
