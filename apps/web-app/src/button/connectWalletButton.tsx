@@ -24,7 +24,7 @@ const ConnectWalletButton = ({ children }: { children: ReactNode }) => {
     >
       {!connected ? (
         <>
-          <Wallet2 size={18}/> Connect Wallet
+          <Wallet2 size={18} /> Connect Wallet
         </>
       ) : (
         "Connected"

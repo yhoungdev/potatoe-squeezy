@@ -15,16 +15,20 @@ import {
 import { useUserStore } from "@/store/user.store";
 import Cookies from "js-cookie";
 import ConnectWalletButton from "@/button/connectWalletButton";
+import { CirclePower } from "lucide-react";
 
 function DashboardHeader() {
   const { checkAuth, logout } = useAuth();
   const clearUser = useUserStore((state) => state.clearUser);
 
   return (
-    <div className={"w-full mx-auto flex items-center gap-2 justify-between"}>
+    <div
+      className={"w-full mx-auto mt-2 flex items-center gap-2 justify-between"}
+    >
       <div>
         <a href={"/app"}>
-          <h1 className="text-4xl text-red-50">🍟</h1>
+          {/* <h1 className="text-4xl text-red-50">🍟</h1> */}
+          <img src={"/logo/logo.png"} width={70} />
         </a>
       </div>
 
@@ -32,9 +36,9 @@ function DashboardHeader() {
         <ConnectWalletButton>.</ConnectWalletButton>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant={"outline"} className="text-red-400 bg-red-200/10">
-              Logout
-            </Button>
+            <div className="p-2 text-red-400 bg-gray-800 rounded-md">
+              <CirclePower />
+            </div>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
