@@ -10,9 +10,9 @@ const ConnectWalletButton = ({ children }: { children: ReactNode }) => {
       style={{
         background: "linear-gradient(51deg, #ee4543 0%, #e58786 100%)",
         color: "#fff",
-        padding: "1em 2em",
+        padding: "  .7em",
         borderRadius: "12px",
-        fontSize: ".8rem",
+        fontSize: "12px",
         fontWeight: "bold",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
@@ -24,7 +24,7 @@ const ConnectWalletButton = ({ children }: { children: ReactNode }) => {
     >
       {!connected ? (
         <>
-          <Wallet2 /> Connect Wallet
+          <Wallet2 size={18}/> Connect Wallet
         </>
       ) : (
         "Connected"
