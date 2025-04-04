@@ -3,7 +3,6 @@ import { TELEGRAM_BOT_TOKEN } from '../constants';
 
 const telegram_bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
-
 let isBotLaunched = false;
 
 const launchBot = async () => {
@@ -16,7 +15,6 @@ const launchBot = async () => {
       console.error('🚫 Failed to launch Telegram bot:', error);
     }
 
-  
     process.once('SIGINT', () => telegram_bot.stop('SIGINT'));
     process.once('SIGTERM', () => telegram_bot.stop('SIGTERM'));
   }
