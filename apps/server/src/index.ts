@@ -1,19 +1,21 @@
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import { authRouter } from "./routes/auth";
-import walletsRoute from "./routes/wallets";
-import { db } from "./db";
-import { sql } from "drizzle-orm";
-import type { Env } from "./types/env";
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { authRouter } from './routes/auth';
+import walletsRoute from './routes/wallets';
+import { db } from './db';
+import { sql } from 'drizzle-orm';
+import type { Env } from './types/env';
 import { logger } from 'hono/logger';
-import { prettyJSON } from "hono/pretty-json";
-import { userRoute } from "./routes/user";
+import { prettyJSON } from 'hono/pretty-json';
+import { userRoute } from './routes/user';
+import { sendTelegramMessage } from './utils/telegram-notification';
+import { TELEGRAM_CHAT_ID } from './constants';
+import { telegram_bot } from './config/telegraf';
 const app = new Hono<{ Bindings: Env }>();
 
-
 app.use(logger());
-app.use(prettyJSON())
-app.use("*", async (c, next) => {
+app.use(prettyJSON());
+app.use('*', async (c, next) => {
   c.env = {
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID!,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET!,
@@ -23,30 +25,32 @@ app.use("*", async (c, next) => {
   await next();
 });
 
-app.use("/*", cors());
+app.use('/*', cors());
 
-app.get("/", (c) => {
+app.get('/', (c) => {
+  sendTelegramMessage(TELEGRAM_CHAT_ID, 'Potatoe API is up and running!');
   return c.json({
-    name: "Potatoe GitHub Users API",
-    version: "1.0.0",
-    description: "⚡ Instantly tip developers with SOL for their contributions",
+    name: 'Potatoe GitHub Users API',
+    version: '1.0.0',
+    description: '⚡ Instantly tip developers with SOL for their contributions',
   });
 });
 
-app.get("/db-test", async (c) => {
+app.get('/db-test', async (c) => {
   try {
     const result = await c.env.DB.query(sql`SELECT NOW()`);
     return c.json({
-      status: "Connected",
+      status: 'Connected',
       timestamp: result[0].now,
-      message: "Database connection successful!",
+      message: 'Database connection successful!',
     });
   } catch (error) {
     return c.json(
       {
-        status: "Error",
-     
-        message: error instanceof Error ? error.message : 'An unknown error occurred',
+        status: 'Error',
+
+        message:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       },
       500,
     );
@@ -54,15 +58,27 @@ app.get("/db-test", async (c) => {
 });
 
 const routes = [
-  { path: "/auth", handler: authRouter },
-  { path: "/wallet", handler: walletsRoute },
-  { path: "/user", handler: userRoute }
+  { path: '/auth', handler: authRouter },
+  { path: '/wallet', handler: walletsRoute },
+  { path: '/user', handler: userRoute },
 ];
 
 routes.forEach(({ path, handler }) => {
   app.route(path, handler);
 });
 
-logger()
+telegram_bot
+  .launch()
+  .then(() => {
+    console.log('Telegram bot launched successfully!');
+  })
+  .catch((error) => {
+    console.error('Failed to launch Telegram bot:', error);
+  });
+
+process.once('SIGINT', () => telegram_bot.stop('SIGINT'));
+process.once('SIGTERM', () => telegram_bot.stop('SIGTERM'));
+
+logger();
 
 export default app;

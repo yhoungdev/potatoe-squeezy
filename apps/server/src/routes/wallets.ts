@@ -13,7 +13,8 @@ walletsRoute.post('/', async (c) => {
       return c.json({ error: 'User ID and wallet address are required' }, 400);
     }
 
-    const newWallet = await db.insert(wallets)
+    const newWallet = await db
+      .insert(wallets)
       .values({
         userId,
         address,
@@ -28,19 +29,20 @@ walletsRoute.post('/', async (c) => {
   }
 });
 
-walletsRoute.put ('/' , async (c) => {
+walletsRoute.put('/', async (c) => {
   try {
     const { walletId, address } = await c.req.json();
     if (!walletId || !address) {
       return c.json({ error: 'Wallet ID and address are required' }, 400);
     }
-    const updatedWallet = await db.update(wallets)
+    const updatedWallet = await db
+      .update(wallets)
       .set({
         address,
         updatedAt: new Date(),
       })
-     .where(eq(wallets.id, walletId))
-     .returning();
+      .where(eq(wallets.id, walletId))
+      .returning();
     return c.json(updatedWallet[0]);
   } catch (error) {
     console.error('Error updating wallet:', error);
@@ -54,7 +56,7 @@ walletsRoute.get('/user/:userId', async (c) => {
     const userWallets = await db.query.wallets.findMany({
       where: eq(wallets.userId, userId),
     });
-    
+
     return c.json(userWallets);
   } catch (error) {
     console.error('Error fetching wallets:', error);
