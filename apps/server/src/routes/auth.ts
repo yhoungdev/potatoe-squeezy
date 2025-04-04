@@ -65,7 +65,6 @@ authRouter.get('/callback', async (c) => {
         .returning();
 
       user = result[0];
-      
 
       const rawMessage = `
       🎉 *${NOTIFICATION_TYPE.NEW_USER}*
@@ -74,11 +73,10 @@ authRouter.get('/callback', async (c) => {
       🖋️ *GitHub Username*: \`${githubUser.login}\`
       🖼️ *Avatar*: [View Avatar](${githubUser.avatar_url})
       `;
-      
-            const message = telegramifyMarkdown(rawMessage.trim(), 'escape');
-      
-            await sendTelegramNotification(TELEGRAM_CHAT_ID, message);
 
+      const message = telegramifyMarkdown(rawMessage.trim(), 'escape');
+
+      await sendTelegramNotification(TELEGRAM_CHAT_ID, message);
     } else {
       const result = await c.env.DB.update(users)
         .set({
@@ -92,7 +90,6 @@ authRouter.get('/callback', async (c) => {
         .returning();
 
       user = result[0];
-
     }
 
     const token = await sign(
