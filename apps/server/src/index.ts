@@ -10,7 +10,7 @@ import { prettyJSON } from 'hono/pretty-json';
 import { userRoute } from './routes/user';
 import { sendTelegramMessage } from './utils/telegram-notification';
 import { TELEGRAM_CHAT_ID } from './constants';
-import { telegram_bot } from './config/telegraf';
+import { launchBot, telegram_bot } from './config/telegraf';
 const app = new Hono<{ Bindings: Env }>();
 
 app.use(logger());
@@ -67,18 +67,7 @@ routes.forEach(({ path, handler }) => {
   app.route(path, handler);
 });
 
-telegram_bot
-  .launch()
-  .then(() => {
-    console.log('Telegram bot launched successfully!');
-  })
-  .catch((error) => {
-    console.error('Failed to launch Telegram bot:', error);
-  });
-
-process.once('SIGINT', () => telegram_bot.stop('SIGINT'));
-process.once('SIGTERM', () => telegram_bot.stop('SIGTERM'));
-
+launchBot();
 logger();
 
 export default app;
