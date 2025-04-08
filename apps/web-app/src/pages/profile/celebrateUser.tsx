@@ -41,6 +41,9 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         setQuantity(0);
         setCustomAmount("");
         setMessage("");
+
+        const txnHash = success.explorerUrl;
+        window.location.href = `/status/success?txnHash=${txnHash}`;
       }
     } catch (error) {
       toast.error("Failed to send tip");

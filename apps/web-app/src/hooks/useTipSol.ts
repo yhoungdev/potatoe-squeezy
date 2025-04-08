@@ -60,12 +60,13 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
       const signature = await sendTransaction(transaction, connection);
       await connection.confirmTransaction(signature, "confirmed");
 
-      toast.success(`Successfully tipped ${amount} SOL to ${recipientName}!`);
-      return true;
+      const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+
+      return { success: true, transactionHash: signature, explorerUrl };
     } catch (error: any) {
       console.error("Error:", error);
       toast.error(error.message || "Failed to send tip");
-      return false;
+      return { success: false, transactionHash: null, explorerUrl: null };
     } finally {
       setLoading(false);
     }

@@ -13,6 +13,7 @@
 import { Route as rootRoute } from "./routes/__root";
 import { Route as IndexImport } from "./routes/index";
 import { Route as AppIndexImport } from "./routes/app/index";
+import { Route as StatusSuccessImport } from "./routes/status/success";
 import { Route as AppProfileImport } from "./routes/app/profile";
 import { Route as AppExploreImport } from "./routes/app/explore";
 
@@ -27,6 +28,12 @@ const IndexRoute = IndexImport.update({
 const AppIndexRoute = AppIndexImport.update({
   id: "/app/",
   path: "/app/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const StatusSuccessRoute = StatusSuccessImport.update({
+  id: "/status/success",
+  path: "/status/success",
   getParentRoute: () => rootRoute,
 } as any);
 
@@ -67,6 +74,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AppProfileImport;
       parentRoute: typeof rootRoute;
     };
+    "/status/success": {
+      id: "/status/success";
+      path: "/status/success";
+      fullPath: "/status/success";
+      preLoaderRoute: typeof StatusSuccessImport;
+      parentRoute: typeof rootRoute;
+    };
     "/app/": {
       id: "/app/";
       path: "/app";
@@ -83,6 +97,7 @@ export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
   "/app/explore": typeof AppExploreRoute;
   "/app/profile": typeof AppProfileRoute;
+  "/status/success": typeof StatusSuccessRoute;
   "/app": typeof AppIndexRoute;
 }
 
@@ -90,6 +105,7 @@ export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/app/explore": typeof AppExploreRoute;
   "/app/profile": typeof AppProfileRoute;
+  "/status/success": typeof StatusSuccessRoute;
   "/app": typeof AppIndexRoute;
 }
 
@@ -98,15 +114,22 @@ export interface FileRoutesById {
   "/": typeof IndexRoute;
   "/app/explore": typeof AppExploreRoute;
   "/app/profile": typeof AppProfileRoute;
+  "/status/success": typeof StatusSuccessRoute;
   "/app/": typeof AppIndexRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/app/explore" | "/app/profile" | "/app";
+  fullPaths: "/" | "/app/explore" | "/app/profile" | "/status/success" | "/app";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/app/explore" | "/app/profile" | "/app";
-  id: "__root__" | "/" | "/app/explore" | "/app/profile" | "/app/";
+  to: "/" | "/app/explore" | "/app/profile" | "/status/success" | "/app";
+  id:
+    | "__root__"
+    | "/"
+    | "/app/explore"
+    | "/app/profile"
+    | "/status/success"
+    | "/app/";
   fileRoutesById: FileRoutesById;
 }
 
@@ -114,6 +137,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   AppExploreRoute: typeof AppExploreRoute;
   AppProfileRoute: typeof AppProfileRoute;
+  StatusSuccessRoute: typeof StatusSuccessRoute;
   AppIndexRoute: typeof AppIndexRoute;
 }
 
@@ -121,6 +145,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppExploreRoute: AppExploreRoute,
   AppProfileRoute: AppProfileRoute,
+  StatusSuccessRoute: StatusSuccessRoute,
   AppIndexRoute: AppIndexRoute,
 };
 
@@ -137,6 +162,7 @@ export const routeTree = rootRoute
         "/",
         "/app/explore",
         "/app/profile",
+        "/status/success",
         "/app/"
       ]
     },
@@ -148,6 +174,9 @@ export const routeTree = rootRoute
     },
     "/app/profile": {
       "filePath": "app/profile.tsx"
+    },
+    "/status/success": {
+      "filePath": "status/success.tsx"
     },
     "/app/": {
       "filePath": "app/index.tsx"
