@@ -100,7 +100,6 @@ function AuthComponent() {
           </ConnectWalletButton> */}
         </motion.div>
       </motion.div>
-      
     </div>
   );
 }
