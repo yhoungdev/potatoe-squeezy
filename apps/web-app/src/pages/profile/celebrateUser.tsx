@@ -1,14 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@solana/wallet-adapter-react";
-import {
-  Connection,
-  PublicKey,
-  Transaction,
-  SystemProgram,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
-import { toast } from "react-hot-toast";
+import { useTipSol } from "@/hooks/useTipSol";
+import { toast } from "sonner";
 
 interface CelebrateUserProps {
   username: string;
@@ -16,51 +10,51 @@ interface CelebrateUserProps {
 }
 
 function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
-  const { publicKey, sendTransaction } = useWallet();
+  const { publicKey } = useWallet();
   const [quantity, setQuantity] = useState<number>(0);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const predefinedAmount = [5, 10, 15, 20];
+  const predefinedAmount = [0.5, 1, 1.5, 2];
+
+  const { sendTip, loading } = useTipSol({
+    recipientAddress: walletAddress,
+    recipientName: username,
+  });
+
+  const hasValidAmount =
+    quantity > 0 ||
+    (customAmount !== "" &&
+      !isNaN(parseFloat(customAmount)) &&
+      parseFloat(customAmount) > 0);
 
   const handleZap = async () => {
-    const amountToSend = customAmount ? parseFloat(customAmount) : quantity;
-
-    if (!publicKey || !amountToSend || isNaN(amountToSend)) {
-      toast.error("Please connect your wallet and select or enter an amount");
-      return;
-    }
-
-    setLoading(true);
     try {
-      const connection = new Connection(
-        import.meta.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
-          "https://api.devnet.solana.com",
-        "confirmed",
-      );
+      const amountToSend = customAmount ? parseFloat(customAmount) : quantity;
+      if (!amountToSend || amountToSend <= 0) {
+        toast.error("Please enter a valid amount");
+        return;
+      }
 
-      const recipientAddress = new PublicKey(walletAddress);
+      const success = await sendTip(amountToSend);
+      if (success) {
+        toast.success("Successfully sent tip!");
+        setQuantity(0);
+        setCustomAmount("");
+        setMessage("");
 
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: recipientAddress,
-          lamports: amountToSend * LAMPORTS_PER_SOL,
-        }),
-      );
-
-      const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, "confirmed");
-
-      toast.success(`Successfully tipped ${amountToSend} SOL to ${username}!`);
-      setQuantity(0);
-      setCustomAmount("");
-      setMessage("");
+        const txnHash = success.explorerUrl;
+        window.location.href = `/status/success?txnHash=${txnHash}`;
+      }
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Failed to send tip");
-    } finally {
-      setLoading(false);
+      console.error(error);
+    }
+  };
+
+  const handleAmountSelect = (selectedAmount: number) => {
+    if (publicKey) {
+      setQuantity(selectedAmount);
+      setCustomAmount("");
     }
   };
 
@@ -74,6 +68,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         <div className="flex items-center gap-4 mx-4 my-4 justify-evenly">
           {predefinedAmount.map((amount) => {
             const isSelected = amount === quantity;
+
             return (
               <div
                 key={amount}
@@ -81,14 +76,9 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
                   rounded-xl w-10 h-10 
                   flex items-center justify-center
                   border-[1px] border-white/20 
-                  ${isSelected && "!bg-red-400"}
-                  ${!publicKey && "opacity-50 cursor-not-allowed"}`}
-                onClick={() => {
-                  if (publicKey) {
-                    setQuantity(amount);
-                    setCustomAmount("");
-                  }
-                }}
+                  ${isSelected ? "!bg-red-400" : ""}
+                  ${!publicKey ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => handleAmountSelect(amount)}
               >
                 {amount}
               </div>
@@ -105,6 +95,8 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
             setCustomAmount(e.target.value);
             setQuantity(0);
           }}
+          min="0"
+          step="0.1"
           placeholder="Enter custom amount (SOL)"
           className="w-full p-2 text-sm bg-transparent border-2 border-white/20 rounded-xl"
           disabled={!publicKey}
@@ -121,19 +113,13 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         />
       </div>
 
-      {!walletAddress ? (
-        <h3 className="font-semibold text-center text-red-500">
-          User has'nt added a SOL address yet
-        </h3>
-      ) : (
-        <Button
-          className="w-full bg-red-400"
-          onClick={handleZap}
-          disabled={loading || !publicKey || (!quantity && !customAmount)}
-        >
-          {loading ? "Processing..." : "Zap 🍟"}
-        </Button>
-      )}
+      <Button
+        className={`w-full ${hasValidAmount && publicKey ? "bg-red-400 hover:bg-red-500" : "bg-gray-600"}`}
+        onClick={() => handleZap()}
+        disabled={!hasValidAmount || !publicKey || loading}
+      >
+        {loading ? "Processing..." : "Zap 🍟"}
+      </Button>
     </div>
   );
 }

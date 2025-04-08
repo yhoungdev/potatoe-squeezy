@@ -7,6 +7,7 @@ import API_ENDPOINTS from "@/enums/API_ENUM";
 import { BASE_API_URL } from "@/constant";
 import useAuth from "@/hooks/useAuth";
 import { Link } from "@tanstack/react-router";
+import ProductHuntCard from "../misc/ProductHuntCard";
 
 function AuthComponent() {
   const { publicKey, connect, disconnect } = useWallet();
@@ -91,7 +92,7 @@ function AuthComponent() {
             </Button>
           ) : (
             <Link to="/app">
-              <Button>Proceed to Dashboard</Button>
+              <Button className="py-5">Proceed to Dashboard</Button>
             </Link>
           )}
           {/* <ConnectWalletButton >

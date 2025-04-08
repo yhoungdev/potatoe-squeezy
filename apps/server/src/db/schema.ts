@@ -17,7 +17,7 @@ export const wallets = pgTable('wallets', {
   userId: integer('user_id')
     .notNull()
     .references(() => users.id),
-  address: text('address').notNull().unique(),
+  address: text('address').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

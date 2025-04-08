@@ -8,6 +8,13 @@
       "when": 1742018780546,
       "tag": "0000_kind_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1744089206973,
+      "tag": "0001_motionless_loki",
+      "breakpoints": true
     }
   ]
 }
