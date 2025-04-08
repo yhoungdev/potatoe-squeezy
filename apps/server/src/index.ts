@@ -10,11 +10,7 @@ import { prettyJSON } from 'hono/pretty-json';
 import { userRoute } from './routes/user';
 import { sendTelegramMessage } from './utils/telegram-notification';
 import { TELEGRAM_CHAT_ID } from './constants';
-<<<<<<< HEAD
 import { launchBot, telegram_bot } from './config/telegraf';
-=======
-import { telegram_bot } from './config/telegraf';
->>>>>>> db96ec1ea830a5b801dbdfc34d6bd547c4e7bf41
 const app = new Hono<{ Bindings: Env }>();
 
 app.use(logger());

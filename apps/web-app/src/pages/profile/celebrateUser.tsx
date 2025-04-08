@@ -21,7 +21,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
   const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const predefinedAmount = [5, 10, 15, 20];
+  const predefinedAmount = [0.5, 1, 1.5, 2];
 
   const handleZap = async () => {
     const amountToSend = customAmount ? parseFloat(customAmount) : quantity;
