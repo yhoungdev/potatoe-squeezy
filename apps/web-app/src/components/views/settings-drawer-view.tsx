@@ -4,10 +4,9 @@ import { useUserStore } from "@/store/user.store";
 import { toast } from "sonner";
 import { Power } from "lucide-react";
 import ModalLayout from "@/components/popups/modals";
-import {DialogDescription} from "@/components/ui/dialog.tsx";
+import { DialogDescription } from "@/components/ui/dialog.tsx";
 import useAuth from "@/hooks/useAuth.ts";
-import {Button} from "@/components/ui/button.tsx";
-
+import { Button } from "@/components/ui/button.tsx";
 
 const SettingsDrawerView = () => {
   const { user } = useUserStore() || {};
@@ -15,7 +14,7 @@ const SettingsDrawerView = () => {
   const { username: profile_name } = user?.users || {};
   const { address } = user?.wallets || {};
 
-  const { logout } = useAuth()
+  const { logout } = useAuth();
 
   const copyBadgeCode = () => {
     const badgeCode = `
@@ -43,20 +42,27 @@ const SettingsDrawerView = () => {
       <div className="mt-[4em] ">
         <ProductHuntBadge />
 
-        <ModalLayout trigger={<div
-            className="flex items-center justify-between p-4 transition-all duration-200
+        <ModalLayout
+          trigger={
+            <div
+              className="flex items-center justify-between p-4 transition-all duration-200
           border-2 cursor-pointer text-r ed-600  bg-gray-900/50 hover:bg-gray-900/70 rounded-xl border-red-900/40 hover:border-purple-500/30"
+            >
+              <div className="flex items-center gap-2">
+                <Power />
+                <h4 className="text-sm "> Log out</h4>
+              </div>
+            </div>
+          }
+          title={"Log Out"}
         >
-          <div className="flex items-center gap-2">
-            <Power />
-            <h4 className="text-sm "> Log out</h4>
-          </div>
-        </div>} title={'Log Out'}>
+          <DialogDescription>
+            Your account would be logged out
+          </DialogDescription>
 
-          <DialogDescription>Your account would be logged out</DialogDescription>
-
-          <Button className={'mt-4 bg-red-700 w-full'} onClick={logout}>Continue</Button>
-
+          <Button className={"mt-4 bg-red-700 w-full"} onClick={logout}>
+            Continue
+          </Button>
         </ModalLayout>
       </div>
     </div>
