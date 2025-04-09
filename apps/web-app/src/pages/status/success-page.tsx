@@ -7,7 +7,7 @@ const SuccessPage = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const params = new URLSearchParams(window.location.search);
-  const txnHash = params.get("txnHash")
+  const txnHash = params.get("txnHash");
   useEffect(() => {
     const handleInteraction = () => {
       if (audioRef.current) {

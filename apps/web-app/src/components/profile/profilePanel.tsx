@@ -1,20 +1,6 @@
-import { Button } from "../ui/button";
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Typography from "../typography";
-import { useSolanaTip } from "@/hooks/useSolanaTip";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { toast } from "sonner";
-import AddressAndBadge from "./addressAndBadge";
-import ProductHuntBadge from "../misc/product-hunt-badge";
-import { useUserStore } from "@/store/user.store";
-
 interface ProfilePanelProps {
   name: string;
   username: string;
@@ -28,39 +14,11 @@ interface ProfilePanelProps {
 function ProfilePanel({
   name,
   username,
-  onUpdateAddress,
   withAction = false,
   avatar,
   userBio = "",
-  walletAddress,
+
 }: ProfilePanelProps) {
-  const { sendTip, isSending, isWalletConnected } = useSolanaTip();
-
-  const handleTip = () => {
-    if (walletAddress) {
-      sendTip(walletAddress);
-    }
-  };
-
-  const { user } = useUserStore() || {};
-
-  const { username: profile_name } = user?.users || {};
-
-  const copyBadgeCode = () => {
-    const badgeCode = `
-      <a href="${window.location.origin}/app/profile?user=${profile_name}" target="_blank" rel="noopener noreferrer">
-        <img 
-          src="https://coffee-major-wallaby-86.mypinata.cloud/ipfs/bafkreiaskbvndui55ycmqdu6ui6arfkhxmqgjvjcaw26myp4y76mmqtbyi" 
-          width="350" 
-          height="54" 
-          style="width: 250px; height: 54px;" 
-          alt="Potatoe Squeezy - Support GitHub contributors with crypto | Product Hunt" 
-        />
-      </a>
-    `.trim();
-    navigator.clipboard.writeText(badgeCode);
-    toast.success("Badge code copied to clipboard!");
-  };
 
   return (
     <div>
@@ -84,7 +42,7 @@ function ProfilePanel({
 
             <Typography className="text-xs">{userBio}</Typography>
 
-            {withAction ? (
+            {/* {withAction ? (
               <Sheet>
                 <SheetTrigger asChild>
                   <Button className="mb-4 ">Manage Actions</Button>
@@ -117,7 +75,7 @@ function ProfilePanel({
                   {isSending ? "Sending..." : "Tip 0.1 SOL 🍟"}
                 </Button>
               )
-            )}
+            )} */}
           </div>
         </div>
       </motion.div>
