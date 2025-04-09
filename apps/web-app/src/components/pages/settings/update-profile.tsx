@@ -1,6 +1,4 @@
 const UpdateProfile = () => {
-    return <>
-        profile
-    </>
-}
+  return <>profile</>;
+};
 export default UpdateProfile;
