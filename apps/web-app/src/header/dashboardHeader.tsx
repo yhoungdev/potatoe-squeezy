@@ -2,7 +2,7 @@ import useAuth from "@/hooks/useAuth.ts";
 import { useUserStore } from "@/store/user.store";
 import { Settings } from "lucide-react";
 import Drawer from "@/components/popups/drawer";
-import SettingsDrawerView from "@/components/views/settings-drawer-view";
+import SettingsDrawerView  from "@/components/views/settings-drawer-view.tsx";
 
 function DashboardHeader() {
   const { logout } = useAuth();
