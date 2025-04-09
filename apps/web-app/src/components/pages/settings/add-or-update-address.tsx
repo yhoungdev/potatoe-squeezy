@@ -7,14 +7,16 @@ import { toast } from "sonner";
 import { useUserStore } from "@/store/user.store";
 
 interface AddOrUpdateAddressProps {
-  currentAddress?: string;
   onUpdateAddress?: (address: string) => void;
 }
 
-const AddOrUpdateAddress = ({ currentAddress = "", onUpdateAddress }: AddOrUpdateAddressProps) => {
-  const [address, setAddress] = useState(currentAddress);
+const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
   const { user } = useUserStore() || {};
   const { id } = user?.users || {};
+
+  const { wallets } = user || {};
+
+  const [address, setAddress] = useState(wallets?.address || "");
 
   const mutate = useMutation({
     mutationFn: (address: string) =>

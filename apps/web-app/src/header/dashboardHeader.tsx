@@ -1,12 +1,8 @@
 import useAuth from "@/hooks/useAuth.ts";
-import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/user.store";
-import ModalLayout from "@/components/popups/modals";
-import ConnectWalletButton from "@/button/connectWalletButton";
-import { CirclePower, Settings } from "lucide-react";
-import { AlertDialogDescription } from "@/components/ui/alert-dialog";
+import { Settings } from "lucide-react";
 import Drawer from "@/components/popups/drawer";
-import SettingsDrawerView from "@/components/views/settings-drawer-view";
+import SettingsDrawerView  from "@/components/views/settings-drawer-view.tsx";
 
 function DashboardHeader() {
   const { logout } = useAuth();

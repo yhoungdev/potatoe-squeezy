@@ -17,9 +17,7 @@ function ProfilePanel({
   withAction = false,
   avatar,
   userBio = "",
-
 }: ProfilePanelProps) {
-
   return (
     <div>
       <motion.div
