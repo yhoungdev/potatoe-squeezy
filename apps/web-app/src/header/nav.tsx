@@ -1,8 +1,6 @@
-import React from "react";
-
 const Nav = () => {
   return (
-    <nav className="mx-auto my-4 container px-4">
+    <nav className="container px-4 mx-auto my-4">
       <div className="flex items-center justify-between w-full gap-4">
         <div>
           <h1 className="text-4xl">🥔</h1>
@@ -12,7 +10,7 @@ const Nav = () => {
             href="https://github.com/yhoungdev/potatoe-squeezy"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-gray-800 p-2 rounded-lg"
+            className="p-2 bg-gray-800 rounded-lg"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
