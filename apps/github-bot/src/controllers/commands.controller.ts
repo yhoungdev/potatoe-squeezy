@@ -8,12 +8,10 @@ class BountyBot {
     this.context = context;
   }
 
-
-
   async handleComment() {
     const { comment: commentContext, sender } = this.context.payload;
     const { body } = commentContext;
-    console.log(body)
+    console.log(body);
 
     if (body.startsWith(COMMANDS.BOUNTY)) {
       const bountyMatch = body.match(/^\/bounty\s+(\d+(?:\.\d+)?)\s+(\w+)$/);
@@ -37,7 +35,6 @@ class BountyBot {
       await this.sendHelp();
     }
   }
-
 
   private async registerBounty(amount?: string, currency?: string) {
     if (!amount || !currency) {
@@ -90,6 +87,5 @@ class BountyBot {
     await this.context.octokit.issues.createComment(comment);
   }
 }
-
 
 export default BountyBot;
