@@ -1,15 +1,11 @@
 import { Probot } from "probot";
+import { handleIssueOpened, handleIssueComment } from "./controllers/index.ts";
 
 export default (app: Probot) => {
-  app.on("issues.opened", async (context) => {
-    const issueComment = context.issue({
-      body: "Thanks for opening this issue!",
-    });
-    await context.octokit.issues.createComment(issueComment);
+  app.log.info("App started 🎉");
+  app.on("issues.opened", handleIssueOpened);
+  app.on("issue_comment.created", async (context) => {
+    if (context.isBot) return;
+    await handleIssueComment(context);
   });
-  // For more information on building apps:
-  // https://probot.github.io/docs/
-
-  // To get your app running against GitHub, see:
-  // https://probot.github.io/docs/development/
 };
