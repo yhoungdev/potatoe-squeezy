@@ -29,7 +29,10 @@ export const transactionRecords = pgTable('transaction_records', {
   senderId: integer('sender_id').references(() => users.id),
   recipientAddress: text('recipient_address').notNull(),
   recipientId: integer('recipient_id').references(() => users.id),
+  txHash: text('tx_hash'),
+  note: text('note'),
   createdAt: timestamp('created_at').defaultNow(),
+
 });
 
 export const walletsRelations = relations(wallets, ({ one }) => ({
