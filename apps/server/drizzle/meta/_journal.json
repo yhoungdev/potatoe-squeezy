@@ -15,6 +15,20 @@
       "when": 1744089206973,
       "tag": "0001_motionless_loki",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1745093521013,
+      "tag": "0002_easy_shen",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1745093718119,
+      "tag": "0003_past_kitty_pryde",
+      "breakpoints": true
     }
   ]
 }
