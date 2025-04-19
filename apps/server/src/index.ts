@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { authRouter } from './routes/auth';
 import walletsRoute from './routes/wallets';
+import txRecordsRoute from './routes/tx-records';
 import { db } from './db';
 import { sql } from 'drizzle-orm';
 import type { Env } from './types/env';
@@ -61,6 +62,7 @@ const routes = [
   { path: '/auth', handler: authRouter },
   { path: '/wallet', handler: walletsRoute },
   { path: '/user', handler: userRoute },
+  { path: '/tx-records', handler: txRecordsRoute },
 ];
 
 routes.forEach(({ path, handler }) => {

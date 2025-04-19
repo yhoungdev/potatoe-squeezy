@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, integer, numeric } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
@@ -22,9 +22,30 @@ export const wallets = pgTable('wallets', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+export const transactionRecords = pgTable('transaction_records', {
+  id: serial('id').primaryKey(),
+  amount: numeric('amount').notNull(),
+  senderAddress: text('sender_address').notNull(),
+  senderId: integer('sender_id').references(() => users.id),
+  recipientAddress: text('recipient_address').notNull(),
+  recipientId: integer('recipient_id').references(() => users.id),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
 export const walletsRelations = relations(wallets, ({ one }) => ({
   user: one(users, {
     fields: [wallets.userId],
+    references: [users.id],
+  }),
+}));
+
+export const transactionRecordsRelations = relations(transactionRecords, ({ one }) => ({
+  sender: one(users, {
+    fields: [transactionRecords.senderId],
+    references: [users.id],
+  }),
+  recipient: one(users, {
+    fields: [transactionRecords.recipientId],
     references: [users.id],
   }),
 }));

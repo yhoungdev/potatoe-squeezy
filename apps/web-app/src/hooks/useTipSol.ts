@@ -14,6 +14,9 @@ interface TipSolParams {
   recipientName: string;
 }
 
+const FEE_PERCENTAGE = 0.005;
+const FEE_WALLET = new PublicKey("FFenFaL1e88RLGiG1AgSPuHDBGDPj4rqvtCNb6xrEwtY");
+
 export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
   const { publicKey, sendTransaction } = useWallet();
   const [loading, setLoading] = useState(false);
@@ -31,6 +34,13 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
       return false;
     }
 
+    const feeAmount = amount * FEE_PERCENTAGE;
+    const recipientAmount = amount - feeAmount;
+    toast.info(
+      `A 0.5% platform fee (${feeAmount.toFixed(4)} SOL) will be deducted. Recipient will receive ${recipientAmount.toFixed(4)} SOL.`,
+      { duration: 5000 }
+    );
+
     setLoading(true);
     try {
       const connection = new Connection(
@@ -39,18 +49,29 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
       );
 
       const recipient = new PublicKey(recipientAddress);
-      const lamports = Math.round(amount * LAMPORTS_PER_SOL);
+      const recipientLamports = Math.round(recipientAmount * LAMPORTS_PER_SOL);
+      const feeLamports = Math.round(feeAmount * LAMPORTS_PER_SOL);
 
-      if (lamports <= 0) {
+      if (recipientLamports <= 0) {
         throw new Error("Amount too small");
       }
 
-      const transaction = new Transaction().add(
+      const transaction = new Transaction();
+      
+      transaction.add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: recipient,
-          lamports,
-        }),
+          lamports: recipientLamports,
+        })
+      );
+
+      transaction.add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: FEE_WALLET,
+          lamports: feeLamports,
+        })
       );
 
       const { blockhash } = await connection.getLatestBlockhash();
