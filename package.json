@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "workspaces": [
-    
-  ],
+  "workspaces": [],
   "scripts": {
     "format": "prettier --write ./",
     "start": "concurrently \"cd apps/web-app && pnpm dev\" \"cd apps/server && pnpm dev\""

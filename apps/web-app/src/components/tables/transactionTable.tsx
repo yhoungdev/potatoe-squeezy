@@ -16,7 +16,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { NoDataFound } from "../fallbacks/noDataFound";
-import TransactionService, { TransactionRecord } from "@/services/transaction.service";
+import TransactionService, {
+  TransactionRecord,
+} from "@/services/transaction.service";
 import { format, formatDistanceToNow } from "date-fns";
 import { useUserStore } from "@/store/user.store";
 
@@ -57,7 +59,9 @@ function WalletTransactionTable() {
       >
         <Card className="border-white/10 bg-black/20 backdrop-blur-xl">
           <CardContent className="flex items-center justify-center h-48">
-            <div className="text-gray-400 animate-pulse">Loading transactions...</div>
+            <div className="text-gray-400 animate-pulse">
+              Loading transactions...
+            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -105,7 +109,8 @@ function WalletTransactionTable() {
             <Table>
               <TableHeader>
                 <TableRow className="border-white/10 hover:bg-transparent">
-                  <TableHead className="text-gray-400">Type</TableHead>
+                  {/*<TableHead className="text-gray-400">Type</TableHead>*/}
+                  <TableHead className="text-gray-400"></TableHead>
                   <TableHead className="text-gray-400">Amount</TableHead>
                   <TableHead className="text-gray-400">From/To</TableHead>
                   <TableHead className="text-gray-400">Time</TableHead>
@@ -114,7 +119,10 @@ function WalletTransactionTable() {
               <TableBody>
                 {transactions.map((tx) => {
                   const type = getTransactionType(tx);
-                  const displayAddress = type === "Received" ? tx.senderAddress : tx.recipientAddress;
+                  const displayAddress =
+                    type === "Received"
+                      ? tx.senderAddress
+                      : tx.recipientAddress;
                   return (
                     <motion.tr
                       key={tx.id}
@@ -136,7 +144,7 @@ function WalletTransactionTable() {
                             <ArrowUpRightIcon className="w-4 h-4" />
                           )}
                         </span>
-                        <span className="text-gray-300">{type}</span>
+                        {/*<span className="text-gray-300">{type}</span>*/}
                       </TableCell>
                       <TableCell
                         className={`font-mono font-medium ${
@@ -149,12 +157,18 @@ function WalletTransactionTable() {
                         {tx.amount} SOL
                       </TableCell>
                       <TableCell className="font-mono text-gray-400">
-                        {displayAddress.slice(0, 4)}...{displayAddress.slice(-4)}
+                        {displayAddress.slice(0, 4)}...
+                        {displayAddress.slice(-4)}
                       </TableCell>
                       <TableCell className="text-gray-400">
-                        <div className="flex items-center gap-2" title={format(new Date(tx.createdAt), 'PPpp')}>
+                        <div
+                          className="flex items-center gap-2"
+                          title={format(new Date(tx.createdAt), "PPpp")}
+                        >
                           <ClockIcon className="w-4 h-4 text-gray-500" />
-                          {formatDistanceToNow(new Date(tx.createdAt), { addSuffix: true })}
+                          {formatDistanceToNow(new Date(tx.createdAt), {
+                            addSuffix: true,
+                          })}
                         </div>
                       </TableCell>
                     </motion.tr>

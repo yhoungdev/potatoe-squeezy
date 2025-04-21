@@ -3,7 +3,10 @@ import { cn } from "@/lib/utils";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
-    <div className="relative w-full overflow-x-auto" data-slot="table-container">
+    <div
+      className="relative w-full overflow-x-auto"
+      data-slot="table-container"
+    >
       <table
         className={cn("w-full caption-bottom text-sm", className)}
         data-slot="table"
@@ -85,7 +88,10 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   );
 }
 
-function TableCaption({ className, ...props }: React.ComponentProps<"caption">) {
+function TableCaption({
+  className,
+  ...props
+}: React.ComponentProps<"caption">) {
   return (
     <caption
       className={cn("text-muted-foreground mt-4 text-sm", className)}

@@ -16,7 +16,6 @@ function WalletProfilePanel() {
         avatar={avatarUrl}
         withAction={true}
         walletAddress={address}
-        onUpdateAddress={() => {}}
       />
     </div>
   );
