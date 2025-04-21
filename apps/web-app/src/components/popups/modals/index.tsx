@@ -11,23 +11,40 @@ import {
 import { X } from "lucide-react";
 
 interface IModalLayout {
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   children: React.ReactNode;
   title: string;
   onClose?: () => void;
+  open?: boolean;
+  closeOnOverlayClick?: boolean;
 }
 
-const ModalLayout = ({ trigger, children, title, onClose }: IModalLayout) => {
+const ModalLayout = ({
+  trigger,
+  children,
+  title,
+  onClose,
+  open,
+  closeOnOverlayClick = true,
+}: IModalLayout) => {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent>
+    <AlertDialog open={open}>
+      {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
+      <AlertDialogContent
+        onPointerDownOutside={(e) => {
+          if (!closeOnOverlayClick) {
+            e.preventDefault();
+          }
+        }}
+      >
         <AlertDialogHeader>
           <div className="flex items-center justify-between">
             <AlertDialogTitle>{title}</AlertDialogTitle>
-            <AlertDialogCancel className="p-2">
-              <X className="w-4 h-4" />
-            </AlertDialogCancel>
+            {(closeOnOverlayClick || !open) && (
+              <AlertDialogCancel onClick={onClose} className="p-2">
+                <X className="w-4 h-4" />
+              </AlertDialogCancel>
+            )}
           </div>
           <div>{children}</div>
         </AlertDialogHeader>
@@ -35,4 +52,5 @@ const ModalLayout = ({ trigger, children, title, onClose }: IModalLayout) => {
     </AlertDialog>
   );
 };
+
 export default ModalLayout;

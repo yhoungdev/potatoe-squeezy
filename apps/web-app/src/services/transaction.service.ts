@@ -8,21 +8,25 @@ interface TransactionRecord {
   senderId: number | null;
   recipientAddress: string;
   recipientId: number | null;
+  txHash: string;
+  note: string | null;
   createdAt: string;
 }
 
 class TransactionService {
   static async getTransactionRecords(): Promise<TransactionRecord[]> {
     const response = await ApiClient.get<TransactionRecord[]>(
-      API_ENDPOINTS.TRANSACTION_RECORDS
+      API_ENDPOINTS.TRANSACTION_RECORDS,
     );
     return response;
   }
 
-  static async createTransactionRecord(data: Omit<TransactionRecord, 'id' | 'createdAt'>) {
+  static async createTransactionRecord(
+    data: Omit<TransactionRecord, "id" | "createdAt">,
+  ) {
     const response = await ApiClient.post<TransactionRecord>(
       API_ENDPOINTS.TRANSACTION_RECORDS,
-      data as any
+      data as any,
     );
     return response;
   }

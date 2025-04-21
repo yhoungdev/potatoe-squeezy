@@ -39,41 +39,6 @@ function ProfilePanel({
             </Typography>
 
             <Typography className="text-xs">{userBio}</Typography>
-
-            {/* {withAction ? (
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button className="mb-4 ">Manage Actions</Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle className="text-white">
-                      Profile Actions
-                    </SheetTitle>
-                  </SheetHeader>
-                  <AddressAndBadge
-                    username={username}
-                    onUpdateAddress={onUpdateAddress}
-                    onCopyBadge={copyBadgeCode}
-                    currentAddress={walletAddress}
-                  />
-
-                  <div className="mt-[5em] fixed bottom-2">
-                    <ProductHuntBadge />
-                  </div>
-                </SheetContent>
-              </Sheet>
-            ) : (
-              walletAddress && (
-                <Button
-                  className="mt-2"
-                  onClick={handleTip}
-                  disabled={isSending || !isWalletConnected}
-                >
-                  {isSending ? "Sending..." : "Tip 0.1 SOL 🍟"}
-                </Button>
-              )
-            )} */}
           </div>
         </div>
       </motion.div>

@@ -15,7 +15,9 @@ interface TipSolParams {
 }
 
 const FEE_PERCENTAGE = 0.005;
-const FEE_WALLET = new PublicKey("FFenFaL1e88RLGiG1AgSPuHDBGDPj4rqvtCNb6xrEwtY");
+const FEE_WALLET = new PublicKey(
+  "FFenFaL1e88RLGiG1AgSPuHDBGDPj4rqvtCNb6xrEwtY",
+);
 
 export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
   const { publicKey, sendTransaction } = useWallet();
@@ -38,7 +40,7 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
     const recipientAmount = amount - feeAmount;
     toast.info(
       `A 0.5% platform fee (${feeAmount.toFixed(4)} SOL) will be deducted. Recipient will receive ${recipientAmount.toFixed(4)} SOL.`,
-      { duration: 5000 }
+      { duration: 5000 },
     );
 
     setLoading(true);
@@ -57,13 +59,13 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
       }
 
       const transaction = new Transaction();
-      
+
       transaction.add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: recipient,
           lamports: recipientLamports,
-        })
+        }),
       );
 
       transaction.add(
@@ -71,7 +73,7 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
           fromPubkey: publicKey,
           toPubkey: FEE_WALLET,
           lamports: feeLamports,
-        })
+        }),
       );
 
       const { blockhash } = await connection.getLatestBlockhash();

@@ -4,7 +4,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ProfilePanel from "@/components/profile/profilePanel";
 import WalletNotConnected from "@/components/fallbacks/wallet-no-connect";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { extractWalletFromUser } from "@/util/extract-wallet-from-user";
 import useExtractUserWallet from "@/hooks/extract-user-wallet";
 
 interface GitHubUser {

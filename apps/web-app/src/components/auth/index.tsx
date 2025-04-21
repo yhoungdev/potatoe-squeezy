@@ -10,24 +10,8 @@ import { Link } from "@tanstack/react-router";
 import ProductHuntCard from "../misc/ProductHuntCard";
 
 function AuthComponent() {
-  const { publicKey, connect, disconnect } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
-  const { isAuthenticated, fetchUserProfile } = useAuth();
-
-  const handleWalletAction = async () => {
-    try {
-      setIsLoading(true);
-      if (publicKey) {
-        await disconnect();
-      } else {
-        await connect();
-      }
-    } catch (error) {
-      console.error("Wallet action failed:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { isAuthenticated } = useAuth();
 
   const handleGithubLogin = async () => {
     try {
