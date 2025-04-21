@@ -1,4 +1,11 @@
-import { pgTable, serial, text, timestamp, integer, numeric } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  integer,
+  numeric,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
@@ -32,7 +39,6 @@ export const transactionRecords = pgTable('transaction_records', {
   txHash: text('tx_hash'),
   note: text('note'),
   createdAt: timestamp('created_at').defaultNow(),
-
 });
 
 export const walletsRelations = relations(wallets, ({ one }) => ({
@@ -42,13 +48,16 @@ export const walletsRelations = relations(wallets, ({ one }) => ({
   }),
 }));
 
-export const transactionRecordsRelations = relations(transactionRecords, ({ one }) => ({
-  sender: one(users, {
-    fields: [transactionRecords.senderId],
-    references: [users.id],
+export const transactionRecordsRelations = relations(
+  transactionRecords,
+  ({ one }) => ({
+    sender: one(users, {
+      fields: [transactionRecords.senderId],
+      references: [users.id],
+    }),
+    recipient: one(users, {
+      fields: [transactionRecords.recipientId],
+      references: [users.id],
+    }),
   }),
-  recipient: one(users, {
-    fields: [transactionRecords.recipientId],
-    references: [users.id],
-  }),
-}));
+);

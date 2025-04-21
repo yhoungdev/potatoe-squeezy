@@ -33,12 +33,16 @@ txRecordsRoute.get('/', async (c) => {
 
 txRecordsRoute.post('/', async (c) => {
   try {
-    const { amount, senderAddress, senderId, recipientAddress, recipientId } = await c.req.json();
+    const { amount, senderAddress, senderId, recipientAddress, recipientId } =
+      await c.req.json();
 
     if (!amount || !senderAddress || !recipientAddress) {
-      return c.json({ 
-        error: 'Amount, sender address, and recipient address are required' 
-      }, 400);
+      return c.json(
+        {
+          error: 'Amount, sender address, and recipient address are required',
+        },
+        400,
+      );
     }
 
     const newRecord = await db
