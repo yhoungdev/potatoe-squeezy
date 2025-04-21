@@ -7,7 +7,7 @@ export async function handleIssueOpened(context: Context) {
     });
     await context.octokit.issues.createComment(issueComment);
   } catch (error) {
-    console.error('Error handling opened issue:', error);
+    console.error("Error handling opened issue:", error);
   }
 }
 
@@ -17,6 +17,6 @@ export async function handleIssueComment(context: Context) {
     const comment = context.payload.comment;
     // Process the comment as needed
   } catch (error) {
-    console.error('Error handling issue comment:', error);
+    console.error("Error handling issue comment:", error);
   }
 }
