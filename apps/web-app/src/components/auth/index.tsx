@@ -79,9 +79,6 @@ function AuthComponent() {
               <Button className="py-5">Proceed to Dashboard</Button>
             </Link>
           )}
-          {/* <ConnectWalletButton >
-            Connect Wallet
-          </ConnectWalletButton> */}
         </motion.div>
       </motion.div>
     </div>

@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 
 export function useProfile() {
   const setUser = useUserStore((state) => state.setUser);
+  const { setWallet } = useUserStore();
   const token = Cookies.get("auth-token");
 
   const { data: profile, isLoading } = useQuery({
@@ -12,6 +13,7 @@ export function useProfile() {
     queryFn: async () => {
       const response = await UserService.fetchUserProfile();
       setUser(response);
+      setWallet(response?.wallets?.address);
 
       return response;
     },

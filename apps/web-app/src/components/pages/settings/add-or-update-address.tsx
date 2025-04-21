@@ -12,12 +12,14 @@ interface AddOrUpdateAddressProps {
 }
 
 const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
-  const { user } = useUserStore() || {};
+  const { user, wallet } = useUserStore() || {};
+
+  const { setWallet } = useUserStore();
   const queryClient = useQueryClient();
   const { id } = user?.users || {};
   const { wallets } = user || {};
 
-  const [address, setAddress] = useState(wallets?.address || "");
+  const [address, setAddress] = useState(wallet || "");
   const hasExistingWallet = Boolean(wallets?.address);
 
   const addWalletMutation = useMutation({
@@ -28,6 +30,7 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
       }),
     onSuccess: () => {
       toast.success("Wallet address saved successfully.");
+      setWallet(address);
       onUpdateAddress?.(address);
       queryClient.invalidateQueries({
         queryKey: ["userProfile"],
@@ -47,6 +50,7 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
     onSuccess: () => {
       toast.success("Wallet address updated successfully.");
       onUpdateAddress?.(address);
+      setWallet(address);
       queryClient.invalidateQueries({
         queryKey: ["userProfile"],
       });
