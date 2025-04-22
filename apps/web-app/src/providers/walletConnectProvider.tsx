@@ -22,8 +22,8 @@ const WalletAdapterProvider = ({ children }: { children: ReactNode }) => {
 
   const wallets = useMemo(
     () => [
+      new PhantomWalletAdapter({ detectable: true }),
       new CoinbaseWalletAdapter(),
-      new PhantomWalletAdapter(),
       new SolflareWalletAdapter({ network }),
       new TorusWalletAdapter(),
     ],
@@ -32,7 +32,7 @@ const WalletAdapterProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets} autoConnect={false}>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
