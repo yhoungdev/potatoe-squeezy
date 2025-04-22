@@ -22,7 +22,7 @@ const WalletAdapterProvider = ({ children }: { children: ReactNode }) => {
 
   const wallets = useMemo(
     () => [
-      new PhantomWalletAdapter({ detectable: true }),
+      new PhantomWalletAdapter(),
       new CoinbaseWalletAdapter(),
       new SolflareWalletAdapter({ network }),
       new TorusWalletAdapter(),
