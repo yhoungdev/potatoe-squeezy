@@ -8,7 +8,7 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { toast } from "sonner";
-import {RPC_URL} from "@/constant";
+import { RPC_URL } from "@/constant";
 
 interface TipSolParams {
   recipientAddress: string;
@@ -46,10 +46,7 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
 
     setLoading(true);
     try {
-      const connection = new Connection(
-        RPC_URL,
-        "confirmed",
-      );
+      const connection = new Connection(RPC_URL, "confirmed");
 
       const recipient = new PublicKey(recipientAddress);
       const recipientLamports = Math.round(recipientAmount * LAMPORTS_PER_SOL);
