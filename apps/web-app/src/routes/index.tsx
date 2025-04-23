@@ -32,6 +32,9 @@ function IndexRoute() {
     <>
       <Homepage />
       <ProductHuntBadge />
+      <div className={'flex items-center justify-center'}>
+        <a href="https://startupfa.me/s/potatoe?utm_source=www.potatoesqueezy.xyz" target="_blank"><img src="https://startupfa.me/badges/featured-badge.webp" alt="Featured on Startup Fame" width="171" height="54" /></a>
+      </div>
     </>
   );
 }
