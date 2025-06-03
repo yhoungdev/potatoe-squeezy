@@ -20,7 +20,6 @@ export default defineConfig({
               env: "development",
             },
           ],
-          
         ],
       },
     }),
