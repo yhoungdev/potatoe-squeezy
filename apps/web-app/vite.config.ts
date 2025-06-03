@@ -20,10 +20,23 @@ export default defineConfig({
               env: "development",
             },
           ],
-          VitePWA({
-            registerType: "autoUpdate",
-          }),
+          
         ],
+      },
+    }),
+    VitePWA({
+      registerType: "autoUpdate",
+      injectRegister: "auto",
+
+      devOptions: {
+        enabled: true,
+      },
+      manifest: {
+        name: "Sui Bulma",
+        short_name: "Sui Bulma",
+        description:
+          "SUI Bulma - A Bitcoin-centric DeFi platform on Sui, enabling lending, stablecoins, perps, and synthetic assets to enhance BTC utility",
+        theme_color: "#0B0B14",
       },
     }),
     nodePolyfills(),

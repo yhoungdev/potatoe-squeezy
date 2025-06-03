@@ -34,11 +34,11 @@ function IndexRoute() {
         <ProductHuntBadge/>
         <a href='https://www.sideprojectors.com/project/56365/potatoe-squeezy'
            title='Potatoe Squeezy is for sale at @SideProjectors'>
-          <img
+          {/* <img
             style={{position: 'fixed', zIndex: 1000, top: '-5px', right: '20px', border: 0}}
             src='https://www.sideprojectors.com/img/badges/badge_2_red.png'
             alt='Potatoe Squeezy is for sale at @SideProjectors'
-          />
+          /> */}
         </a>
         <div  className={'text-center  lg:w-[40%]  text-gray-500 mt-4  text-sm mx-auto'}>
           I would love to keep Potatoe in good hands, so I am offering to sell it.{' '}
