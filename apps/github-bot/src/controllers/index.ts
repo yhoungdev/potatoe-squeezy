@@ -1,4 +1,4 @@
-import { handleIssueOpened, handleIssueComment } from "./issues.controller.ts";
-import bountyController from "./bounty.controller.ts";
+import { handleIssueOpened, handleIssueComment } from "./issues.controller";
+import bountyController from "./bounty.controller";
 
 export { handleIssueOpened, handleIssueComment, bountyController };

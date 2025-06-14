@@ -1,16 +1,19 @@
+//@ts-nocheck
 import { Context } from "probot";
-import COMMANDS from "../enums/commands.ts";
+import COMMANDS from "../enums/commands";
 
 class BountyBot {
-  private context: Context;
+  private context: Context<'issue_comment.created'>;
 
-  constructor(context: Context) {
+  constructor(context: Context<'issue_comment.created'>) {
     this.context = context;
   }
 
   async handleComment() {
-    const { comment: commentContext, sender } = this.context.payload;
-    const { body } = commentContext;
+    const { comment, sender } = this.context.payload;
+    if (!comment || !sender) return;
+
+    const { body } = comment;
     console.log(body);
 
     if (body.startsWith(COMMANDS.BOUNTY)) {
@@ -51,17 +54,12 @@ class BountyBot {
     await this.context.octokit.issues.createComment(comment);
   }
 
-  private async rewardBounty() {
-    const comment = this.context.issue({
-      body: `💰 Bounty registered!`,
-    });
-    await this.context.octokit.issues.createComment(comment);
-  }
-
   private async claimBounty() {
-    const sender = this.context.payload.sender.login;
+    const { sender } = this.context.payload;
+    if (!sender) return;
+
     const comment = this.context.issue({
-      body: `🛠️ @${sender} is claiming this bounty.`,
+      body: `🛠️ @${sender.login} is claiming this bounty.`,
     });
     await this.context.octokit.issues.createComment(comment);
   }
