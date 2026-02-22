@@ -9,6 +9,11 @@ import type { Env } from './types/env';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { userRoute } from './routes/user';
+import leaderboardRoute from './routes/leaderboard';
+import publicUsersRoute from './routes/public-users';
+import bountiesRoute from './routes/bounties';
+import githubWebhookRoute from './routes/github-webhook';
+import docsRoute from './routes/docs';
 import { sendTelegramMessage } from './utils/telegram-notification';
 import { TELEGRAM_CHAT_ID } from './constants';
 import { launchBot, telegram_bot } from './config/telegraf';
@@ -63,6 +68,11 @@ const routes = [
   { path: '/wallet', handler: walletsRoute },
   { path: '/user', handler: userRoute },
   { path: '/tx-records', handler: txRecordsRoute },
+  { path: '/leaderboard', handler: leaderboardRoute },
+  { path: '/users', handler: publicUsersRoute },
+  { path: '/bounties', handler: bountiesRoute },
+  { path: '/github', handler: githubWebhookRoute },
+  { path: '/docs', handler: docsRoute },
 ];
 
 routes.forEach(({ path, handler }) => {

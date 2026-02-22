@@ -1,8 +1,9 @@
 {
-  "name": "my-app",
+  "name": "@potatoe/server",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "start": "bun run --hot src/index.ts",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
     "db:generate": "drizzle-kit generate",
     "push": "bun run scripts/push-db.ts",
     "db:studio": "drizzle-kit studio",

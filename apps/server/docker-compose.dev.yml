@@ -1,0 +1,14 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: potatoe-server-dev
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: bun run dev
