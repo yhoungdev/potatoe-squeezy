@@ -8,6 +8,10 @@ enum API_ENDPOINTS {
   USER_WALLET = "/wallet",
 
   TRANSACTION_RECORDS = "/tx-records",
+  LEADERBOARD_GLOBAL = "/leaderboard/global",
+  LEADERBOARD_WEEKLY = "/leaderboard/weekly",
+  LEADERBOARD_STREAKS = "/leaderboard/streaks",
+  BOUNTIES = "/bounties",
 }
 
 export default API_ENDPOINTS;
