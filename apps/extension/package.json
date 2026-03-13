@@ -1,5 +1,5 @@
 {
-  "name": "potato-squeezy",
+  "name": "@potatoe/extension",
   "private": true,
   "version": "1.0.0",
   "type": "module",

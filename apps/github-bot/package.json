@@ -1,5 +1,5 @@
 {
-  "name": "github-bot",
+  "name": "@potatoe/github-bot",
   "version": "1.0.0",
   "private": true,
   "description": "Reward contributors from PR and comment with 🍟 potatoe bot",
