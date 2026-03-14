@@ -6,10 +6,10 @@
 
 ```sh
 # Install dependencies
-npm install
+bun install
 
 # Run the bot
-npm start
+bun run start
 ```
 
 ## Docker

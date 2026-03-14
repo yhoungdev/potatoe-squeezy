@@ -2,6 +2,7 @@
   "name": "@potatoe/github-bot",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "bun@1.3.10",
   "description": "Reward contributors from PR and comment with 🍟 potatoe bot",
   "author": "obiabo",
   "license": "ISC",
