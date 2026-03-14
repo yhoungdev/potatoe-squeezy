@@ -1,6 +1,6 @@
 {
-  "installCommand": "pnpm --filter @potatoe/web-app... install --no-frozen-lockfile --config.strict-peer-dependencies=false",
-  "buildCommand": "pnpm --filter @potatoe/web-app build",
+  "installCommand": "cd apps/web-app && bun install",
+  "buildCommand": "cd apps/web-app && bun run build",
   "outputDirectory": "apps/web-app/dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
