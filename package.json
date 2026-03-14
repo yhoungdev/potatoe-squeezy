@@ -5,8 +5,7 @@
   "packageManager": "bun@1.3.10",
   "workspaces": [
     "apps/*",
-    "libs/*",
-    "program"
+    "libs/*"
   ],
   "scripts": {
     "dev": "bun --cwd apps/server dev & bun --cwd apps/web-app dev & bun --cwd apps/github-bot dev & bun --cwd apps/extension dev & wait",
