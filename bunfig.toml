@@ -1,0 +1,4 @@
+[install]
+# Keep installs tolerant in CI (many wallet adapter deps have noisy peers)
+peer = false
+
