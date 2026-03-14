@@ -37,8 +37,8 @@
     "@walletconnect/solana-adapter": "^0.0.8",
     "avatar": "^0.1.0",
     "axios": "^1.9.0",
-    "bs58": "^6.0.0",
     "boring-avatars": "^1.11.2",
+    "bs58": "^6.0.0",
     "card": "^2.5.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -85,6 +85,6 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.33.1",
     "vite": "^6.3.5",
-    "vite-plugin-pwa": "^1.0.0"
+    "vite-plugin-pwa": "^1.2.0"
   }
 }
