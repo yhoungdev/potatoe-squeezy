@@ -1,6 +1,5 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { authRouter } from './routes/auth';
 import walletsRoute from './routes/wallets';
 import txRecordsRoute from './routes/tx-records';
 import { db } from './db';
@@ -17,11 +16,42 @@ import docsRoute from './routes/docs';
 import { sendTelegramMessage } from './utils/telegram-notification';
 import { TELEGRAM_CHAT_ID } from './constants';
 import { launchBot, telegram_bot } from './config/telegraf';
-const app = new Hono<{ Bindings: Env }>();
+import { auth } from './lib/better-auth/auth';
+
+const app = new Hono<{
+  Variables: {
+    user: typeof auth.$Infer.Session.user | null;
+    session: typeof auth.$Infer.Session.session | null;
+  };
+  Bindings: Env;
+}>();
 
 app.use(logger());
 app.use(prettyJSON());
+
+app.use(
+  '*',
+  cors({
+    origin: process.env.FRONTEND_APP_URL || 'http://localhost:5173',
+    allowHeaders: ['Content-Type', 'Authorization'],
+    allowMethods: ['POST', 'GET', 'OPTIONS'],
+    exposeHeaders: ['Content-Length'],
+    maxAge: 600,
+    credentials: true,
+  }),
+);
+
 app.use('*', async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+  if (!session) {
+    c.set('user', null);
+    c.set('session', null);
+  } else {
+    c.set('user', session.user);
+    c.set('session', session.session);
+  }
+
   c.env = {
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID!,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET!,
@@ -31,7 +61,9 @@ app.use('*', async (c, next) => {
   await next();
 });
 
-app.use('/*', cors());
+app.on(['POST', 'GET'], '/api/auth/*', (c) => {
+  return auth.handler(c.req.raw);
+});
 
 app.get('/', (c) => {
   sendTelegramMessage(TELEGRAM_CHAT_ID, 'Potatoe API is up and running!');
@@ -64,7 +96,6 @@ app.get('/db-test', async (c) => {
 });
 
 const routes = [
-  { path: '/auth', handler: authRouter },
   { path: '/wallet', handler: walletsRoute },
   { path: '/user', handler: userRoute },
   { path: '/tx-records', handler: txRecordsRoute },
