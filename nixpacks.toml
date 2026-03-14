@@ -1,0 +1,14 @@
+[phases.setup]
+
+nixPkgs = ["nodejs_20", "curl", "bash"]
+
+[phases.install]
+cmds = [
+  "corepack enable",
+  "curl -fsSL https://bun.sh/install | bash",
+  "pnpm install --frozen-lockfile",
+]
+
+[start]
+cmd = "export PATH=\"$HOME/.bun/bin:$PATH\" && pnpm --filter @potatoe/server start"
+

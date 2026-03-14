@@ -1,3 +1,24 @@
+## Monorepo
+
+This repository is configured as a workspace monorepo.
+
+Workspace layout:
+
+- `apps/*`
+- `libs/*`
+- `program`
+
+Common commands from repo root:
+
+- `pnpm dev`
+- `pnpm dev:all`
+- `pnpm dev:server`
+- `pnpm dev:web`
+- `pnpm build`
+- `pnpm test`
+- `pnpm lint`
+- `pnpm format`
+
 ## 🚀 Features
 
 - 🔥 **Zap GitHub Users** – Instantly tip developers with SOL for their contributions.

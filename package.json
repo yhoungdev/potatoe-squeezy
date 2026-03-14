@@ -1,21 +1,32 @@
 {
   "name": "potato-monorepo",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
-  "workspaces": [],
+  "packageManager": "pnpm@10.5.2",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "libs/*",
+    "program"
+  ],
   "scripts": {
-    "format": "prettier --write ./",
-    "start": "concurrently \"cd apps/web-app && pnpm dev\" \"cd apps/server && pnpm dev\""
+    "dev": "pnpm -r --parallel --filter @potatoe/server --filter @potatoe/web-app dev",
+    "dev:all": "pnpm -r --parallel --filter @potatoe/server --filter @potatoe/web-app --filter @potatoe/github-bot --filter @potatoe/extension dev",
+    "dev:server": "pnpm --filter @potatoe/server dev",
+    "dev:web": "pnpm --filter @potatoe/web-app dev",
+    "dev:bot": "pnpm --filter @potatoe/github-bot dev",
+    "dev:extension": "pnpm --filter @potatoe/extension dev",
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r --if-present lint",
+    "format": "pnpm -r --if-present format",
+    "format:write": "pnpm -r --if-present prettier --write .",
+    "start": "pnpm -r --parallel --filter @potatoe/server --filter @potatoe/web-app start"
   },
   "private": true,
-  "dependencies": {
-    "@radix-ui/react-alert-dialog": "^1.1.6",
-    "dotenv": "^16.4.7",
-    "lucid": "^2.21.0",
-    "prettier": "^3.4.2"
-  },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "prettier": "^3.5.3"
   }
 }
