@@ -2,6 +2,7 @@
   "name": "@potatoe/common",
   "version": "1.0.0",
   "description": "french fries",
+  "packageManager": "bun@1.3.10",
   "author": "yhoungdev",
   "license": "MIT",
   "repository": "yhoungdev/common",
@@ -20,7 +21,7 @@
     "test:lint": "eslint .",
     "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
     "test:watch": "react-scripts test --env=jsdom",
-    "predeploy": "cd example && yarn install && yarn run build",
+    "predeploy": "cd example && bun install && bun run build",
     "deploy": "gh-pages -d example/build"
   },
   "peerDependencies": {

@@ -1,8 +1,12 @@
-FROM node:20-slim
-WORKDIR /usr/src/app
-COPY package.json package-lock.json ./
-RUN npm ci --production
-RUN npm cache clean --force
+FROM oven/bun:1.3.10
+
+WORKDIR /app
+
+COPY package.json ./
+RUN bun install --production
+
 ENV NODE_ENV="production"
+
 COPY . .
-CMD [ "npm", "start" ]
+
+CMD ["bun", "run", "start"]

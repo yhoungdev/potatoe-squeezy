@@ -10,14 +10,15 @@ Workspace layout:
 
 Common commands from repo root:
 
-- `pnpm dev`
-- `pnpm dev:all`
-- `pnpm dev:server`
-- `pnpm dev:web`
-- `pnpm build`
-- `pnpm test`
-- `pnpm lint`
-- `pnpm format`
+- `bun run dev` (starts all apps in parallel)
+- `bun run start` (starts all apps in parallel)
+- `bun run dev:server`
+- `bun run dev:web`
+- `bun run start:server`
+- `bun run start:bot`
+- `bun run build:web`
+- `bun run build:extension`
+- `bun run format`
 
 ## 🚀 Features
 

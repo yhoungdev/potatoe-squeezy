@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import supabase from "@/lib/supabase";
 import useAuth from "@/hooks/useAuth";
+import { BASE_API_URL } from "@/constant";
+import API_ENDPOINTS from "@/enums/API_ENUM";
 function AuthButton() {
-  const webSupabase = supabase;
   const { session, loading, error } = useAuth();
 
   useEffect(() => {
@@ -13,14 +13,8 @@ function AuthButton() {
 
   const signInWithGithub = async () => {
     try {
-      const { error } = await webSupabase.auth.signInWithOAuth({
-        provider: "github",
-      });
-
-      if (error) {
-        console.error("Error signing in:", error.message);
-        alert("Failed to sign in. Please try again.");
-      }
+      const loginUrl = `${BASE_API_URL}${API_ENDPOINTS.GITHUB_AUTH}`;
+      window.location.href = loginUrl;
     } catch (err) {
       console.error("Unexpected error during sign-in:", err);
       alert("An unexpected error occurred. Please try again.");
