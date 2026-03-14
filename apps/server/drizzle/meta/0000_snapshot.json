@@ -34,9 +34,7 @@
         "badges_name_unique": {
           "name": "badges_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -149,12 +147,8 @@
           "name": "bounties_creator_id_users_id_fk",
           "tableFrom": "bounties",
           "tableTo": "users",
-          "columnsFrom": [
-            "creator_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["creator_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -248,12 +242,8 @@
           "name": "contributions_bounty_id_bounties_id_fk",
           "tableFrom": "contributions",
           "tableTo": "bounties",
-          "columnsFrom": [
-            "bounty_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bounty_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -261,12 +251,8 @@
           "name": "contributions_contributor_id_users_id_fk",
           "tableFrom": "contributions",
           "tableTo": "users",
-          "columnsFrom": [
-            "contributor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["contributor_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -348,12 +334,8 @@
           "name": "developer_stats_user_id_users_id_fk",
           "tableFrom": "developer_stats",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -363,9 +345,7 @@
         "developer_stats_user_id_unique": {
           "name": "developer_stats_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         }
       },
       "policies": {},
@@ -432,12 +412,8 @@
           "name": "tips_sender_id_users_id_fk",
           "tableFrom": "tips",
           "tableTo": "users",
-          "columnsFrom": [
-            "sender_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["sender_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -445,12 +421,8 @@
           "name": "tips_receiver_id_users_id_fk",
           "tableFrom": "tips",
           "tableTo": "users",
-          "columnsFrom": [
-            "receiver_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["receiver_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -460,9 +432,7 @@
         "tips_tx_hash_unique": {
           "name": "tips_tx_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tx_hash"
-          ]
+          "columns": ["tx_hash"]
         }
       },
       "policies": {},
@@ -535,12 +505,8 @@
           "name": "transaction_records_sender_id_users_id_fk",
           "tableFrom": "transaction_records",
           "tableTo": "users",
-          "columnsFrom": [
-            "sender_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["sender_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -548,12 +514,8 @@
           "name": "transaction_records_recipient_id_users_id_fk",
           "tableFrom": "transaction_records",
           "tableTo": "users",
-          "columnsFrom": [
-            "recipient_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["recipient_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -622,12 +584,8 @@
           "name": "user_badges_user_id_users_id_fk",
           "tableFrom": "user_badges",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -635,12 +593,8 @@
           "name": "user_badges_badge_id_badges_id_fk",
           "tableFrom": "user_badges",
           "tableTo": "badges",
-          "columnsFrom": [
-            "badge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["badge_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -725,16 +679,12 @@
         "users_github_id_unique": {
           "name": "users_github_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "github_id"
-          ]
+          "columns": ["github_id"]
         },
         "users_username_unique": {
           "name": "users_username_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "username"
-          ]
+          "columns": ["username"]
         }
       },
       "policies": {},
@@ -784,12 +734,8 @@
           "name": "wallets_user_id_users_id_fk",
           "tableFrom": "wallets",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -855,9 +801,7 @@
         "webhook_events_delivery_id_unique": {
           "name": "webhook_events_delivery_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "delivery_id"
-          ]
+          "columns": ["delivery_id"]
         }
       },
       "policies": {},
@@ -992,12 +936,8 @@
           "name": "auth_accounts_user_id_auth_users_id_fk",
           "tableFrom": "auth_accounts",
           "tableTo": "auth_users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1100,12 +1040,8 @@
           "name": "auth_sessions_user_id_auth_users_id_fk",
           "tableFrom": "auth_sessions",
           "tableTo": "auth_users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

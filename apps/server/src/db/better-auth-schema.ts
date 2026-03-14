@@ -57,8 +57,9 @@ export const authAccounts = pgTable(
     updated_at: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => ({
-    providerAccountUnique: uniqueIndex('auth_accounts_provider_account_unique')
-      .on(table.provider_id, table.account_id),
+    providerAccountUnique: uniqueIndex(
+      'auth_accounts_provider_account_unique',
+    ).on(table.provider_id, table.account_id),
     userIdIndex: index('auth_accounts_user_id_idx').on(table.user_id),
   }),
 );
