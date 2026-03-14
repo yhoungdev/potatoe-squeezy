@@ -11,29 +11,29 @@ export const authUsers = pgTable('auth_users', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull(),
-  emailVerified: boolean('email_verified').notNull().default(false),
+  email_verified: boolean('email_verified').notNull().default(false),
   image: text('image'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
 });
 
 export const authSessions = pgTable(
   'auth_sessions',
   {
     id: text('id').primaryKey(),
-    userId: text('user_id')
+    user_id: text('user_id')
       .notNull()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
-    expiresAt: timestamp('expires_at').notNull(),
+    expires_at: timestamp('expires_at').notNull(),
     token: text('token').notNull(),
-    ipAddress: text('ip_address'),
-    userAgent: text('user_agent'),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    ip_address: text('ip_address'),
+    user_agent: text('user_agent'),
+    created_at: timestamp('created_at').notNull().defaultNow(),
+    updated_at: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => ({
     tokenUnique: uniqueIndex('auth_sessions_token_unique').on(table.token),
-    userIdIndex: index('auth_sessions_user_id_idx').on(table.userId),
+    userIdIndex: index('auth_sessions_user_id_idx').on(table.user_id),
   }),
 );
 
@@ -41,25 +41,25 @@ export const authAccounts = pgTable(
   'auth_accounts',
   {
     id: text('id').primaryKey(),
-    accountId: text('account_id').notNull(),
-    providerId: text('provider_id').notNull(),
-    userId: text('user_id')
+    account_id: text('account_id').notNull(),
+    provider_id: text('provider_id').notNull(),
+    user_id: text('user_id')
       .notNull()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
-    accessToken: text('access_token'),
-    refreshToken: text('refresh_token'),
-    idToken: text('id_token'),
-    accessTokenExpiresAt: timestamp('access_token_expires_at'),
-    refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+    access_token: text('access_token'),
+    refresh_token: text('refresh_token'),
+    id_token: text('id_token'),
+    access_token_expires_at: timestamp('access_token_expires_at'),
+    refresh_token_expires_at: timestamp('refresh_token_expires_at'),
     scope: text('scope'),
     password: text('password'),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    created_at: timestamp('created_at').notNull().defaultNow(),
+    updated_at: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => ({
     providerAccountUnique: uniqueIndex('auth_accounts_provider_account_unique')
-      .on(table.providerId, table.accountId),
-    userIdIndex: index('auth_accounts_user_id_idx').on(table.userId),
+      .on(table.provider_id, table.account_id),
+    userIdIndex: index('auth_accounts_user_id_idx').on(table.user_id),
   }),
 );
 
@@ -69,9 +69,9 @@ export const authVerifications = pgTable(
     id: text('id').primaryKey(),
     identifier: text('identifier').notNull(),
     value: text('value').notNull(),
-    expiresAt: timestamp('expires_at').notNull(),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    expires_at: timestamp('expires_at').notNull(),
+    created_at: timestamp('created_at').notNull().defaultNow(),
+    updated_at: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => ({
     identifierIndex: index('auth_verifications_identifier_idx').on(
@@ -79,4 +79,3 @@ export const authVerifications = pgTable(
     ),
   }),
 );
-

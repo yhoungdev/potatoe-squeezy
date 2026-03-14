@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1742018780546,
-      "tag": "0000_kind_gamora",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1744089206973,
-      "tag": "0001_motionless_loki",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1745093521013,
-      "tag": "0002_easy_shen",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1745093718119,
-      "tag": "0003_past_kitty_pryde",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1773514530885,
-      "tag": "0004_tan_mister_fear",
+      "when": 1773517652847,
+      "tag": "0000_jazzy_romulus",
       "breakpoints": true
     }
   ]

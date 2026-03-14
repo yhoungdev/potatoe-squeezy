@@ -8,8 +8,9 @@
     "db:generate": "drizzle-kit generate",
     "push": "bun run scripts/push-db.ts",
     "auth:generate": "bun x auth@latest generate --config ./auth.ts",
+    "auth:migrate": "bun x auth@latest migrate --config ./auth.ts",
     "db:studio": "drizzle-kit studio",
-    "db:push": "npx drizzle-kit push",
+    "db:push": "bun x drizzle-kit push",
     "format": "prettier --write ."
   },
   "dependencies": {

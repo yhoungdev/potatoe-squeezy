@@ -1,1 +1,0 @@
-ALTER TABLE "transaction_records" ALTER COLUMN "tx_hash" DROP NOT NULL;
