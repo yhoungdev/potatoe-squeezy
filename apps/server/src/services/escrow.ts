@@ -139,10 +139,7 @@ class BaseEscrowService implements EscrowService {
     });
   }
 
-  async refundFunds(
-    bountyId: string,
-    creatorAddress: string,
-  ): Promise<string> {
+  async refundFunds(bountyId: string, creatorAddress: string): Promise<string> {
     return db.transaction(async (tx) => {
       const lockResult = await tx.execute(
         sql`select id, network, status, payout_tx_hash, refund_tx_hash, amount from bounties where id = ${bountyId} for update`,

@@ -41,14 +41,23 @@ export class LeaderboardService {
         difficultySum: sql<number>`cast(coalesce(sum(${contributions.difficulty}), 0) as int)`,
       })
       .from(contributions)
-      .where(and(eq(contributions.contributorId, userId), eq(contributions.merged, true)));
+      .where(
+        and(
+          eq(contributions.contributorId, userId),
+          eq(contributions.merged, true),
+        ),
+      );
 
     const earningsUSD = Number(statsRow[0]?.totalEarnedUSD ?? 0);
     const consecutiveDays = Number(statsRow[0]?.consecutiveDays ?? 0);
     const mergedPRCount = contributionRow[0]?.mergedCount ?? 0;
     const difficultySum = contributionRow[0]?.difficultySum ?? 0;
 
-    const points = earningsUSD + difficultySum * 10 + consecutiveDays * 5 + mergedPRCount * 2;
+    const points =
+      earningsUSD +
+      difficultySum * 10 +
+      consecutiveDays * 5 +
+      mergedPRCount * 2;
 
     await db
       .update(developerStats)
@@ -73,7 +82,10 @@ export class LeaderboardService {
       })
       .from(users)
       .leftJoin(developerStats, eq(users.id, developerStats.userId))
-      .orderBy(desc(developerStats.totalPoints), desc(developerStats.totalEarnedUSD))
+      .orderBy(
+        desc(developerStats.totalPoints),
+        desc(developerStats.totalEarnedUSD),
+      )
       .limit(limit);
 
     const aggregateRows = await db
@@ -86,7 +98,10 @@ export class LeaderboardService {
       .where(eq(contributions.merged, true))
       .groupBy(contributions.contributorId);
 
-    const aggregateMap = new Map<number, { mergedPRCount: number; difficultySum: number }>();
+    const aggregateMap = new Map<
+      number,
+      { mergedPRCount: number; difficultySum: number }
+    >();
     for (const row of aggregateRows) {
       aggregateMap.set(row.userId, {
         mergedPRCount: row.mergedPRCount,
@@ -132,7 +147,12 @@ export class LeaderboardService {
       .innerJoin(users, eq(contributions.contributorId, users.id))
       .innerJoin(bounties, eq(contributions.bountyId, bounties.id))
       .leftJoin(developerStats, eq(users.id, developerStats.userId))
-      .where(and(eq(contributions.merged, true), gte(contributions.createdAt, since)));
+      .where(
+        and(
+          eq(contributions.merged, true),
+          gte(contributions.createdAt, since),
+        ),
+      );
 
     const grouped = new Map<number, LeaderboardUser>();
 
@@ -195,7 +215,10 @@ export class LeaderboardService {
       })
       .from(developerStats)
       .innerJoin(users, eq(developerStats.userId, users.id))
-      .orderBy(desc(developerStats.consecutiveDays), desc(developerStats.totalPoints))
+      .orderBy(
+        desc(developerStats.consecutiveDays),
+        desc(developerStats.totalPoints),
+      )
       .limit(limit);
 
     const aggregateRows = await db
@@ -208,7 +231,10 @@ export class LeaderboardService {
       .where(eq(contributions.merged, true))
       .groupBy(contributions.contributorId);
 
-    const aggregateMap = new Map<number, { mergedPRCount: number; difficultySum: number }>();
+    const aggregateMap = new Map<
+      number,
+      { mergedPRCount: number; difficultySum: number }
+    >();
     for (const row of aggregateRows) {
       aggregateMap.set(row.userId, {
         mergedPRCount: row.mergedPRCount,
@@ -216,7 +242,9 @@ export class LeaderboardService {
       });
     }
 
-    const badgesByUser = await badgeService.getBadgesForUsers(rows.map((row) => row.userId));
+    const badgesByUser = await badgeService.getBadgesForUsers(
+      rows.map((row) => row.userId),
+    );
 
     const leaderboardRows = rows.map((row) => ({
       userId: row.userId,

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import DefaultDashboard from '@/layouts/dashboard';
-import ApiClient from '@/util/api';
-import API_ENDPOINTS from '@/enums/API_ENUM';
+import { useEffect, useState } from "react";
+import DefaultDashboard from "@/layouts/dashboard";
+import ApiClient from "@/util/api";
+import API_ENDPOINTS from "@/enums/API_ENUM";
 
 type Bounty = {
   id: string;
@@ -25,7 +25,9 @@ function BountyExplorerPage() {
     const run = async () => {
       setLoading(true);
       try {
-        const rows = await ApiClient.get<Bounty[]>(`${API_ENDPOINTS.BOUNTIES}?status=open&limit=50`);
+        const rows = await ApiClient.get<Bounty[]>(
+          `${API_ENDPOINTS.BOUNTIES}?status=open&limit=50`,
+        );
         setBounties(rows);
       } finally {
         setLoading(false);
@@ -40,7 +42,9 @@ function BountyExplorerPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-white">Bounty Explorer</h1>
-          <p className="text-sm text-gray-400">Open escrowed bounties across Solana and Stellar</p>
+          <p className="text-sm text-gray-400">
+            Open escrowed bounties across Solana and Stellar
+          </p>
         </div>
 
         {loading && (
@@ -67,10 +71,15 @@ function BountyExplorerPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-gray-400">{bounty.repo}</p>
-                  <h2 className="text-lg font-medium text-white">Issue #{bounty.issueNumber}</h2>
+                  <h2 className="text-lg font-medium text-white">
+                    Issue #{bounty.issueNumber}
+                  </h2>
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <img
-                      src={bounty.creatorAvatarUrl || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'}
+                      src={
+                        bounty.creatorAvatarUrl ||
+                        "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                      }
                       className="w-5 h-5 rounded-full"
                     />
                     <span>{bounty.creatorUsername}</span>
@@ -80,10 +89,12 @@ function BountyExplorerPage() {
                   <p className="text-xl font-semibold text-white">
                     {bounty.amount} {bounty.token}
                   </p>
-                  <p className="text-xs text-gray-400 uppercase">{bounty.network}</p>
+                  <p className="text-xs text-gray-400 uppercase">
+                    {bounty.network}
+                  </p>
                   <p className="text-xs text-gray-500">
                     {bounty.mergedContributions} merged contribution
-                    {bounty.mergedContributions === 1 ? '' : 's'}
+                    {bounty.mergedContributions === 1 ? "" : "s"}
                   </p>
                 </div>
               </div>

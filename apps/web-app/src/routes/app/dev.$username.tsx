@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import DeveloperProfilePage from '@/pages/developer/profile';
+import { createFileRoute } from "@tanstack/react-router";
+import DeveloperProfilePage from "@/pages/developer/profile";
 
-export const Route = createFileRoute('/app/dev/$username')({
+export const Route = createFileRoute("/app/dev/$username")({
   component: RouteComponent,
 });
 

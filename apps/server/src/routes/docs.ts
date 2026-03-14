@@ -101,7 +101,10 @@ const openApiSpec = {
           amount: { type: 'string' },
           token: { type: 'string' },
           network: { type: 'string', enum: ['solana', 'stellar'] },
-          status: { type: 'string', enum: ['pending', 'open', 'completed', 'cancelled'] },
+          status: {
+            type: 'string',
+            enum: ['pending', 'open', 'completed', 'cancelled'],
+          },
           escrowTxHash: { type: 'string' },
           payoutTxHash: { type: ['string', 'null'] },
           createdAt: { type: 'string', format: 'date-time' },
@@ -439,7 +442,10 @@ const openApiSpec = {
           {
             name: 'status',
             in: 'query',
-            schema: { type: 'string', enum: ['pending', 'open', 'completed', 'cancelled'] },
+            schema: {
+              type: 'string',
+              enum: ['pending', 'open', 'completed', 'cancelled'],
+            },
           },
           {
             name: 'limit',

@@ -64,6 +64,7 @@ Checks database connectivity.
 Starts GitHub OAuth flow.
 
 Response:
+
 - `302` redirect
 
 #### `GET /auth/callback`
@@ -71,6 +72,7 @@ Response:
 GitHub OAuth callback.
 
 Response:
+
 - `302` redirect to frontend with token query param
 - `401` when GitHub auth payload is missing
 - `500` on DB failure
@@ -80,6 +82,7 @@ Response:
 Revokes GitHub token and clears cookies.
 
 Response:
+
 - `200` logout success
 - `500` revoke failure
 
@@ -99,6 +102,7 @@ Body:
 ```
 
 Response:
+
 - `200` created wallet
 - `400` missing fields
 
@@ -116,6 +120,7 @@ Body:
 ```
 
 Response:
+
 - `200` updated wallet
 - `400` missing fields
 
@@ -124,6 +129,7 @@ Response:
 Fetch wallets by user id.
 
 Response:
+
 - `200` wallet list
 
 ## Users
@@ -133,9 +139,11 @@ Response:
 Authenticated user profile.
 
 Headers:
+
 - `Authorization: Bearer <jwt>`
 
 Response:
+
 - `200` user profile with wallet join
 - `404` user not found
 
@@ -144,6 +152,7 @@ Response:
 List all users with wallet joins.
 
 Response:
+
 - `200` users list
 - `404` no users found
 
@@ -152,6 +161,7 @@ Response:
 Public developer profile with stats, badges, contributions, created bounties, earned networks.
 
 Response:
+
 - `200` profile payload
 - `404` user not found
 
@@ -162,6 +172,7 @@ Response:
 List latest transaction records.
 
 Response:
+
 - `200` records list
 
 #### `POST /tx-records`
@@ -181,6 +192,7 @@ Body:
 ```
 
 Response:
+
 - `200` created transaction
 - `400` missing required fields
 
@@ -191,6 +203,7 @@ Response:
 Global ranking by points.
 
 Query params:
+
 - `limit` number, default `20`, min `1`, max `100`
 
 #### `GET /leaderboard/weekly`
@@ -198,6 +211,7 @@ Query params:
 Weekly ranking by points.
 
 Query params:
+
 - `limit` number, default `20`, min `1`, max `100`
 
 #### `GET /leaderboard/streaks`
@@ -205,9 +219,11 @@ Query params:
 Streak-based ranking.
 
 Query params:
+
 - `limit` number, default `20`, min `1`, max `100`
 
 Response for leaderboard routes:
+
 - `200` array of ranked rows:
 
 ```json
@@ -234,10 +250,12 @@ Response for leaderboard routes:
 List bounties.
 
 Query params:
+
 - `status` one of `pending | open | completed | cancelled`
 - `limit` number, default `50`, min `1`, max `100`
 
 Response:
+
 - `200` array of bounties with creator metadata and merged contribution count
 
 ## GitHub Webhook
@@ -247,16 +265,19 @@ Response:
 Consumes GitHub webhook events for bounty creation and payout flows.
 
 Required headers:
+
 - `x-hub-signature-256`
 - `x-github-event`
 - `x-github-delivery` optional but recommended
 
 Supported events:
+
 - `issue_comment`
 - `pull_request`
 - `pull_request_review`
 
 Response:
+
 - `200` processed or duplicate event
 - `401` invalid signature
 - `500` processing error

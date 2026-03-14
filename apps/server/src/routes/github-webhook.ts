@@ -2,12 +2,7 @@ import { Hono } from 'hono';
 import { and, eq, inArray } from 'drizzle-orm';
 import { createHash } from 'crypto';
 import { db } from '../db';
-import {
-  bounties,
-  contributions,
-  users,
-  webhookEvents,
-} from '../db/schema';
+import { bounties, contributions, users, webhookEvents } from '../db/schema';
 import { verifyGitHubSignature } from '../utils/github-signature';
 import { getEscrowService } from '../services/escrow';
 import { DeveloperStatsService } from '../services/developer-stats';
@@ -40,7 +35,9 @@ const parseLinkedIssueNumbers = (body: string | undefined) => {
 
   const matches = body.matchAll(/#(\d+)/g);
   const values = Array.from(matches).map((value) => Number(value[1]));
-  return [...new Set(values)].filter((value) => Number.isInteger(value) && value > 0);
+  return [...new Set(values)].filter(
+    (value) => Number.isInteger(value) && value > 0,
+  );
 };
 
 const postGitHubComment = async (
@@ -54,21 +51,26 @@ const postGitHubComment = async (
     return;
   }
 
-  await fetch(`https://api.github.com/repos/${repo}/issues/${issueNumber}/comments`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json',
+  await fetch(
+    `https://api.github.com/repos/${repo}/issues/${issueNumber}/comments`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ body }),
     },
-    body: JSON.stringify({ body }),
-  });
+  );
 };
 
 const ensureGitHubUser = async (payloadUser: Record<string, unknown>) => {
   const githubId = String(payloadUser.id ?? '');
   const username = String(payloadUser.login ?? '');
-  const avatarUrl = payloadUser.avatar_url ? String(payloadUser.avatar_url) : null;
+  const avatarUrl = payloadUser.avatar_url
+    ? String(payloadUser.avatar_url)
+    : null;
 
   if (!githubId || !username) {
     return null;
@@ -81,7 +83,10 @@ const ensureGitHubUser = async (payloadUser: Record<string, unknown>) => {
     .limit(1);
 
   if (existing.length > 0) {
-    if (existing[0].username !== username || existing[0].avatarUrl !== avatarUrl) {
+    if (
+      existing[0].username !== username ||
+      existing[0].avatarUrl !== avatarUrl
+    ) {
       const updated = await db
         .update(users)
         .set({
@@ -114,7 +119,9 @@ const handleBountyCommand = async (payload: Record<string, unknown>) => {
   const repository = payload.repository as Record<string, unknown> | undefined;
 
   const commentBody = String(comment?.body ?? '').trim();
-  const match = commentBody.match(/^\/bounty\s+(\d+(?:\.\d+)?)\s+([a-zA-Z0-9]+)$/i);
+  const match = commentBody.match(
+    /^\/bounty\s+(\d+(?:\.\d+)?)\s+([a-zA-Z0-9]+)$/i,
+  );
 
   if (!match) {
     return;
@@ -215,7 +222,9 @@ const handleBountyCommand = async (payload: Record<string, unknown>) => {
 };
 
 const attachContributionForPR = async (payload: Record<string, unknown>) => {
-  const pullRequest = payload.pull_request as Record<string, unknown> | undefined;
+  const pullRequest = payload.pull_request as
+    | Record<string, unknown>
+    | undefined;
   const repository = payload.repository as Record<string, unknown> | undefined;
 
   if (!pullRequest || !repository) {
@@ -279,7 +288,9 @@ const attachContributionForPR = async (payload: Record<string, unknown>) => {
 };
 
 const processMergedPR = async (payload: Record<string, unknown>) => {
-  const pullRequest = payload.pull_request as Record<string, unknown> | undefined;
+  const pullRequest = payload.pull_request as
+    | Record<string, unknown>
+    | undefined;
   const repository = payload.repository as Record<string, unknown> | undefined;
 
   if (!pullRequest || !repository) {
@@ -353,7 +364,12 @@ const processMergedPR = async (payload: Record<string, unknown>) => {
     const contributionRow = await db
       .select()
       .from(contributions)
-      .where(and(eq(contributions.bountyId, bounty.id), eq(contributions.prNumber, prNumber)))
+      .where(
+        and(
+          eq(contributions.bountyId, bounty.id),
+          eq(contributions.prNumber, prNumber),
+        ),
+      )
       .limit(1);
 
     if (contributionRow[0]?.merged) {
@@ -374,7 +390,12 @@ const processMergedPR = async (payload: Record<string, unknown>) => {
         merged: true,
         mergedAt,
       })
-      .where(and(eq(contributions.bountyId, bounty.id), eq(contributions.prNumber, prNumber)));
+      .where(
+        and(
+          eq(contributions.bountyId, bounty.id),
+          eq(contributions.prNumber, prNumber),
+        ),
+      );
 
     const earnedUSD = toUsd(Number(bounty.amount), bounty.token);
     await statsService.updateAfterMerge(contributor.id, earnedUSD);
@@ -472,7 +493,8 @@ githubWebhookRoute.post('/webhook', async (c) => {
 
     return c.json(
       {
-        error: error instanceof Error ? error.message : 'Webhook processing failed',
+        error:
+          error instanceof Error ? error.message : 'Webhook processing failed',
       },
       500,
     );

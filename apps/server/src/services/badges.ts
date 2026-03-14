@@ -1,6 +1,12 @@
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../db';
-import { badges, contributions, developerStats, bounties, userBadges } from '../db/schema';
+import {
+  badges,
+  contributions,
+  developerStats,
+  bounties,
+  userBadges,
+} from '../db/schema';
 
 const BADGE_DEFINITIONS = [
   {
@@ -47,7 +53,12 @@ export class BadgeService {
         count: sql<number>`cast(count(*) as int)`,
       })
       .from(contributions)
-      .where(and(eq(contributions.contributorId, userId), eq(contributions.merged, true)));
+      .where(
+        and(
+          eq(contributions.contributorId, userId),
+          eq(contributions.merged, true),
+        ),
+      );
 
     const statsRow = await db
       .select({
@@ -63,7 +74,12 @@ export class BadgeService {
       })
       .from(contributions)
       .innerJoin(bounties, eq(contributions.bountyId, bounties.id))
-      .where(and(eq(contributions.contributorId, userId), eq(contributions.merged, true)));
+      .where(
+        and(
+          eq(contributions.contributorId, userId),
+          eq(contributions.merged, true),
+        ),
+      );
 
     const mergedCount = mergedRow[0]?.count ?? 0;
     const totalEarned = Number(statsRow[0]?.totalEarnedUSD ?? 0);
@@ -124,7 +140,10 @@ export class BadgeService {
 
   async getBadgesForUsers(userIds: number[]) {
     if (userIds.length === 0) {
-      return new Map<number, { id: string; name: string; description: string }[]>();
+      return new Map<
+        number,
+        { id: string; name: string; description: string }[]
+      >();
     }
 
     const rows = await db
@@ -138,7 +157,10 @@ export class BadgeService {
       .innerJoin(badges, eq(userBadges.badgeId, badges.id))
       .where(inArray(userBadges.userId, userIds));
 
-    const grouped = new Map<number, { id: string; name: string; description: string }[]>();
+    const grouped = new Map<
+      number,
+      { id: string; name: string; description: string }[]
+    >();
 
     for (const row of rows) {
       const existing = grouped.get(row.userId) ?? [];

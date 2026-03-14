@@ -64,7 +64,9 @@ export class DeveloperStatsService {
       await tx
         .update(developerStats)
         .set({
-          totalEarnedUSD: (Number(row.totalEarnedUSD ?? 0) + earnedUsd).toString(),
+          totalEarnedUSD: (
+            Number(row.totalEarnedUSD ?? 0) + earnedUsd
+          ).toString(),
           bountiesCompleted: Number(row.bountiesCompleted ?? 0) + 1,
           consecutiveDays: nextConsecutiveDays,
           lastContributionDate: now,
@@ -80,7 +82,12 @@ export class DeveloperStatsService {
     const rows = await db
       .select({ id: contributions.id })
       .from(contributions)
-      .where(and(eq(contributions.contributorId, userId), eq(contributions.merged, true)));
+      .where(
+        and(
+          eq(contributions.contributorId, userId),
+          eq(contributions.merged, true),
+        ),
+      );
 
     return rows.length;
   }

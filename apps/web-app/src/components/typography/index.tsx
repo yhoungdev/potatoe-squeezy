@@ -43,7 +43,8 @@ const typographyVariants = cva("", {
 });
 
 interface TypographyProps
-  extends React.HTMLAttributes<HTMLElement>,
+  extends
+    React.HTMLAttributes<HTMLElement>,
     VariantProps<typeof typographyVariants> {
   as?: keyof JSX.IntrinsicElements;
   children: React.ReactNode;

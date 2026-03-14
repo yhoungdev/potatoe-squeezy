@@ -99,9 +99,16 @@ publicUsersRoute.get('/:username/profile', async (c) => {
     .select({ network: bounties.network })
     .from(contributions)
     .innerJoin(bounties, eq(contributions.bountyId, bounties.id))
-    .where(and(eq(contributions.contributorId, user.id), eq(contributions.merged, true)));
+    .where(
+      and(
+        eq(contributions.contributorId, user.id),
+        eq(contributions.merged, true),
+      ),
+    );
 
-  const networkSet = [...new Set(mergedOnNetworks.map((entry) => entry.network))];
+  const networkSet = [
+    ...new Set(mergedOnNetworks.map((entry) => entry.network)),
+  ];
 
   return c.json({
     user,

@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import DefaultDashboard from '@/layouts/dashboard';
-import ApiClient from '@/util/api';
-import API_ENDPOINTS from '@/enums/API_ENUM';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Link } from '@tanstack/react-router';
+import { useEffect, useMemo, useState } from "react";
+import DefaultDashboard from "@/layouts/dashboard";
+import ApiClient from "@/util/api";
+import API_ENDPOINTS from "@/enums/API_ENUM";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "@tanstack/react-router";
 
 type LeaderboardBadge = {
   id: string;
@@ -25,17 +25,17 @@ type LeaderboardRow = {
 };
 
 const medalByRank: Record<number, string> = {
-  1: '🥇',
-  2: '🥈',
-  3: '🥉',
+  1: "🥇",
+  2: "🥈",
+  3: "🥉",
 };
 
 const tableHeader = [
-  'Rank',
-  'Developer',
-  'Points',
-  'Earnings',
-  'Badges',
+  "Rank",
+  "Developer",
+  "Points",
+  "Earnings",
+  "Badges",
 ] as const;
 
 function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
@@ -53,7 +53,10 @@ function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={`${row.userId}-${row.rank}`} className="border-b border-gray-900">
+            <tr
+              key={`${row.userId}-${row.rank}`}
+              className="border-b border-gray-900"
+            >
               <td className="px-4 py-3 font-semibold text-white">
                 {medalByRank[row.rank] ?? `#${row.rank}`}
               </td>
@@ -64,14 +67,21 @@ function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
                   className="flex items-center gap-3"
                 >
                   <img
-                    src={row.avatarUrl || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'}
+                    src={
+                      row.avatarUrl ||
+                      "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                    }
                     className="object-cover w-8 h-8 rounded-full"
                   />
                   <span className="font-medium text-white">{row.username}</span>
                 </Link>
               </td>
-              <td className="px-4 py-3 text-white">{row.totalPoints.toFixed(2)}</td>
-              <td className="px-4 py-3 text-white">${row.totalEarnedUSD.toFixed(2)}</td>
+              <td className="px-4 py-3 text-white">
+                {row.totalPoints.toFixed(2)}
+              </td>
+              <td className="px-4 py-3 text-white">
+                ${row.totalEarnedUSD.toFixed(2)}
+              </td>
               <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-2">
                   {row.badges.slice(0, 3).map((badge) => (
@@ -136,7 +146,9 @@ function LeaderboardPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-white">Leaderboard</h1>
-          <p className="text-sm text-gray-400">Global, weekly, and streak rankings</p>
+          <p className="text-sm text-gray-400">
+            Global, weekly, and streak rankings
+          </p>
         </div>
 
         <Tabs defaultValue="global" className="space-y-4">
@@ -147,15 +159,33 @@ function LeaderboardPage() {
           </TabsList>
 
           <TabsContent value="global">
-            {loading ? emptyState : globalRows.length > 0 ? <LeaderboardTable rows={globalRows} /> : emptyState}
+            {loading ? (
+              emptyState
+            ) : globalRows.length > 0 ? (
+              <LeaderboardTable rows={globalRows} />
+            ) : (
+              emptyState
+            )}
           </TabsContent>
 
           <TabsContent value="weekly">
-            {loading ? emptyState : weeklyRows.length > 0 ? <LeaderboardTable rows={weeklyRows} /> : emptyState}
+            {loading ? (
+              emptyState
+            ) : weeklyRows.length > 0 ? (
+              <LeaderboardTable rows={weeklyRows} />
+            ) : (
+              emptyState
+            )}
           </TabsContent>
 
           <TabsContent value="streaks">
-            {loading ? emptyState : streakRows.length > 0 ? <LeaderboardTable rows={streakRows} /> : emptyState}
+            {loading ? (
+              emptyState
+            ) : streakRows.length > 0 ? (
+              <LeaderboardTable rows={streakRows} />
+            ) : (
+              emptyState
+            )}
           </TabsContent>
         </Tabs>
       </div>

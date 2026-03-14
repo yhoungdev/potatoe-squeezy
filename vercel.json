@@ -1,0 +1,7 @@
+{
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter @potatoe/web-app build",
+  "outputDirectory": "apps/web-app/dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+

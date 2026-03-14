@@ -44,7 +44,12 @@ bountiesRoute.get('/', async (c) => {
       mergedCount: contributions.merged,
     })
     .from(contributions)
-    .where(and(eq(contributions.merged, true), inArray(contributions.bountyId, bountyIds)));
+    .where(
+      and(
+        eq(contributions.merged, true),
+        inArray(contributions.bountyId, bountyIds),
+      ),
+    );
 
   const counts = new Map<string, number>();
   for (const row of contributionRows) {

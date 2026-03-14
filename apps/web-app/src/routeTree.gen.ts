@@ -10,208 +10,208 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as AppIndexImport } from './routes/app/index'
-import { Route as StatusSuccessImport } from './routes/status/success'
-import { Route as AppProfileImport } from './routes/app/profile'
-import { Route as AppLeaderboardImport } from './routes/app/leaderboard'
-import { Route as AppExploreImport } from './routes/app/explore'
-import { Route as AppBountiesImport } from './routes/app/bounties'
-import { Route as AppDevUsernameImport } from './routes/app/dev.$username'
+import { Route as rootRoute } from "./routes/__root";
+import { Route as IndexImport } from "./routes/index";
+import { Route as AppIndexImport } from "./routes/app/index";
+import { Route as StatusSuccessImport } from "./routes/status/success";
+import { Route as AppProfileImport } from "./routes/app/profile";
+import { Route as AppLeaderboardImport } from "./routes/app/leaderboard";
+import { Route as AppExploreImport } from "./routes/app/explore";
+import { Route as AppBountiesImport } from "./routes/app/bounties";
+import { Route as AppDevUsernameImport } from "./routes/app/dev.$username";
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const AppIndexRoute = AppIndexImport.update({
-  id: '/app/',
-  path: '/app/',
+  id: "/app/",
+  path: "/app/",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const StatusSuccessRoute = StatusSuccessImport.update({
-  id: '/status/success',
-  path: '/status/success',
+  id: "/status/success",
+  path: "/status/success",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const AppProfileRoute = AppProfileImport.update({
-  id: '/app/profile',
-  path: '/app/profile',
+  id: "/app/profile",
+  path: "/app/profile",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const AppLeaderboardRoute = AppLeaderboardImport.update({
-  id: '/app/leaderboard',
-  path: '/app/leaderboard',
+  id: "/app/leaderboard",
+  path: "/app/leaderboard",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const AppExploreRoute = AppExploreImport.update({
-  id: '/app/explore',
-  path: '/app/explore',
+  id: "/app/explore",
+  path: "/app/explore",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const AppBountiesRoute = AppBountiesImport.update({
-  id: '/app/bounties',
-  path: '/app/bounties',
+  id: "/app/bounties",
+  path: "/app/bounties",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const AppDevUsernameRoute = AppDevUsernameImport.update({
-  id: '/app/dev/$username',
-  path: '/app/dev/$username',
+  id: "/app/dev/$username",
+  path: "/app/dev/$username",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 // Populate the FileRoutesByPath interface
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/bounties': {
-      id: '/app/bounties'
-      path: '/app/bounties'
-      fullPath: '/app/bounties'
-      preLoaderRoute: typeof AppBountiesImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/explore': {
-      id: '/app/explore'
-      path: '/app/explore'
-      fullPath: '/app/explore'
-      preLoaderRoute: typeof AppExploreImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/leaderboard': {
-      id: '/app/leaderboard'
-      path: '/app/leaderboard'
-      fullPath: '/app/leaderboard'
-      preLoaderRoute: typeof AppLeaderboardImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/profile': {
-      id: '/app/profile'
-      path: '/app/profile'
-      fullPath: '/app/profile'
-      preLoaderRoute: typeof AppProfileImport
-      parentRoute: typeof rootRoute
-    }
-    '/status/success': {
-      id: '/status/success'
-      path: '/status/success'
-      fullPath: '/status/success'
-      preLoaderRoute: typeof StatusSuccessImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/': {
-      id: '/app/'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/dev/$username': {
-      id: '/app/dev/$username'
-      path: '/app/dev/$username'
-      fullPath: '/app/dev/$username'
-      preLoaderRoute: typeof AppDevUsernameImport
-      parentRoute: typeof rootRoute
-    }
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/app/bounties": {
+      id: "/app/bounties";
+      path: "/app/bounties";
+      fullPath: "/app/bounties";
+      preLoaderRoute: typeof AppBountiesImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/app/explore": {
+      id: "/app/explore";
+      path: "/app/explore";
+      fullPath: "/app/explore";
+      preLoaderRoute: typeof AppExploreImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/app/leaderboard": {
+      id: "/app/leaderboard";
+      path: "/app/leaderboard";
+      fullPath: "/app/leaderboard";
+      preLoaderRoute: typeof AppLeaderboardImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/app/profile": {
+      id: "/app/profile";
+      path: "/app/profile";
+      fullPath: "/app/profile";
+      preLoaderRoute: typeof AppProfileImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/status/success": {
+      id: "/status/success";
+      path: "/status/success";
+      fullPath: "/status/success";
+      preLoaderRoute: typeof StatusSuccessImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/app/": {
+      id: "/app/";
+      path: "/app";
+      fullPath: "/app";
+      preLoaderRoute: typeof AppIndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/app/dev/$username": {
+      id: "/app/dev/$username";
+      path: "/app/dev/$username";
+      fullPath: "/app/dev/$username";
+      preLoaderRoute: typeof AppDevUsernameImport;
+      parentRoute: typeof rootRoute;
+    };
   }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/app/bounties': typeof AppBountiesRoute
-  '/app/explore': typeof AppExploreRoute
-  '/app/leaderboard': typeof AppLeaderboardRoute
-  '/app/profile': typeof AppProfileRoute
-  '/status/success': typeof StatusSuccessRoute
-  '/app': typeof AppIndexRoute
-  '/app/dev/$username': typeof AppDevUsernameRoute
+  "/": typeof IndexRoute;
+  "/app/bounties": typeof AppBountiesRoute;
+  "/app/explore": typeof AppExploreRoute;
+  "/app/leaderboard": typeof AppLeaderboardRoute;
+  "/app/profile": typeof AppProfileRoute;
+  "/status/success": typeof StatusSuccessRoute;
+  "/app": typeof AppIndexRoute;
+  "/app/dev/$username": typeof AppDevUsernameRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/app/bounties': typeof AppBountiesRoute
-  '/app/explore': typeof AppExploreRoute
-  '/app/leaderboard': typeof AppLeaderboardRoute
-  '/app/profile': typeof AppProfileRoute
-  '/status/success': typeof StatusSuccessRoute
-  '/app': typeof AppIndexRoute
-  '/app/dev/$username': typeof AppDevUsernameRoute
+  "/": typeof IndexRoute;
+  "/app/bounties": typeof AppBountiesRoute;
+  "/app/explore": typeof AppExploreRoute;
+  "/app/leaderboard": typeof AppLeaderboardRoute;
+  "/app/profile": typeof AppProfileRoute;
+  "/status/success": typeof StatusSuccessRoute;
+  "/app": typeof AppIndexRoute;
+  "/app/dev/$username": typeof AppDevUsernameRoute;
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/app/bounties': typeof AppBountiesRoute
-  '/app/explore': typeof AppExploreRoute
-  '/app/leaderboard': typeof AppLeaderboardRoute
-  '/app/profile': typeof AppProfileRoute
-  '/status/success': typeof StatusSuccessRoute
-  '/app/': typeof AppIndexRoute
-  '/app/dev/$username': typeof AppDevUsernameRoute
+  __root__: typeof rootRoute;
+  "/": typeof IndexRoute;
+  "/app/bounties": typeof AppBountiesRoute;
+  "/app/explore": typeof AppExploreRoute;
+  "/app/leaderboard": typeof AppLeaderboardRoute;
+  "/app/profile": typeof AppProfileRoute;
+  "/status/success": typeof StatusSuccessRoute;
+  "/app/": typeof AppIndexRoute;
+  "/app/dev/$username": typeof AppDevUsernameRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/'
-    | '/app/bounties'
-    | '/app/explore'
-    | '/app/leaderboard'
-    | '/app/profile'
-    | '/status/success'
-    | '/app'
-    | '/app/dev/$username'
-  fileRoutesByTo: FileRoutesByTo
+    | "/"
+    | "/app/bounties"
+    | "/app/explore"
+    | "/app/leaderboard"
+    | "/app/profile"
+    | "/status/success"
+    | "/app"
+    | "/app/dev/$username";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/'
-    | '/app/bounties'
-    | '/app/explore'
-    | '/app/leaderboard'
-    | '/app/profile'
-    | '/status/success'
-    | '/app'
-    | '/app/dev/$username'
+    | "/"
+    | "/app/bounties"
+    | "/app/explore"
+    | "/app/leaderboard"
+    | "/app/profile"
+    | "/status/success"
+    | "/app"
+    | "/app/dev/$username";
   id:
-    | '__root__'
-    | '/'
-    | '/app/bounties'
-    | '/app/explore'
-    | '/app/leaderboard'
-    | '/app/profile'
-    | '/status/success'
-    | '/app/'
-    | '/app/dev/$username'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/app/bounties"
+    | "/app/explore"
+    | "/app/leaderboard"
+    | "/app/profile"
+    | "/status/success"
+    | "/app/"
+    | "/app/dev/$username";
+  fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AppBountiesRoute: typeof AppBountiesRoute
-  AppExploreRoute: typeof AppExploreRoute
-  AppLeaderboardRoute: typeof AppLeaderboardRoute
-  AppProfileRoute: typeof AppProfileRoute
-  StatusSuccessRoute: typeof StatusSuccessRoute
-  AppIndexRoute: typeof AppIndexRoute
-  AppDevUsernameRoute: typeof AppDevUsernameRoute
+  IndexRoute: typeof IndexRoute;
+  AppBountiesRoute: typeof AppBountiesRoute;
+  AppExploreRoute: typeof AppExploreRoute;
+  AppLeaderboardRoute: typeof AppLeaderboardRoute;
+  AppProfileRoute: typeof AppProfileRoute;
+  StatusSuccessRoute: typeof StatusSuccessRoute;
+  AppIndexRoute: typeof AppIndexRoute;
+  AppDevUsernameRoute: typeof AppDevUsernameRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -223,11 +223,11 @@ const rootRouteChildren: RootRouteChildren = {
   StatusSuccessRoute: StatusSuccessRoute,
   AppIndexRoute: AppIndexRoute,
   AppDevUsernameRoute: AppDevUsernameRoute,
-}
+};
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {
