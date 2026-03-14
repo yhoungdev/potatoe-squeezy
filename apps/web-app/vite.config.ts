@@ -44,6 +44,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "unenv/node/process": "process/browser",
     },
   },
   define: {
