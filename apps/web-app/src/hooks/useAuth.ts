@@ -1,55 +1,66 @@
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import { useUserStore } from "@/store/user.store";
 import { useNavigate } from "@tanstack/react-router";
+import { AuthService } from "@/services/auth.service";
 
 function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const token = Cookies.get("auth-token");
-    return !!token;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { user, clearUser } = useUserStore();
+  const { authUser, setAuthUser, clearUser } = useUserStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = Cookies.get("auth-token");
-    if (!token && isAuthenticated) {
-      handleLogout();
-    }
-  }, [isAuthenticated]);
+    const loadSession = async () => {
+      try {
+        const session = await AuthService.getSession();
+        if (session?.user) {
+          setAuthUser(session.user);
+          setIsAuthenticated(true);
+        } else {
+          setAuthUser(null);
+          setIsAuthenticated(false);
+        }
+      } catch {
+        setAuthUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleLogin = (token: string) => {
-    Cookies.set("auth-token", token, {
-      secure: true,
-      sameSite: "lax",
-      expires: 7,
-    });
+    loadSession();
+  }, [setAuthUser]);
+
+  const handleLogin = () => {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
-    Cookies.remove("auth-token");
+  const handleLogout = async () => {
+    await AuthService.signOut();
     clearUser();
     setIsAuthenticated(false);
     navigate({ to: "/" });
   };
 
-  const checkAuthStatus = () => {
-    const token = Cookies.get("auth-token");
-    const isValid = !!token;
-    setIsAuthenticated(isValid);
-
-    if (!isValid) {
-      handleLogout();
+  const checkAuthStatus = async () => {
+    try {
+      const session = await AuthService.getSession();
+      const ok = !!session?.user;
+      setIsAuthenticated(ok);
+      setAuthUser(session?.user || null);
+      return ok;
+    } catch {
+      setIsAuthenticated(false);
+      setAuthUser(null);
       return false;
     }
-    return true;
   };
 
   return {
     isAuthenticated,
-    user,
+    isLoading,
+    user: authUser,
     login: handleLogin,
     logout: handleLogout,
     checkAuthStatus,

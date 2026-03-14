@@ -1,28 +1,27 @@
 import React, { useEffect } from "react";
 import useAuth from "@/hooks/useAuth";
-import { BASE_API_URL } from "@/constant";
-import API_ENDPOINTS from "@/enums/API_ENUM";
+import { AuthService } from "@/services/auth.service";
 function AuthButton() {
-  const { session, loading, error } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    if (session && typeof window !== "undefined") {
+    if (isAuthenticated && typeof window !== "undefined") {
       window.location.href = "/app";
     }
-  }, [session]);
+  }, [isAuthenticated]);
 
   const signInWithGithub = async () => {
     try {
-      const loginUrl = `${BASE_API_URL}${API_ENDPOINTS.GITHUB_AUTH}`;
-      window.location.href = loginUrl;
+      const callbackURL = `${window.location.origin}/app`;
+      const { url } = await AuthService.signInWithGithub(callbackURL);
+      window.location.href = url;
     } catch (err) {
       console.error("Unexpected error during sign-in:", err);
       alert("An unexpected error occurred. Please try again.");
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div>

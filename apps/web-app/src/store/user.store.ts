@@ -22,9 +22,11 @@ interface User {
 
 interface UserState {
   user: User | null;
+  authUser: any | null;
   wallet: Wallet | null;
   isLoading: boolean;
   setUser: (user: User) => void;
+  setAuthUser: (user: any) => void;
   setWallet: (wallet: Wallet) => void;
   clearUser: () => void;
   setLoading: (status: boolean) => void;
@@ -36,11 +38,18 @@ export const useUserStore = create<UserState>()(
     persist(
       (set, get) => ({
         user: null,
+        authUser: null,
         wallet: null,
         isLoading: false,
         setUser: (user) => set({ user }, false, "setUser"),
+        setAuthUser: (authUser) => set({ authUser }, false, "setAuthUser"),
         setWallet: (wallet) => set({ wallet }, false, "setWallet"),
-        clearUser: () => set({ user: null, wallet: null }, false, "clearUser"),
+        clearUser: () =>
+          set(
+            { user: null, authUser: null, wallet: null },
+            false,
+            "clearUser",
+          ),
         setLoading: (status) => set({ isLoading: status }, false, "setLoading"),
         updateWalletAddress: (address: string) =>
           set(
@@ -61,6 +70,7 @@ export const useUserStore = create<UserState>()(
         name: "user-storage",
         partialize: (state) => ({
           user: state.user,
+          authUser: state.authUser,
           wallet: state.wallet,
         }),
       },

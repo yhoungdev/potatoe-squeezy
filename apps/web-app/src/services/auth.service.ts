@@ -2,15 +2,28 @@ import API_ENDPOINTS from "@/enums/API_ENUM";
 import ApiClient from "@/util/api";
 
 class AuthService {
-  static async signInWithGithub(): Promise<any> {
-    const response = await ApiClient.get<{ url: string }>(
-      API_ENDPOINTS.GITHUB_AUTH,
-    );
-    return response;
+  static async signInWithGithub(callbackURL: string): Promise<{
+    url: string;
+    redirect: boolean;
+  }> {
+    return await ApiClient.post(API_ENDPOINTS.SIGN_IN_SOCIAL, {
+      provider: "github",
+      callbackURL,
+    });
   }
 
-  static async signInWithGoogle(): Promise<any> {
-    return await ApiClient.get(API_ENDPOINTS.GOOGLE_AUTH);
+  static async signInWithGoogle(callbackURL: string): Promise<{
+    url: string;
+    redirect: boolean;
+  }> {
+    return await ApiClient.post(API_ENDPOINTS.SIGN_IN_SOCIAL, {
+      provider: "google",
+      callbackURL,
+    });
+  }
+
+  static async getSession(): Promise<any> {
+    return await ApiClient.get(API_ENDPOINTS.GET_SESSION);
   }
 
   static async signOut(): Promise<void> {

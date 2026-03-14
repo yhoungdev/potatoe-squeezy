@@ -1,23 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { UserService } from "@/services";
 import { useUserStore } from "@/store/user.store";
-import Cookies from "js-cookie";
 
 export function useProfile() {
-  const setUser = useUserStore((state) => state.setUser);
-  const { setWallet } = useUserStore();
-  const token = Cookies.get("auth-token");
+  const setAuthUser = useUserStore((state) => state.setAuthUser);
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ["userProfile", token],
+    queryKey: ["userProfile"],
     queryFn: async () => {
       const response = await UserService.fetchUserProfile();
-      setUser(response);
-      setWallet(response?.wallets?.address);
+      if (response?.user) {
+        setAuthUser(response.user);
+      }
 
       return response;
     },
-    enabled: !!token,
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
