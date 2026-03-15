@@ -15,7 +15,7 @@ import bountiesRoute from './routes/bounties';
 import githubWebhookRoute from './routes/github-webhook';
 import docsRoute from './routes/docs';
 import { sendTelegramMessage } from './utils/telegram-notification';
-import { TELEGRAM_CHAT_ID } from './constants';
+import { TELEGRAM_CHAT_ID, FRONTEND_APP_URL } from './constants';
 import { launchBot, telegram_bot } from './config/telegraf';
 const telegram_bot_config = { launchBot, telegram_bot };
 
@@ -75,9 +75,21 @@ app.get('/auth/callback', (c) => {
 app.get('/callback/:provider', async (c) => {
   const provider = c.req.param('provider');
   const query = c.req.query();
+  
+  // If we don't have code or state, it's likely a post-auth redirect
+  // or a manual navigation. Send to frontend.
+  if (!query.code || !query.state) {
+    return c.redirect(`${FRONTEND_APP_URL}/app`);
+  }
+
   const searchParams = new URLSearchParams(query);
   const redirectUrl = `/api/auth/callback/${provider}?${searchParams.toString()}`;
   return c.redirect(redirectUrl);
+});
+
+app.get('/status/error', (c) => {
+  const state = c.req.query('state');
+  return c.json({ error: 'Authentication failed', state }, 400);
 });
 
 app.get('/', (c) => {
