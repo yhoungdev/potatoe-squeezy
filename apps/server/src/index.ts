@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import walletsRoute from './routes/wallets';
 import txRecordsRoute from './routes/tx-records';
 import { db } from './db';
@@ -29,17 +28,50 @@ const app = new Hono<{
 app.use(logger());
 app.use(prettyJSON());
 
-app.use(
-  '*',
-  cors({
-    origin: process.env.FRONTEND_APP_URL || 'http://localhost:5173',
-    allowHeaders: ['Content-Type', 'Authorization'],
-    allowMethods: ['POST', 'GET', 'OPTIONS'],
-    exposeHeaders: ['Content-Length'],
-    maxAge: 600,
-    credentials: true,
-  }),
-);
+const varyAppend = (value: string | null, item: string) => {
+  if (!value) return item;
+  const parts = value
+    .split(',')
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.some((p) => p.toLowerCase() === item.toLowerCase())) return value;
+  return `${value}, ${item}`;
+};
+
+app.use('*', async (c, next) => {
+  const origin = c.req.header('Origin');
+  const requestHeaders = c.req.header('Access-Control-Request-Headers');
+
+  if (origin) {
+    c.header('Access-Control-Allow-Origin', origin);
+    c.header('Access-Control-Allow-Credentials', 'true');
+    c.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    c.header(
+      'Access-Control-Allow-Headers',
+      requestHeaders || 'Content-Type, Authorization',
+    );
+    c.header('Access-Control-Max-Age', '600');
+    c.header('Vary', varyAppend(c.res.headers.get('Vary'), 'Origin'));
+  }
+
+  if (c.req.method === 'OPTIONS') {
+    return c.body(null, 204);
+  }
+
+  await next();
+
+  if (origin) {
+    c.res.headers.set('Access-Control-Allow-Origin', origin);
+    c.res.headers.set('Access-Control-Allow-Credentials', 'true');
+    c.res.headers.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    c.res.headers.set(
+      'Access-Control-Allow-Headers',
+      requestHeaders || 'Content-Type, Authorization',
+    );
+    c.res.headers.set('Access-Control-Max-Age', '600');
+    c.res.headers.set('Vary', varyAppend(c.res.headers.get('Vary'), 'Origin'));
+  }
+});
 
 app.use('*', async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
@@ -61,8 +93,29 @@ app.use('*', async (c, next) => {
   await next();
 });
 
-app.on(['POST', 'GET'], '/api/auth/*', (c) => {
-  return auth.handler(c.req.raw);
+app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
+  const origin = c.req.header('Origin');
+  const requestHeaders = c.req.header('Access-Control-Request-Headers');
+  const res = await auth.handler(c.req.raw);
+
+  if (!origin) return res;
+
+  const headers = new Headers(res.headers);
+  headers.set('Access-Control-Allow-Origin', origin);
+  headers.set('Access-Control-Allow-Credentials', 'true');
+  headers.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  headers.set(
+    'Access-Control-Allow-Headers',
+    requestHeaders || 'Content-Type, Authorization',
+  );
+  headers.set('Access-Control-Max-Age', '600');
+  headers.set('Vary', varyAppend(headers.get('Vary'), 'Origin'));
+
+  return new Response(res.body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers,
+  });
 });
 
 app.get('/', (c) => {

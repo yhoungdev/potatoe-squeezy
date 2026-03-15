@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useUserStore } from "@/store/user.store";
 import { useNavigate } from "@tanstack/react-router";
 import { AuthService } from "@/services/auth.service";
@@ -10,19 +10,29 @@ function useAuth() {
   const { authUser, setAuthUser, clearUser } = useUserStore();
   const navigate = useNavigate();
 
+  const setAuthUserIfChanged = useCallback(
+    (nextUser: any | null) => {
+      const currentId = authUser?.id ?? null;
+      const nextId = nextUser?.id ?? null;
+      if (currentId === nextId) return;
+      setAuthUser(nextUser);
+    },
+    [authUser?.id, setAuthUser],
+  );
+
   useEffect(() => {
     const loadSession = async () => {
       try {
         const session = await AuthService.getSession();
         if (session?.user) {
-          setAuthUser(session.user);
+          setAuthUserIfChanged(session.user);
           setIsAuthenticated(true);
         } else {
-          setAuthUser(null);
+          setAuthUserIfChanged(null);
           setIsAuthenticated(false);
         }
       } catch {
-        setAuthUser(null);
+        setAuthUserIfChanged(null);
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
@@ -30,32 +40,32 @@ function useAuth() {
     };
 
     loadSession();
-  }, [setAuthUser]);
+  }, [setAuthUserIfChanged]);
 
-  const handleLogin = () => {
+  const handleLogin = useCallback(() => {
     setIsAuthenticated(true);
-  };
+  }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await AuthService.signOut();
     clearUser();
     setIsAuthenticated(false);
     navigate({ to: "/" });
-  };
+  }, [clearUser, navigate]);
 
-  const checkAuthStatus = async () => {
+  const checkAuthStatus = useCallback(async () => {
     try {
       const session = await AuthService.getSession();
       const ok = !!session?.user;
       setIsAuthenticated(ok);
-      setAuthUser(session?.user || null);
+      setAuthUserIfChanged(session?.user || null);
       return ok;
     } catch {
       setIsAuthenticated(false);
-      setAuthUser(null);
+      setAuthUserIfChanged(null);
       return false;
     }
-  };
+  }, [setAuthUserIfChanged]);
 
   return {
     isAuthenticated,

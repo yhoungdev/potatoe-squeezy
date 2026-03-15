@@ -14,6 +14,16 @@ Start development server:
 bun run dev
 ```
 
+Note: `bun run dev` runs Drizzle migrations on startup. Make sure Postgres is running and `DATABASE_URL` is set in `apps/server/.env` (or `.env.local`).
+
+Run migrations manually:
+
+```sh
+bun run db:migrate
+```
+
+If your DB already has the app tables (but Drizzle migrations haven’t been tracked), `db:migrate` will fall back to ensuring the Better Auth tables (`auth_users`, `auth_sessions`, `auth_accounts`, `auth_verifications`) exist so `/api/auth/*` works.
+
 Run with Docker dev setup:
 
 ```sh

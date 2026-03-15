@@ -1,4 +1,4 @@
-import Nav from "@/header/nav.astro";
+import Nav from "@/header/nav";
 
 const Hero = () => {
   return (

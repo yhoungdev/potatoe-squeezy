@@ -17,8 +17,12 @@ export const auth = betterAuth({
   secret:
     process.env.BETTER_AUTH_SECRET ||
     process.env.JWT_SECRET ||
-    'better-auth-dev-secret-that-is-long-enough',
-  trustedOrigins: [process.env.FRONTEND_APP_URL || 'http://localhost:5173'],
+    'BFCHBe6PfJmTFLs5iPLPE4',
+  trustedOrigins: [
+    process.env.FRONTEND_APP_URL,
+    'http://localhost:4173',
+    'http://localhost:4174',
+  ].filter(Boolean) as string[],
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema: {

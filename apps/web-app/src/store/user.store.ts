@@ -77,7 +77,7 @@ export const useUserStore = create<UserState>()(
     ),
     {
       name: "UserStore",
-      enabled: process.env.NODE_ENV === "development",
+      enabled: import.meta.env.NODE_ENV === "development",
     },
   ),
 );

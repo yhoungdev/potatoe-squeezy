@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
 import useAuth from "@/hooks/useAuth";
 import { AuthService } from "@/services/auth.service";
+import { useNavigate } from "@tanstack/react-router";
 function AuthButton() {
   const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated && typeof window !== "undefined") {
-      window.location.href = "/app";
+      navigate({ to: "/app", replace: true });
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
   const signInWithGithub = async () => {
     try {

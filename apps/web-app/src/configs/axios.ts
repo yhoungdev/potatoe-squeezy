@@ -11,7 +11,9 @@ DEFAULT_AXIOS.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      window.location.href = "/";
+      if (window.location.pathname.startsWith("/app")) {
+        window.location.replace("/");
+      }
     }
     return Promise.reject(error);
   },
