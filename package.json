@@ -18,6 +18,7 @@
     "start:bot": "bun --cwd apps/github-bot start",
     "dev:extension": "bun --cwd apps/extension dev",
     "build:extension": "bun --cwd apps/extension build",
+    "build": "bun --filter '*' run build",
     "format": "prettier --write ."
   },
   "private": true,

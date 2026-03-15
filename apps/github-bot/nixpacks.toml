@@ -1,0 +1,16 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "curl", "bash", "unzip"]
+
+[phases.install]
+cmds = [
+  "curl -fsSL https://bun.sh/install | bash",
+  "export PATH=\"$HOME/.bun/bin:$PATH\" && bun install --frozen-lockfile"
+]
+
+[phases.build]
+cmds = [
+  "export PATH=\"$HOME/.bun/bin:$PATH\" && bun run build"
+]
+
+[start]
+cmd = "export PATH=\"$HOME/.bun/bin:$PATH\" && bun run start"

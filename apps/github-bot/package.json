@@ -20,7 +20,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "prettier": "^3.5.3",
+    "prettier": "^3.8.1",
     "probot": "^13.0.1",
     "tsx": "^4.7.1"
   },
