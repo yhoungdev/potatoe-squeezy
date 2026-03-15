@@ -4,6 +4,7 @@ import type { Env } from '../types/env';
 import { eq } from 'drizzle-orm';
 import { users, wallets } from '../db/schema';
 import { auth } from '../lib/better-auth/auth';
+import { sign } from 'hono/jwt';
 
 const userRoute = new Hono<{
   Bindings: Env;
@@ -21,6 +22,15 @@ userRoute.get('/profile', async (c) => {
     if (!authUser) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
+
+    const token = await sign(
+      {
+        userId: authUser.id,
+        email: authUser.email,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
+      },
+      process.env.JWT_SECRET!,
+    );
 
     const userRecord = await db
       .select()
@@ -60,6 +70,7 @@ userRoute.get('/profile', async (c) => {
       user: userData,
       wallet: userWallets[0] || null,
       session,
+      token,
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);

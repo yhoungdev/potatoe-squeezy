@@ -19,6 +19,8 @@ import { TELEGRAM_CHAT_ID, FRONTEND_APP_URL } from './constants';
 import { launchBot, telegram_bot } from './config/telegraf';
 const telegram_bot_config = { launchBot, telegram_bot };
 
+import { sign } from 'hono/jwt';
+
 const app = new Hono<{
   Variables: {
     user: typeof auth.$Infer.Session.user | null;
@@ -62,8 +64,44 @@ app.use('*', async (c, next) => {
   await next();
 });
 
-app.on(['POST', 'GET'], '/api/auth/*', (c) => {
-  return auth.handler(c.req.raw);
+app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
+  const res = await auth.handler(c.req.raw);
+
+  // If it's a success redirect, we generate a JWT
+  if (res.status === 302) {
+    const location = res.headers.get('Location');
+    if (
+      location &&
+      (location === FRONTEND_APP_URL ||
+        location.startsWith(FRONTEND_APP_URL + '/'))
+    ) {
+      const session = await auth.api.getSession({ headers: res.headers });
+
+      if (session?.user) {
+        const token = await sign(
+          {
+            userId: session.user.id,
+            email: session.user.email,
+          },
+          process.env.JWT_SECRET!,
+        );
+
+        const url = new URL(location);
+        url.searchParams.set('token', token);
+
+        // Create a new redirect response with the token
+        const newRes = c.redirect(url.toString());
+        // Copy cookies from original response
+        res.headers.forEach((value, key) => {
+          if (key.toLowerCase() === 'set-cookie') {
+            newRes.headers.append(key, value);
+          }
+        });
+        return newRes;
+      }
+    }
+  }
+  return res;
 });
 
 app.get('/auth/callback', (c) => {

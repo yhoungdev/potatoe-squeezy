@@ -3,12 +3,14 @@ import { useUserStore } from "@/store/user.store";
 import { useNavigate } from "@tanstack/react-router";
 import { AuthService } from "@/services/auth.service";
 import UserService from "@/services/user.service";
+import Cookies from "js-cookie";
 
 function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { authUser, setAuthUser, setUser, setWallet, clearUser } = useUserStore();
+  const { authUser, setAuthUser, setUser, setWallet, clearUser } =
+    useUserStore();
   const navigate = useNavigate();
 
   const loadUserProfile = useCallback(async () => {
@@ -20,6 +22,9 @@ function useAuth() {
         }
         if (profile.wallet) {
           setWallet(profile.wallet);
+        }
+        if (profile.token) {
+          Cookies.set("auth-token", profile.token, { expires: 7 });
         }
       }
     } catch (err) {
@@ -38,6 +43,15 @@ function useAuth() {
   );
 
   useEffect(() => {
+    const url = new URL(window.location.href);
+    const token = url.searchParams.get("token");
+    if (token) {
+      Cookies.set("auth-token", token, { expires: 7 });
+
+      url.searchParams.delete("token");
+      window.history.replaceState({}, document.title, url.pathname);
+    }
+
     const loadSession = async () => {
       try {
         const session = await AuthService.getSession();
@@ -67,6 +81,7 @@ function useAuth() {
 
   const handleLogout = useCallback(async () => {
     await AuthService.signOut();
+    Cookies.remove("auth-token");
     clearUser();
     setIsAuthenticated(false);
     navigate({ to: "/" });
