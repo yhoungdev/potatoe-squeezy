@@ -183,7 +183,8 @@ export const auth = betterAuth({
 
               let email = profile.email ?? null;
               if (!email && emails.length) {
-                email = (emails.find((e: any) => e.primary) ?? emails[0])?.email;
+                email = (emails.find((e: any) => e.primary) ?? emails[0])
+                  ?.email;
               }
 
               if (!email && githubAllowNoreplyEmail) {

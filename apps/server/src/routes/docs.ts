@@ -163,7 +163,10 @@ const openApiSpec = {
                 required: ['provider'],
                 properties: {
                   provider: { type: 'string', example: 'github' },
-                  callbackURL: { type: 'string', example: 'http://localhost:3000/callback/github' },
+                  callbackURL: {
+                    type: 'string',
+                    example: 'http://localhost:3000/callback/github',
+                  },
                 },
               },
             },

@@ -75,9 +75,7 @@ app.get('/auth/callback', (c) => {
 app.get('/callback/:provider', async (c) => {
   const provider = c.req.param('provider');
   const query = c.req.query();
-  
-  // If we don't have code or state, it's likely a post-auth redirect
-  // or a manual navigation. Send to frontend.
+
   if (!query.code || !query.state) {
     return c.redirect(`${FRONTEND_APP_URL}/app`);
   }
