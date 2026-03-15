@@ -12,7 +12,12 @@ const openApiSpec = {
   },
   servers: [
     {
-      url: process.env.API_BASE_URL || 'http://localhost:3000',
+      url: 'http://localhost:3000',
+      description: 'Development server',
+    },
+    {
+      url: 'https://potato-squeezy.up.railway.app',
+      description: 'Production server',
     },
   ],
   tags: [

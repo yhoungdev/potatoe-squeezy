@@ -35,12 +35,35 @@ function toOrigin(value?: string) {
   }
 }
 
+const frontendOrigin = toOrigin(process.env.FRONTEND_APP_URL);
+const apiOrigin = toOrigin(baseURL) || baseURL;
+const isCrossOrigin = !!frontendOrigin && frontendOrigin !== apiOrigin;
+const cookieSameSite =
+  (process.env.BETTER_AUTH_COOKIE_SAMESITE?.toLowerCase() as
+    | 'lax'
+    | 'none'
+    | 'strict'
+    | undefined) || (isCrossOrigin ? 'none' : 'lax');
+const defaultErrorURL =
+  process.env.BETTER_AUTH_ERROR_URL ||
+  (frontendOrigin ? `${frontendOrigin}/status/error` : null) ||
+  `${apiOrigin}/status/error`;
+
 export const auth = betterAuth({
   basePath,
   baseURL,
   secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
   advanced: {
     useSecureCookies: isProduction,
+    defaultCookieAttributes: isProduction
+      ? {
+          secure: true,
+          sameSite: cookieSameSite,
+        }
+      : undefined,
+  },
+  onAPIError: {
+    errorURL: defaultErrorURL,
   },
   trustedOrigins: [
     process.env.FRONTEND_APP_URL,
@@ -81,6 +104,7 @@ export const auth = betterAuth({
     },
   },
   account: {
+    storeStateStrategy: 'cookie',
     fields: {
       accountId: 'account_id',
       providerId: 'provider_id',
