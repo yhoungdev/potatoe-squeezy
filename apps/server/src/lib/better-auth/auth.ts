@@ -16,7 +16,7 @@ const basePath = '/api/auth';
 const baseURL =
   process.env.BETTER_AUTH_URL ||
   process.env.API_BASE_URL ||
-  'http://localhost:3000';
+  `http://localhost:${process.env.PORT || 3000}`;
 
 const isProduction = process.env.NODE_ENV === 'production';
 

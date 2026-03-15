@@ -67,7 +67,6 @@ app.use('*', async (c, next) => {
 app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
   const res = await auth.handler(c.req.raw);
 
-  // If it's a success redirect, we generate a JWT
   if (res.status === 302) {
     const location = res.headers.get('Location');
     if (
@@ -89,9 +88,8 @@ app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
         const url = new URL(location);
         url.searchParams.set('token', token);
 
-        // Create a new redirect response with the token
         const newRes = c.redirect(url.toString());
-        // Copy cookies from original response
+
         res.headers.forEach((value, key) => {
           if (key.toLowerCase() === 'set-cookie') {
             newRes.headers.append(key, value);
@@ -122,6 +120,8 @@ app.get('/callback/:provider', async (c) => {
   const redirectUrl = `/api/auth/callback/${provider}?${searchParams.toString()}`;
   return c.redirect(redirectUrl);
 });
+
+const PORT = process.env.PORT || 3000;
 
 app.get('/status/error', (c) => {
   const state = c.req.query('state');
@@ -177,4 +177,7 @@ routes.forEach(({ path, handler }) => {
 launchBot();
 logger();
 
-export default app;
+export default {
+  port: Number(PORT),
+  fetch: app.fetch,
+};
