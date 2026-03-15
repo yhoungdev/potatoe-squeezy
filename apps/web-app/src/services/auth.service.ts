@@ -8,7 +8,21 @@ type SocialSignInOptions = {
   scopes?: string[];
 };
 
+enum AuthProvider {
+  GITHUB = "github",
+  GOOGLE = "google",
+}
+
 class AuthService {
+  static async signWithSocial(options: SocialSignInOptions): Promise<{
+    provider: AuthProvider;
+    callbackURL: boolean;
+  }> {
+    return await ApiClient.post(API_ENDPOINTS.SIGN_IN_SOCIAL, {
+      ...options,
+    });
+  }
+
   static async signInWithGithub(options: SocialSignInOptions): Promise<{
     url: string;
     redirect: boolean;

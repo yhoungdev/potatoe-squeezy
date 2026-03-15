@@ -11,7 +11,6 @@ function IndexRoute() {
     <>
       <Homepage />
       <ProductHuntBadge />
- 
     </>
   );
 }

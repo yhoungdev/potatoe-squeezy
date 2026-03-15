@@ -19,7 +19,7 @@ export default defineConfig({
       stream: "stream-browserify",
       util: "util",
       crypto: "crypto-browserify",
-      // Specifically block unenv/node/buffer which some packages might try to use
+
       "unenv/node/buffer": "buffer",
       "unenv/node/process": "process",
       "unenv/node/util": "util",

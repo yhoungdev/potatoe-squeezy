@@ -17,6 +17,8 @@ const baseURL =
   process.env.API_BASE_URL ||
   'http://localhost:3000';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const githubRedirectURI =
   process.env.GITHUB_REDIRECT_URI ||
   new URL('/callback/github', baseURL).toString();
@@ -24,14 +26,33 @@ const githubRedirectURI =
 const githubAllowNoreplyEmail =
   process.env.GITHUB_ALLOW_NOREPLY_EMAIL?.toLowerCase() === 'true';
 
+function toOrigin(value?: string) {
+  if (!value) return null;
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+}
+
 export const auth = betterAuth({
   basePath,
   baseURL,
   secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
+  advanced: {
+    useSecureCookies: isProduction,
+  },
   trustedOrigins: [
     process.env.FRONTEND_APP_URL,
+    toOrigin(process.env.BETTER_AUTH_URL),
+    toOrigin(process.env.API_BASE_URL),
+    toOrigin(baseURL),
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
     'http://localhost:4173',
     'http://localhost:4174',
+    'https://potato-squeezy.up.railway.app',
+    'https://www.potatosqueezy.xyz',
   ].filter(Boolean) as string[],
   database: drizzleAdapter(db, {
     provider: 'pg',
