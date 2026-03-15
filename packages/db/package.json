@@ -1,0 +1,15 @@
+{
+  "name": "@potatoe/db",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "drizzle-orm": "^0.40.0",
+    "pg": "^8.14.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.5"
+  }
+}
