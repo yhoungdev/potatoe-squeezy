@@ -1,7 +1,7 @@
 enum API_ENDPOINTS {
-  GITHUB_AUTH = "/auth/login",
-  GOOGLE_AUTH = "/auth/google",
-  SIGN_OUT = "/auth/logout",
+  SIGN_IN_SOCIAL = "/api/auth/sign-in/social",
+  GET_SESSION = "/api/auth/get-session",
+  SIGN_OUT = "/api/auth/sign-out",
 
   USER_PROFILE = "/user/profile",
   USER_ALL = "/user/all",

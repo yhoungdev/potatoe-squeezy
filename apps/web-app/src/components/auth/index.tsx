@@ -1,23 +1,35 @@
 import { Button } from "../ui/button";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { GithubIcon } from "lucide-react";
-import API_ENDPOINTS from "@/enums/API_ENUM";
-import { BASE_API_URL } from "@/constant";
 import useAuth from "@/hooks/useAuth";
 import { Link } from "@tanstack/react-router";
-import ProductHuntCard from "../misc/ProductHuntCard";
+import { AuthService } from "@/services/auth.service";
+import { useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 function AuthComponent() {
   const [isLoading, setIsLoading] = useState(false);
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate({ to: "/app", replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleGithubLogin = async () => {
     try {
       setIsLoading(true);
-      const loginUrl = `${BASE_API_URL}${API_ENDPOINTS.GITHUB_AUTH}`;
-      window.location.href = loginUrl;
+      const callbackURL = `${window.location.origin}/app`;
+      const errorCallbackURL = `${window.location.origin}/status/error`;
+      const { url } = await AuthService.signInWithGithub({
+        callbackURL,
+        newUserCallbackURL: callbackURL,
+        errorCallbackURL,
+      });
+      window.location.href = url;
     } catch (error) {
       console.error("Failed to initiate GitHub login:", error);
     } finally {

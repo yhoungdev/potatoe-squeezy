@@ -145,33 +145,46 @@ const openApiSpec = {
         },
       },
     },
-    '/auth/login': {
-      get: {
-        tags: ['Auth'],
-        summary: 'Start GitHub OAuth flow',
-        responses: {
-          '302': { description: 'Redirect to GitHub or home' },
-        },
-      },
-    },
-    '/auth/callback': {
-      get: {
-        tags: ['Auth'],
-        summary: 'GitHub OAuth callback',
-        responses: {
-          '302': { description: 'Redirect to frontend with auth token' },
-          '401': { description: 'Missing auth payload' },
-          '500': { description: 'Database operation failed' },
-        },
-      },
-    },
-    '/auth/logout': {
+    '/api/auth/sign-in/social': {
       post: {
         tags: ['Auth'],
-        summary: 'Logout and revoke GitHub token',
+        summary: 'Start social OAuth flow via Better-auth',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['provider'],
+                properties: {
+                  provider: { type: 'string', example: 'github' },
+                  callbackURL: { type: 'string', example: '/app' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Returns provider authorization URL' },
+        },
+      },
+    },
+    '/api/auth/get-session': {
+      get: {
+        tags: ['Auth'],
+        summary: 'Get current session info via Better-auth',
+        responses: {
+          '200': { description: 'Session and user data' },
+          '401': { description: 'Unauthorized' },
+        },
+      },
+    },
+    '/api/auth/sign-out': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Logout via Better-auth',
         responses: {
           '200': { description: 'Logout success' },
-          '500': { description: 'Token revocation failed' },
         },
       },
     },

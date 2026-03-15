@@ -18,11 +18,15 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
   const { wallet } = useUserStore();
 
   useEffect(() => {
-    const isValid = checkAuthStatus();
-    if (!isValid) {
-      navigate({ to: "/" });
-    }
-  }, []);
+    let cancelled = false;
+    checkAuthStatus().then((isValid) => {
+      if (cancelled) return;
+      if (!isValid) navigate({ to: "/" });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [checkAuthStatus, navigate]);
 
   console.log(wallet);
 
@@ -34,11 +38,10 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
     <div>
       {wallet === undefined && (
         <div
-          className="py-2 text-center text-white "
           style={{
             background: "linear-gradient(64deg, #a43d3c, #ad4b4a, #e67271)",
           }}
-          className={"w-full bg-gray-900 text-center py-2"}
+          className="w-full text-center py-2 text-white"
         >
           <ModalLayout
             title="Add a wallet address to continue"

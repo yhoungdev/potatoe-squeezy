@@ -14,6 +14,16 @@ Start development server:
 bun run dev
 ```
 
+Note: `bun run dev` runs Drizzle migrations on startup. Make sure Postgres is running and `DATABASE_URL` is set in `apps/server/.env` (or `.env.local`).
+
+Run migrations manually:
+
+```sh
+bun run db:migrate
+```
+
+If your DB already has the app tables (but Drizzle migrations haven’t been tracked), `db:migrate` will fall back to ensuring the Better Auth tables (`auth_users`, `auth_sessions`, `auth_accounts`, `auth_verifications`) exist so `/api/auth/*` works.
+
 Run with Docker dev setup:
 
 ```sh
@@ -42,8 +52,12 @@ GET /docs/openapi.json
 
 ## Authentication
 
-- Protected routes require `Authorization: Bearer <jwt>`.
-- JWT is issued by `GET /auth/callback` after GitHub OAuth.
+- Better Auth is mounted under `POST|GET /api/auth/*`.
+- GitHub OAuth callback URL must match the server callback route. This project supports either:
+  - `http://localhost:3000/callback/github` (default in code)
+  - `http://localhost:3000/api/auth/callback/github` (Better Auth native route)
+    Set `GITHUB_REDIRECT_URI` to control which one is used.
+- If you hit `email_not_found`, your GitHub auth token didn’t have access to your email. For GitHub Apps, enable **Account permissions → Email addresses: Read-only**, then re-authorize. As a fallback, set `GITHUB_ALLOW_NOREPLY_EMAIL=true` to use a `users.noreply.github.com` email.
 
 ## Routes
 
@@ -57,34 +71,15 @@ Returns API metadata.
 
 Checks database connectivity.
 
-## Auth
+## Auth (Better Auth)
 
-#### `GET /auth/login`
+#### `GET /api/auth/get-session`
 
-Starts GitHub OAuth flow.
+Get current session (cookie-based).
 
-Response:
+#### `POST /api/auth/sign-in/social`
 
-- `302` redirect
-
-#### `GET /auth/callback`
-
-GitHub OAuth callback.
-
-Response:
-
-- `302` redirect to frontend with token query param
-- `401` when GitHub auth payload is missing
-- `500` on DB failure
-
-#### `POST /auth/logout`
-
-Revokes GitHub token and clears cookies.
-
-Response:
-
-- `200` logout success
-- `500` revoke failure
+Start social OAuth flow.
 
 ## Wallets
 

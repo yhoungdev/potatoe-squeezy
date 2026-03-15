@@ -1,55 +1,76 @@
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import { useCallback, useEffect, useState } from "react";
 import { useUserStore } from "@/store/user.store";
 import { useNavigate } from "@tanstack/react-router";
+import { AuthService } from "@/services/auth.service";
 
 function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const token = Cookies.get("auth-token");
-    return !!token;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { user, clearUser } = useUserStore();
+  const { authUser, setAuthUser, clearUser } = useUserStore();
   const navigate = useNavigate();
 
+  const setAuthUserIfChanged = useCallback(
+    (nextUser: any | null) => {
+      const currentId = authUser?.id ?? null;
+      const nextId = nextUser?.id ?? null;
+      if (currentId === nextId) return;
+      setAuthUser(nextUser);
+    },
+    [authUser?.id, setAuthUser],
+  );
+
   useEffect(() => {
-    const token = Cookies.get("auth-token");
-    if (!token && isAuthenticated) {
-      handleLogout();
-    }
-  }, [isAuthenticated]);
+    const loadSession = async () => {
+      try {
+        const session = await AuthService.getSession();
+        if (session?.user) {
+          setAuthUserIfChanged(session.user);
+          setIsAuthenticated(true);
+        } else {
+          setAuthUserIfChanged(null);
+          setIsAuthenticated(false);
+        }
+      } catch {
+        setAuthUserIfChanged(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleLogin = (token: string) => {
-    Cookies.set("auth-token", token, {
-      secure: true,
-      sameSite: "lax",
-      expires: 7,
-    });
+    loadSession();
+  }, [setAuthUserIfChanged]);
+
+  const handleLogin = useCallback(() => {
     setIsAuthenticated(true);
-  };
+  }, []);
 
-  const handleLogout = () => {
-    Cookies.remove("auth-token");
+  const handleLogout = useCallback(async () => {
+    await AuthService.signOut();
     clearUser();
     setIsAuthenticated(false);
     navigate({ to: "/" });
-  };
+  }, [clearUser, navigate]);
 
-  const checkAuthStatus = () => {
-    const token = Cookies.get("auth-token");
-    const isValid = !!token;
-    setIsAuthenticated(isValid);
-
-    if (!isValid) {
-      handleLogout();
+  const checkAuthStatus = useCallback(async () => {
+    try {
+      const session = await AuthService.getSession();
+      const ok = !!session?.user;
+      setIsAuthenticated(ok);
+      setAuthUserIfChanged(session?.user || null);
+      return ok;
+    } catch {
+      setIsAuthenticated(false);
+      setAuthUserIfChanged(null);
       return false;
     }
-    return true;
-  };
+  }, [setAuthUserIfChanged]);
 
   return {
     isAuthenticated,
-    user,
+    isLoading,
+    user: authUser,
     login: handleLogin,
     logout: handleLogout,
     checkAuthStatus,

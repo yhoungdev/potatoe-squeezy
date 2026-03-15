@@ -36,7 +36,7 @@ export const useFetchGithubDataStore = create<GithubDataState>()(
     ),
     {
       name: "FetchGithubDataStore",
-      enabled: process.env.NODE_ENV === "development",
+      enabled: import.meta.env.NODE_ENV === "development",
     },
   ),
 );
