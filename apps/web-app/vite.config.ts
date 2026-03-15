@@ -28,7 +28,6 @@ export default defineConfig({
 
   define: {
     global: "globalThis",
-    "process.env": "{}",
-    process: "process",
+    // process: "process",
   },
 });
