@@ -177,6 +177,7 @@ const routes = [
 ];
 
 routes.forEach(({ path, handler }) => {
+  //@ts-ignore
   app.route(path, handler);
 });
 

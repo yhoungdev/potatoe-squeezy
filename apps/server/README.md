@@ -57,6 +57,7 @@ GET /docs/openapi.json
   - `http://localhost:3000/callback/github` (default in code)
   - `http://localhost:3000/api/auth/callback/github` (Better Auth native route)
     Set `GITHUB_REDIRECT_URI` to control which one is used.
+- If you hit `email_not_found`, your GitHub auth token didn’t have access to your email. For GitHub Apps, enable **Account permissions → Email addresses: Read-only**, then re-authorize. As a fallback, set `GITHUB_ALLOW_NOREPLY_EMAIL=true` to use a `users.noreply.github.com` email.
 
 ## Routes
 

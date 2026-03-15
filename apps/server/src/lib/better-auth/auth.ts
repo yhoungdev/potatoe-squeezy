@@ -21,6 +21,9 @@ const githubRedirectURI =
   process.env.GITHUB_REDIRECT_URI ||
   new URL('/callback/github', baseURL).toString();
 
+const githubAllowNoreplyEmail =
+  process.env.GITHUB_ALLOW_NOREPLY_EMAIL?.toLowerCase() === 'true';
+
 export const auth = betterAuth({
   basePath,
   baseURL,
@@ -84,6 +87,74 @@ export const auth = betterAuth({
             clientId: githubClientId,
             clientSecret: githubClientSecret,
             redirectURI: githubRedirectURI,
+            scope: ['read:user', 'user:email'],
+            async getUserInfo(token) {
+              const headers = {
+                Authorization: `Bearer ${token.accessToken}`,
+                'User-Agent': 'potatoe-squeezy',
+                Accept: 'application/vnd.github+json',
+              };
+
+              const profileRes = await fetch('https://api.github.com/user', {
+                headers,
+              });
+              if (!profileRes.ok) return null;
+
+              const profile = (await profileRes.json()) as {
+                id: number | string;
+                login?: string | null;
+                name?: string | null;
+                email?: string | null;
+                avatar_url?: string | null;
+              };
+
+              let emails: Array<{
+                email: string;
+                primary?: boolean;
+                verified?: boolean;
+              }> | null = null;
+
+              try {
+                const emailsRes = await fetch(
+                  'https://api.github.com/user/emails',
+                  { headers },
+                );
+                if (emailsRes.ok) {
+                  emails = (await emailsRes.json()) as typeof emails;
+                } else {
+                  const body = await emailsRes.text().catch(() => '');
+                  console.warn(
+                    `[auth] GitHub /user/emails failed (${emailsRes.status}). ${body}`,
+                  );
+                }
+              } catch (err) {
+                console.warn('[auth] GitHub /user/emails request failed', err);
+              }
+
+              let email = profile.email ?? null;
+              if (!email && emails?.length) {
+                email = (emails.find((e) => e.primary) ?? emails[0])?.email;
+              }
+
+              if (!email && githubAllowNoreplyEmail) {
+                const login = profile.login ?? String(profile.id);
+                email = `${profile.id}+${login}@users.noreply.github.com`;
+              }
+
+              const emailVerified =
+                emails?.find((e) => e.email === email)?.verified ?? false;
+
+              return {
+                user: {
+                  id: profile.id,
+                  name: profile.name || profile.login || '',
+                  email: email ?? undefined,
+                  image: profile.avatar_url ?? undefined,
+                  emailVerified,
+                },
+                data: profile,
+              };
+            },
           },
         }
       : {},
