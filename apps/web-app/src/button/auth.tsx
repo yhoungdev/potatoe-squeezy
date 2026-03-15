@@ -12,9 +12,11 @@ function AuthButton() {
     }
   }, [isAuthenticated, navigate]);
 
+  console.log(import.meta.env.VITE_GITHUB_OAUTH_CALLBACK_URL, "showing auth")
+
   const signInWithGithub = async () => {
     try {
-      const callbackURL = import.meta.env.VITE_GITHUB_OAUTH_CALLBACK_URL || `${window.location.origin}/callback/github`;
+      const callbackURL = import.meta.env.VITE_GITHUB_OAUTH_CALLBACK_URL;
       const errorCallbackURL = `${window.location.origin}/status/error`;
       const { url } = await AuthService.signInWithGithub({
         callbackURL,
