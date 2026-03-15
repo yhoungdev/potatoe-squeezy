@@ -1,4 +1,6 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { auth } from './auth';
 import walletsRoute from './routes/wallets';
 import txRecordsRoute from './routes/tx-records';
 import { db } from './db';
@@ -6,7 +8,6 @@ import { sql } from 'drizzle-orm';
 import type { Env } from './types/env';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
-import { cors } from 'hono/cors';
 import { userRoute } from './routes/user';
 import leaderboardRoute from './routes/leaderboard';
 import publicUsersRoute from './routes/public-users';
@@ -16,7 +17,7 @@ import docsRoute from './routes/docs';
 import { sendTelegramMessage } from './utils/telegram-notification';
 import { TELEGRAM_CHAT_ID } from './constants';
 import { launchBot, telegram_bot } from './config/telegraf';
-import { auth } from './lib/better-auth/auth';
+const telegram_bot_config = { launchBot, telegram_bot };
 
 const app = new Hono<{
   Variables: {
@@ -26,19 +27,20 @@ const app = new Hono<{
   Bindings: Env;
 }>();
 
+app.use(logger());
+app.use(prettyJSON());
+
 app.use(
   '*',
   cors({
-    origin: (origin) => origin,
-    credentials: true,
+    origin: process.env.FRONTEND_APP_URL || 'http://localhost:5173',
     allowHeaders: ['Content-Type', 'Authorization'],
-    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowMethods: ['POST', 'GET', 'OPTIONS'],
+    exposeHeaders: ['Content-Length'],
     maxAge: 600,
+    credentials: true,
   }),
 );
-
-app.use(logger());
-app.use(prettyJSON());
 
 app.use('*', async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
@@ -60,18 +62,22 @@ app.use('*', async (c, next) => {
   await next();
 });
 
-app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
-  const res = await auth.handler(c.req.raw);
-  return res;
+app.on(['POST', 'GET'], '/api/auth/*', (c) => {
+  return auth.handler(c.req.raw);
 });
 
-// Compatibility route: allow GitHub redirect URIs like `/callback/github` while
-// Better Auth is mounted under `/api/auth/*`.
+app.get('/auth/callback', (c) => {
+  const url = new URL(c.req.url);
+  url.pathname = '/api/auth/callback/github';
+  return c.redirect(url.toString());
+});
+
 app.get('/callback/:provider', async (c) => {
   const provider = c.req.param('provider');
-  const url = new URL(c.req.url);
-  url.pathname = `/api/auth/callback/${provider}`;
-  return c.redirect(url.toString());
+  const query = c.req.query();
+  const searchParams = new URLSearchParams(query);
+  const redirectUrl = `/api/auth/callback/${provider}?${searchParams.toString()}`;
+  return c.redirect(redirectUrl);
 });
 
 app.get('/', (c) => {

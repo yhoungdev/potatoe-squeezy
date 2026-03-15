@@ -23,6 +23,12 @@ const githubRedirectURI =
   process.env.GITHUB_REDIRECT_URI ||
   new URL('/callback/github', baseURL).toString();
 
+console.log('Better Auth Configuration:');
+console.log('Base Path:', basePath);
+console.log('Base URL:', baseURL);
+console.log('Is Production:', isProduction);
+console.log('GitHub Redirect URI:', githubRedirectURI);
+
 const githubAllowNoreplyEmail =
   process.env.GITHUB_ALLOW_NOREPLY_EMAIL?.toLowerCase() === 'true';
 
@@ -55,12 +61,11 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
   advanced: {
     useSecureCookies: isProduction,
-    defaultCookieAttributes: isProduction
-      ? {
-          secure: true,
-          sameSite: cookieSameSite,
-        }
-      : undefined,
+    defaultCookieAttributes: {
+      sameSite: 'lax',
+      path: '/',
+      secure: isProduction,
+    },
   },
   onAPIError: {
     errorURL: defaultErrorURL,
@@ -157,7 +162,7 @@ export const auth = betterAuth({
                 email: string;
                 primary?: boolean;
                 verified?: boolean;
-              }> | null = null;
+              }> = [];
 
               try {
                 const emailsRes = await fetch(
@@ -177,8 +182,8 @@ export const auth = betterAuth({
               }
 
               let email = profile.email ?? null;
-              if (!email && emails?.length) {
-                email = (emails.find((e) => e.primary) ?? emails[0])?.email;
+              if (!email && emails.length) {
+                email = (emails.find((e: any) => e.primary) ?? emails[0])?.email;
               }
 
               if (!email && githubAllowNoreplyEmail) {
@@ -187,18 +192,18 @@ export const auth = betterAuth({
               }
 
               const emailVerified =
-                emails?.find((e) => e.email === email)?.verified ?? false;
+                emails.find((e: any) => e.email === email)?.verified ?? false;
 
               return {
                 user: {
-                  id: profile.id,
+                  id: String(profile.id),
                   name: profile.name || profile.login || '',
                   email: email ?? undefined,
                   image: profile.avatar_url ?? undefined,
                   emailVerified,
                 },
                 data: profile,
-              };
+              } as any;
             },
           },
         }
