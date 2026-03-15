@@ -17,7 +17,7 @@ class ApiClient {
 
   static async post<T>(
     path: string,
-    data?: Record<string, string>,
+    data?: Record<string, unknown>,
   ): Promise<T> {
     const response = await this.axiosInstance.post(
       `${this.baseUrl}${path}`,
@@ -26,7 +26,10 @@ class ApiClient {
     return response.data;
   }
 
-  static async put<T>(path: string, data?: Record<string, string>): Promise<T> {
+  static async put<T>(
+    path: string,
+    data?: Record<string, unknown>,
+  ): Promise<T> {
     const response = await this.axiosInstance.put(
       `${this.baseUrl}${path}`,
       data,

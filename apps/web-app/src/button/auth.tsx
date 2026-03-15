@@ -15,7 +15,12 @@ function AuthButton() {
   const signInWithGithub = async () => {
     try {
       const callbackURL = `${window.location.origin}/app`;
-      const { url } = await AuthService.signInWithGithub(callbackURL);
+      const errorCallbackURL = `${window.location.origin}/status/error`;
+      const { url } = await AuthService.signInWithGithub({
+        callbackURL,
+        newUserCallbackURL: callbackURL,
+        errorCallbackURL,
+      });
       window.location.href = url;
     } catch (err) {
       console.error("Unexpected error during sign-in:", err);

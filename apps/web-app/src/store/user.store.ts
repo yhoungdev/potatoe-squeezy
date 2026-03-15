@@ -45,11 +45,7 @@ export const useUserStore = create<UserState>()(
         setAuthUser: (authUser) => set({ authUser }, false, "setAuthUser"),
         setWallet: (wallet) => set({ wallet }, false, "setWallet"),
         clearUser: () =>
-          set(
-            { user: null, authUser: null, wallet: null },
-            false,
-            "clearUser",
-          ),
+          set({ user: null, authUser: null, wallet: null }, false, "clearUser"),
         setLoading: (status) => set({ isLoading: status }, false, "setLoading"),
         updateWalletAddress: (address: string) =>
           set(

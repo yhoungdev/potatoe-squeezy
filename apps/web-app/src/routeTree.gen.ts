@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as StatusSuccessRouteImport } from './routes/status/success'
+import { Route as StatusErrorRouteImport } from './routes/status/error'
 import { Route as AppProfileRouteImport } from './routes/app/profile'
 import { Route as AppLeaderboardRouteImport } from './routes/app/leaderboard'
 import { Route as AppExploreRouteImport } from './routes/app/explore'
@@ -31,6 +32,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const StatusSuccessRoute = StatusSuccessRouteImport.update({
   id: '/status/success',
   path: '/status/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusErrorRoute = StatusErrorRouteImport.update({
+  id: '/status/error',
+  path: '/status/error',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/app/explore': typeof AppExploreRoute
   '/app/leaderboard': typeof AppLeaderboardRoute
   '/app/profile': typeof AppProfileRoute
+  '/status/error': typeof StatusErrorRoute
   '/status/success': typeof StatusSuccessRoute
   '/app/': typeof AppIndexRoute
   '/app/dev/$username': typeof AppDevUsernameRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/app/explore': typeof AppExploreRoute
   '/app/leaderboard': typeof AppLeaderboardRoute
   '/app/profile': typeof AppProfileRoute
+  '/status/error': typeof StatusErrorRoute
   '/status/success': typeof StatusSuccessRoute
   '/app': typeof AppIndexRoute
   '/app/dev/$username': typeof AppDevUsernameRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/app/explore': typeof AppExploreRoute
   '/app/leaderboard': typeof AppLeaderboardRoute
   '/app/profile': typeof AppProfileRoute
+  '/status/error': typeof StatusErrorRoute
   '/status/success': typeof StatusSuccessRoute
   '/app/': typeof AppIndexRoute
   '/app/dev/$username': typeof AppDevUsernameRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/leaderboard'
     | '/app/profile'
+    | '/status/error'
     | '/status/success'
     | '/app/'
     | '/app/dev/$username'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/leaderboard'
     | '/app/profile'
+    | '/status/error'
     | '/status/success'
     | '/app'
     | '/app/dev/$username'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/app/explore'
     | '/app/leaderboard'
     | '/app/profile'
+    | '/status/error'
     | '/status/success'
     | '/app/'
     | '/app/dev/$username'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   AppExploreRoute: typeof AppExploreRoute
   AppLeaderboardRoute: typeof AppLeaderboardRoute
   AppProfileRoute: typeof AppProfileRoute
+  StatusErrorRoute: typeof StatusErrorRoute
   StatusSuccessRoute: typeof StatusSuccessRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDevUsernameRoute: typeof AppDevUsernameRoute
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/status/success'
       fullPath: '/status/success'
       preLoaderRoute: typeof StatusSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status/error': {
+      id: '/status/error'
+      path: '/status/error'
+      fullPath: '/status/error'
+      preLoaderRoute: typeof StatusErrorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/profile': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppExploreRoute: AppExploreRoute,
   AppLeaderboardRoute: AppLeaderboardRoute,
   AppProfileRoute: AppProfileRoute,
+  StatusErrorRoute: StatusErrorRoute,
   StatusSuccessRoute: StatusSuccessRoute,
   AppIndexRoute: AppIndexRoute,
   AppDevUsernameRoute: AppDevUsernameRoute,

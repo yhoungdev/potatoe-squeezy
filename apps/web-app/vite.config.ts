@@ -5,30 +5,30 @@ import { defineConfig } from "vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
 export default defineConfig({
-    plugins: [
-        TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
-        react(),
-        tailwindcss(),
-    ],
+  plugins: [
+    TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
+    react(),
+    tailwindcss(),
+  ],
 
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./src"),
-            buffer: "buffer",
-            process: "process",
-            stream: "stream-browserify",
-            util: "util",
-            crypto: "crypto-browserify",
-            // Specifically block unenv/node/buffer which some packages might try to use
-            "unenv/node/buffer": "buffer",
-            "unenv/node/process": "process",
-            "unenv/node/util": "util",
-        },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      buffer: "buffer",
+      process: "process",
+      stream: "stream-browserify",
+      util: "util",
+      crypto: "crypto-browserify",
+      // Specifically block unenv/node/buffer which some packages might try to use
+      "unenv/node/buffer": "buffer",
+      "unenv/node/process": "process",
+      "unenv/node/util": "util",
     },
+  },
 
-    define: {
-        global: "globalThis",
-        "process.env": "{}",
-        process: "process",
-    }
+  define: {
+    global: "globalThis",
+    "process.env": "{}",
+    process: "process",
+  },
 });

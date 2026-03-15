@@ -1,24 +1,31 @@
 import API_ENDPOINTS from "@/enums/API_ENUM";
 import ApiClient from "@/util/api";
 
+type SocialSignInOptions = {
+  callbackURL?: string;
+  newUserCallbackURL?: string;
+  errorCallbackURL?: string;
+  scopes?: string[];
+};
+
 class AuthService {
-  static async signInWithGithub(callbackURL: string): Promise<{
+  static async signInWithGithub(options: SocialSignInOptions): Promise<{
     url: string;
     redirect: boolean;
   }> {
     return await ApiClient.post(API_ENDPOINTS.SIGN_IN_SOCIAL, {
       provider: "github",
-      callbackURL,
+      ...options,
     });
   }
 
-  static async signInWithGoogle(callbackURL: string): Promise<{
+  static async signInWithGoogle(options: SocialSignInOptions): Promise<{
     url: string;
     redirect: boolean;
   }> {
     return await ApiClient.post(API_ENDPOINTS.SIGN_IN_SOCIAL, {
       provider: "google",
-      callbackURL,
+      ...options,
     });
   }
 
