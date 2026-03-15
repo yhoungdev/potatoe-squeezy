@@ -14,7 +14,7 @@ function AuthButton() {
 
   const signInWithGithub = async () => {
     try {
-      const callbackURL = `${window.location.origin}/app`;
+      const callbackURL = import.meta.env.VITE_GITHUB_OAUTH_CALLBACK_URL || `${window.location.origin}/callback/github`;
       const errorCallbackURL = `${window.location.origin}/status/error`;
       const { url } = await AuthService.signInWithGithub({
         callbackURL,
