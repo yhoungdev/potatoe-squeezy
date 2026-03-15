@@ -18,8 +18,12 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: "Unknown error" }));
-    throw new Error(error.error || `Request failed with status ${response.status}`);
+    const error = await response
+      .json()
+      .catch(() => ({ error: "Unknown error" }));
+    throw new Error(
+      error.error || `Request failed with status ${response.status}`,
+    );
   }
 
   return response.json();

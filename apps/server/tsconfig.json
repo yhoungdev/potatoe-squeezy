@@ -4,7 +4,12 @@
     "target": "ES2022",
     "module": "ESNext",
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@potatoe/shared": ["../../packages/shared/src/index.ts"],
+      "@potatoe/shared/*": ["../../packages/shared/src/*"]
+    }
   },
   "include": ["src"]
 }

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@potatoe/db": "workspace:*",
+    "@potatoe/shared": "workspace:*",
     "@hono-dev/auth-github": "^0.0.1",
     "@neondatabase/serverless": "^0.10.4",
     "better-auth": "^1.5.5",

@@ -14,6 +14,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@potatoe/shared": path.resolve(
+        __dirname,
+        "../../packages/shared/src/index.ts",
+      ),
       buffer: "buffer",
       process: "process",
       stream: "stream-browserify",

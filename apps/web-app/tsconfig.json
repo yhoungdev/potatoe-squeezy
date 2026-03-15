@@ -12,7 +12,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@potatoe/shared": ["../../packages/shared/src/index.ts"],
+      "@potatoe/shared/*": ["../../packages/shared/src/*"]
     },
     "jsx": "react-jsx"
   }
