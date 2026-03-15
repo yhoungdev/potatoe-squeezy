@@ -15,14 +15,52 @@ const userRoute = new Hono<{
 
 userRoute.get('/profile', async (c) => {
   try {
-    const user = c.get('user');
+    const authUser = c.get('user');
     const session = c.get('session');
 
-    if (!user) {
+    if (!authUser) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
-    return c.json({ user, session });
+    const userRecord = await db
+      .select()
+      .from(users)
+      .where(eq(users.githubId, authUser.id))
+      .limit(1)
+      .execute();
+
+    if (userRecord.length === 0) {
+      if (authUser.email) {
+        const userByEmail = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, authUser.email))
+          .limit(1)
+          .execute();
+
+        if (userByEmail.length > 0) {
+          userRecord.push(userByEmail[0]);
+        }
+      }
+    }
+
+    if (userRecord.length === 0) {
+      return c.json({ error: 'User profile not found in database' }, 404);
+    }
+
+    const userData = userRecord[0];
+
+    const userWallets = await db
+      .select()
+      .from(wallets)
+      .where(eq(wallets.userId, userData.id))
+      .execute();
+
+    return c.json({
+      user: userData,
+      wallet: userWallets[0] || null,
+      session,
+    });
   } catch (error) {
     console.error('Error fetching user profile:', error);
     return c.json({ error: 'Internal server error' }, 500);

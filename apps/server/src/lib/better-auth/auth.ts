@@ -222,9 +222,14 @@ export const auth = betterAuth({
                       updatedAt: new Date(),
                     },
                   });
-                console.log(`[auth] Synced user ${username} to application users table`);
+                console.log(
+                  `[auth] Synced user ${username} to application users table`,
+                );
               } catch (syncError) {
-                console.error('[auth] Failed to sync user to application users table:', syncError);
+                console.error(
+                  '[auth] Failed to sync user to application users table:',
+                  syncError,
+                );
               }
 
               return {
