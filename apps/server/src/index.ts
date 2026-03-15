@@ -118,6 +118,23 @@ app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
   });
 });
 
+// Compatibility route: allow GitHub redirect URIs like `/callback/github` while
+// Better Auth is mounted under `/api/auth/*`.
+app.get('/callback/:provider', async (c) => {
+  const provider = c.req.param('provider');
+  const url = new URL(c.req.url);
+  url.pathname = `/api/auth/callback/${provider}`;
+
+  const res = await auth.handler(
+    new Request(url.toString(), {
+      method: 'GET',
+      headers: c.req.raw.headers,
+    }),
+  );
+
+  return res;
+});
+
 app.get('/', (c) => {
   sendTelegramMessage(TELEGRAM_CHAT_ID, 'Potatoe API is up and running!');
   return c.json({

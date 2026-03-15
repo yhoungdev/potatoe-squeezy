@@ -128,9 +128,7 @@ try {
   } catch {
     // ignore
   }
-  // If the DB already has some tables but no Drizzle journal state, a full migrate
-  // can fail on "relation already exists". In that case, ensure Better Auth tables
-  // exist so auth endpoints can function.
+
   try {
     await ensureBetterAuthTables();
     // eslint-disable-next-line no-console

@@ -52,8 +52,11 @@ GET /docs/openapi.json
 
 ## Authentication
 
-- Protected routes require `Authorization: Bearer <jwt>`.
-- JWT is issued by `GET /auth/callback` after GitHub OAuth.
+- Better Auth is mounted under `POST|GET /api/auth/*`.
+- GitHub OAuth callback URL must match the server callback route. This project supports either:
+  - `http://localhost:3000/callback/github` (default in code)
+  - `http://localhost:3000/api/auth/callback/github` (Better Auth native route)
+    Set `GITHUB_REDIRECT_URI` to control which one is used.
 
 ## Routes
 
@@ -67,34 +70,15 @@ Returns API metadata.
 
 Checks database connectivity.
 
-## Auth
+## Auth (Better Auth)
 
-#### `GET /auth/login`
+#### `GET /api/auth/get-session`
 
-Starts GitHub OAuth flow.
+Get current session (cookie-based).
 
-Response:
+#### `POST /api/auth/sign-in/social`
 
-- `302` redirect
-
-#### `GET /auth/callback`
-
-GitHub OAuth callback.
-
-Response:
-
-- `302` redirect to frontend with token query param
-- `401` when GitHub auth payload is missing
-- `500` on DB failure
-
-#### `POST /auth/logout`
-
-Revokes GitHub token and clears cookies.
-
-Response:
-
-- `200` logout success
-- `500` revoke failure
+Start social OAuth flow.
 
 ## Wallets
 
