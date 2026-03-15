@@ -7,6 +7,7 @@ import {
   authUsers,
   authVerifications,
 } from '../../db/better-auth-schema';
+import { users } from '../../db/schema';
 
 const githubClientId = process.env.GITHUB_CLIENT_ID;
 const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
@@ -195,12 +196,43 @@ export const auth = betterAuth({
               const emailVerified =
                 emails.find((e: any) => e.email === email)?.verified ?? false;
 
+              const githubId = String(profile.id);
+              const username = profile.login || '';
+              const displayName = profile.name || profile.login || '';
+              const avatarUrl = profile.avatar_url || '';
+
+              // Sync to the 'users' table used by the application
+              try {
+                await db
+                  .insert(users)
+                  .values({
+                    githubId,
+                    username,
+                    email: email || '',
+                    name: displayName,
+                    avatarUrl,
+                  })
+                  .onConflictDoUpdate({
+                    target: users.githubId,
+                    set: {
+                      username,
+                      email: email || '',
+                      name: displayName,
+                      avatarUrl,
+                      updatedAt: new Date(),
+                    },
+                  });
+                console.log(`[auth] Synced user ${username} to application users table`);
+              } catch (syncError) {
+                console.error('[auth] Failed to sync user to application users table:', syncError);
+              }
+
               return {
                 user: {
-                  id: String(profile.id),
-                  name: profile.name || profile.login || '',
+                  id: githubId,
+                  name: displayName,
                   email: email ?? undefined,
-                  image: profile.avatar_url ?? undefined,
+                  image: avatarUrl ?? undefined,
                   emailVerified,
                 },
                 data: profile,
