@@ -1,5 +1,6 @@
 import API_ENDPOINTS from "@/enums/API_ENUM";
 import ApiClient from "@/util/api";
+import { BASE_API_URL } from "@/constant";
 
 type SocialSignInOptions = {
   callbackURL?: string;
@@ -27,10 +28,12 @@ class AuthService {
     url: string;
     redirect: boolean;
   }> {
-    return await ApiClient.post(API_ENDPOINTS.SIGN_IN_SOCIAL, {
-      provider: "github",
-      ...options,
-    });
+    void options;
+    const baseUrl = String(BASE_API_URL || '').replace(/\/+$/, '');
+    return {
+      url: `${baseUrl}/auth/github`,
+      redirect: true,
+    };
   }
 
   static async signInWithGoogle(options: SocialSignInOptions): Promise<{

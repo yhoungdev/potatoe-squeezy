@@ -36,9 +36,19 @@ app.use(
   '*',
   cors({
     origin: (origin) => {
+      const normalizeOrigin = (value: string) => {
+        try {
+          return new URL(value).origin;
+        } catch {
+          return value;
+        }
+      };
+
       const allowedOrigins = new Set(
         [
-          process.env.FRONTEND_APP_URL,
+          process.env.FRONTEND_APP_URL
+            ? normalizeOrigin(process.env.FRONTEND_APP_URL)
+            : null,
           'https://www.potatosqueezy.xyz',
           'https://potatosqueezy.xyz',
           'http://localhost:5173',
@@ -49,7 +59,8 @@ app.use(
       );
 
       if (!origin) return '*';
-      return allowedOrigins.has(origin) ? origin : null;
+      const normalized = normalizeOrigin(origin);
+      return allowedOrigins.has(normalized) ? origin : null;
     },
     allowHeaders: ['Content-Type', 'Authorization'],
     allowMethods: ['POST', 'GET', 'OPTIONS'],
@@ -121,6 +132,45 @@ app.get('/auth/callback', (c) => {
   const url = new URL(c.req.url);
   url.pathname = '/api/auth/callback/github';
   return c.redirect(url.toString());
+});
+
+app.get('/auth/github', async (c) => {
+  const frontend = process.env.FRONTEND_APP_URL || 'http://localhost:5173';
+  const callbackURL = `${new URL(frontend).origin}/app`;
+  const errorCallbackURL = `${new URL(frontend).origin}/status/error`;
+
+  const internalReq = new Request(
+    new URL('/api/auth/sign-in/social', c.req.url),
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        provider: 'github',
+        callbackURL,
+        newUserCallbackURL: callbackURL,
+        errorCallbackURL,
+      }),
+    },
+  );
+
+  const res = await auth.handler(internalReq);
+
+  if (!res.ok) {
+    return res;
+  }
+
+  const data = (await res.json()) as { url?: string };
+  if (!data?.url) {
+    return c.json({ error: 'Missing OAuth redirect URL' }, 500);
+  }
+
+  const redirectRes = c.redirect(data.url);
+  res.headers.forEach((value, key) => {
+    if (key.toLowerCase() === 'set-cookie') {
+      redirectRes.headers.append(key, value);
+    }
+  });
+  return redirectRes;
 });
 
 app.get('/callback/:provider', async (c) => {
