@@ -18,9 +18,9 @@ COPY apps/extension/package.json apps/extension/package.json
 COPY libs/common/package.json libs/common/package.json
 COPY libs/common/example/package.json libs/common/example/package.json
 COPY packages/db/package.json packages/db/package.json
-COPY packages/shared/package.json packages/shared/package.json
+COPY packages/shared packages/shared
 
-RUN bun install 
+RUN bun install --frozen-lockfile
 
 COPY . .
 
