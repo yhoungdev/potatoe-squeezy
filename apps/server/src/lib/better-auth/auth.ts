@@ -45,12 +45,14 @@ function toOrigin(value?: string) {
 const frontendOrigin = toOrigin(process.env.FRONTEND_APP_URL);
 const apiOrigin = toOrigin(baseURL) || baseURL;
 const isCrossOrigin = !!frontendOrigin && frontendOrigin !== apiOrigin;
-const cookieSameSite =
-  (process.env.BETTER_AUTH_COOKIE_SAMESITE?.toLowerCase() as
+const requestedSameSite =
+  process.env.BETTER_AUTH_COOKIE_SAMESITE?.toLowerCase() as
     | 'lax'
     | 'none'
     | 'strict'
-    | undefined) || (isProduction && isCrossOrigin ? 'none' : 'lax');
+    | undefined;
+const cookieSameSite =
+  isProduction && isCrossOrigin ? 'none' : requestedSameSite || 'lax';
 const cookieSecure = isProduction || cookieSameSite === 'none';
 const defaultErrorURL =
   process.env.BETTER_AUTH_ERROR_URL ||
