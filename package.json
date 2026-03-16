@@ -26,5 +26,9 @@
   "devDependencies": {
     "@potatoe/shared": "workspace:*",
     "prettier": "^3.5.3"
+  },
+  "overrides": {
+    "eslint": "^8.57.1",
+    "typescript": "~5.8.3"
   }
 }

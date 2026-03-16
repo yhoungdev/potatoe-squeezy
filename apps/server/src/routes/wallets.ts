@@ -53,9 +53,10 @@ walletsRoute.put('/', async (c) => {
 walletsRoute.get('/user/:userId', async (c) => {
   try {
     const userId = parseInt(c.req.param('userId'));
-    const userWallets = await db.query.wallets.findMany({
-      where: eq(wallets.userId, userId),
-    });
+    const userWallets = await db
+      .select()
+      .from(wallets)
+      .where(eq(wallets.userId, userId));
 
     return c.json(userWallets);
   } catch (error) {

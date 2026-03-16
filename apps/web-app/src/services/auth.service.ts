@@ -1,6 +1,7 @@
 import API_ENDPOINTS from "@/enums/API_ENUM";
 import ApiClient from "@/util/api";
 import { BASE_API_URL } from "@/constant";
+import { createAuthClient } from "better-auth/client";
 
 type SocialSignInOptions = {
   callbackURL?: string;
@@ -13,6 +14,14 @@ enum AuthProvider {
   GITHUB = "github",
   GOOGLE = "google",
 }
+
+const baseUrl = String(BASE_API_URL || "").replace(/\/+$/, "");
+const authClient = createAuthClient({
+  baseURL: baseUrl,
+  fetchOptions: {
+    credentials: "include",
+  },
+});
 
 class AuthService {
   static async signWithSocial(options: SocialSignInOptions): Promise<{
@@ -28,10 +37,32 @@ class AuthService {
     url: string;
     redirect: boolean;
   }> {
-    void options;
-    const baseUrl = String(BASE_API_URL || "").replace(/\/+$/, "");
+    const callbackURL = options.callbackURL ?? `${window.location.origin}/app`;
+    const newUserCallbackURL = options.newUserCallbackURL ?? callbackURL;
+    const errorCallbackURL =
+      options.errorCallbackURL ?? `${window.location.origin}/status/error`;
+
+    const result = (await authClient.signIn.social({
+      provider: "github",
+      callbackURL,
+      newUserCallbackURL,
+      errorCallbackURL,
+      scopes: options.scopes,
+      disableRedirect: true,
+    } as any)) as any;
+
+    const error = result?.error;
+    if (error) {
+      throw error;
+    }
+
+    const url = result?.data?.url ?? result?.url;
+    if (!url) {
+      throw new Error("Missing OAuth redirect URL");
+    }
+
     return {
-      url: `${baseUrl}/auth/github`,
+      url,
       redirect: true,
     };
   }
@@ -47,11 +78,20 @@ class AuthService {
   }
 
   static async getSession(): Promise<any> {
-    return await ApiClient.get(API_ENDPOINTS.GET_SESSION);
+    const result = (await authClient.getSession()) as any;
+    const error = result?.error;
+    if (error) {
+      throw error;
+    }
+    return result?.data ?? result;
   }
 
   static async signOut(): Promise<void> {
-    await ApiClient.post(API_ENDPOINTS.SIGN_OUT);
+    const result = (await authClient.signOut()) as any;
+    const error = result?.error;
+    if (error) {
+      throw error;
+    }
   }
 }
 

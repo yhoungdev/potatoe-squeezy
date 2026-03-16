@@ -22,7 +22,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const githubRedirectURI =
   process.env.GITHUB_REDIRECT_URI ||
-  new URL('/callback/github', baseURL).toString();
+  new URL(`${basePath}/callback/github`, baseURL).toString();
 
 console.log('Better Auth Configuration:');
 console.log('Base Path:', basePath);

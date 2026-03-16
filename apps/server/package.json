@@ -32,6 +32,7 @@
     "@types/bun": "latest",
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.5",
+    "typescript": "~5.8.3",
     "tsx": "^4.19.3"
   }
 }

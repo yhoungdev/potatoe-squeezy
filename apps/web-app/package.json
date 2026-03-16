@@ -13,7 +13,6 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@potatoe/shared": "workspace:*",
     "@babel/core": "^7.27.4",
     "@babel/runtime": "^7.27.4",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -38,6 +37,7 @@
     "@walletconnect/solana-adapter": "^0.0.8",
     "avatar": "^0.1.0",
     "axios": "^1.9.0",
+    "better-auth": "^1.5.5",
     "boring-avatars": "^1.11.2",
     "bs58": "^6.0.0",
     "buffer": "^6.0.3",
@@ -72,17 +72,18 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@eslint/js": "^9.28.0",
+    "@eslint/js": "^8.57.1",
     "@locator/babel-jsx": "^0.4.4",
     "@tanstack/router-cli": "^1.120.15",
     "@tanstack/router-devtools": "^1.120.15",
     "@tanstack/router-plugin": "^1.120.15",
+    "@typescript-eslint/parser": "^8.57.0",
     "@types/node": "^22.15.29",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.5.1",
     "@vitejs/plugin-react-swc": "^3.10.1",
-    "eslint": "^9.28.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",

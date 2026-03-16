@@ -18,5 +18,7 @@ export const verifyGitHubSignature = (
     return false;
   }
 
-  return timingSafeEqual(expectedBuffer, signatureBuffer);
+  const expectedBytes = Uint8Array.from(expectedBuffer);
+  const signatureBytes = Uint8Array.from(signatureBuffer);
+  return timingSafeEqual(expectedBytes, signatureBytes);
 };
