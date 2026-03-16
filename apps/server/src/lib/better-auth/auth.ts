@@ -50,7 +50,8 @@ const cookieSameSite =
     | 'lax'
     | 'none'
     | 'strict'
-    | undefined) || (isCrossOrigin ? 'none' : 'lax');
+    | undefined) || (isProduction && isCrossOrigin ? 'none' : 'lax');
+const cookieSecure = isProduction || cookieSameSite === 'none';
 const defaultErrorURL =
   process.env.BETTER_AUTH_ERROR_URL ||
   (frontendOrigin ? `${frontendOrigin}/status/error` : null) ||
@@ -61,11 +62,11 @@ export const auth = betterAuth({
   baseURL,
   secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
   advanced: {
-    useSecureCookies: isProduction,
+    useSecureCookies: cookieSecure,
     defaultCookieAttributes: {
-      sameSite: 'lax',
+      sameSite: cookieSameSite,
       path: '/',
-      secure: isProduction,
+      secure: cookieSecure,
     },
   },
   onAPIError: {
@@ -82,6 +83,7 @@ export const auth = betterAuth({
     'http://localhost:4174',
     'https://potato-squeezy.up.railway.app',
     'https://www.potatosqueezy.xyz',
+    'https://potatosqueezy.xyz',
   ].filter(Boolean) as string[],
   database: drizzleAdapter(db, {
     provider: 'pg',

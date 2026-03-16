@@ -35,7 +35,22 @@ app.use(prettyJSON());
 app.use(
   '*',
   cors({
-    origin: process.env.FRONTEND_APP_URL || 'http://localhost:5173',
+    origin: (origin) => {
+      const allowedOrigins = new Set(
+        [
+          process.env.FRONTEND_APP_URL,
+          'https://www.potatosqueezy.xyz',
+          'https://potatosqueezy.xyz',
+          'http://localhost:5173',
+          'http://127.0.0.1:5173',
+          'http://localhost:4173',
+          'http://localhost:4174',
+        ].filter(Boolean) as string[],
+      );
+
+      if (!origin) return '*';
+      return allowedOrigins.has(origin) ? origin : null;
+    },
     allowHeaders: ['Content-Type', 'Authorization'],
     allowMethods: ['POST', 'GET', 'OPTIONS'],
     exposeHeaders: ['Content-Length'],
