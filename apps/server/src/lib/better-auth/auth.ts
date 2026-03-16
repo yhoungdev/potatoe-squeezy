@@ -69,7 +69,7 @@ export const auth = betterAuth({
       ? {
           crossSubDomainCookies: {
             enabled: true,
-            domain: 'api.potatosqueezy.xyz',
+             domain: '.potatosqueezy.xyz',
             
           },
         }
