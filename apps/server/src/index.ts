@@ -19,7 +19,31 @@ import { TELEGRAM_CHAT_ID, FRONTEND_APP_URL } from './constants';
 import { launchBot, telegram_bot } from './config/telegraf';
 const telegram_bot_config = { launchBot, telegram_bot };
 
-import { sign } from 'hono/jwt';
+const normalizeOrigin = (value: string) => {
+  try {
+    return new URL(value).origin;
+  } catch {
+    return value;
+  }
+};
+
+const allowedFrontendOrigins = new Set(
+  [
+    process.env.FRONTEND_APP_URL ? normalizeOrigin(process.env.FRONTEND_APP_URL) : null,
+    'https://www.potatosqueezy.xyz',
+    'https://potatosqueezy.xyz',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:4173',
+    'http://localhost:4174',
+  ].filter(Boolean) as string[],
+);
+
+const stripSetCookie = (res: Response) => {
+  const headers = new Headers(res.headers);
+  headers.delete('set-cookie');
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+};
 
 const app = new Hono<{
   Variables: {
@@ -36,14 +60,6 @@ app.use(
   '*',
   cors({
     origin: (origin) => {
-      const normalizeOrigin = (value: string) => {
-        try {
-          return new URL(value).origin;
-        } catch {
-          return value;
-        }
-      };
-
       const allowedOrigins = new Set(
         [
           process.env.FRONTEND_APP_URL
@@ -64,9 +80,9 @@ app.use(
     },
     allowHeaders: ['Content-Type', 'Authorization'],
     allowMethods: ['POST', 'GET', 'OPTIONS'],
-    exposeHeaders: ['Content-Length'],
+    exposeHeaders: ['Content-Length', 'set-auth-token'],
     maxAge: 600,
-    credentials: true,
+    credentials: false,
   }),
 );
 
@@ -91,37 +107,26 @@ app.use('*', async (c, next) => {
 });
 
 app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
-  const res = await auth.handler(c.req.raw);
+  const res = stripSetCookie(await auth.handler(c.req.raw));
 
   if (res.status === 302) {
     const location = res.headers.get('Location');
-    if (
-      location &&
-      (location === FRONTEND_APP_URL ||
-        location.startsWith(FRONTEND_APP_URL + '/'))
-    ) {
-      const session = await auth.api.getSession({ headers: res.headers });
+    const token = res.headers.get('set-auth-token');
+    if (location && token) {
+      let url: URL | null = null;
+      try {
+        url = new URL(location);
+      } catch {
+        try {
+          url = new URL(location, FRONTEND_APP_URL);
+        } catch {
+          url = null;
+        }
+      }
 
-      if (session?.user) {
-        const token = await sign(
-          {
-            userId: session.user.id,
-            email: session.user.email,
-          },
-          process.env.JWT_SECRET!,
-        );
-
-        const url = new URL(location);
+      if (url && allowedFrontendOrigins.has(url.origin)) {
         url.searchParams.set('token', token);
-
-        const newRes = c.redirect(url.toString());
-
-        res.headers.forEach((value, key) => {
-          if (key.toLowerCase() === 'set-cookie') {
-            newRes.headers.append(key, value);
-          }
-        });
-        return newRes;
+        return c.redirect(url.toString());
       }
     }
   }
@@ -153,7 +158,7 @@ app.get('/auth/github', async (c) => {
     },
   );
 
-  const res = await auth.handler(internalReq);
+  const res = stripSetCookie(await auth.handler(internalReq));
 
   if (!res.ok) {
     return res;
@@ -164,13 +169,7 @@ app.get('/auth/github', async (c) => {
     return c.json({ error: 'Missing OAuth redirect URL' }, 500);
   }
 
-  const redirectRes = c.redirect(data.url);
-  res.headers.forEach((value, key) => {
-    if (key.toLowerCase() === 'set-cookie') {
-      redirectRes.headers.append(key, value);
-    }
-  });
-  return redirectRes;
+  return c.redirect(data.url);
 });
 
 app.get('/callback/:provider', async (c) => {
@@ -189,7 +188,7 @@ app.get('/callback/:provider', async (c) => {
     headers: c.req.raw.headers,
   });
 
-  return await auth.handler(internalReq);
+  return stripSetCookie(await auth.handler(internalReq));
 });
 
 const PORT = process.env.PORT || 3000;

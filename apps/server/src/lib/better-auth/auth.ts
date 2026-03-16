@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { bearer } from 'better-auth/plugins';
 import { db } from '../../db/index';
 import {
   authAccounts,
@@ -44,16 +45,6 @@ function toOrigin(value?: string) {
 
 const frontendOrigin = toOrigin(process.env.FRONTEND_APP_URL);
 const apiOrigin = toOrigin(baseURL) || baseURL;
-const isCrossOrigin = !!frontendOrigin && frontendOrigin !== apiOrigin;
-const requestedSameSite =
-  process.env.BETTER_AUTH_COOKIE_SAMESITE?.toLowerCase() as
-    | 'lax'
-    | 'none'
-    | 'strict'
-    | undefined;
-const cookieSameSite =
-  isProduction && isCrossOrigin ? 'none' : requestedSameSite || 'lax';
-const cookieSecure = isProduction || cookieSameSite === 'none';
 const defaultErrorURL =
   process.env.BETTER_AUTH_ERROR_URL ||
   (frontendOrigin ? `${frontendOrigin}/status/error` : null) ||
@@ -63,22 +54,7 @@ export const auth = betterAuth({
   basePath,
   baseURL,
   secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
-  advanced: {
-    useSecureCookies: cookieSecure,
-    ...(isProduction
-      ? {
-          crossSubDomainCookies: {
-            enabled: true,
-            domain: '.potatosqueezy.xyz',
-          },
-        }
-      : {}),
-    defaultCookieAttributes: {
-      sameSite: 'none',
-      secure: true,
-      path: '/',
-    },
-  },
+  plugins: [bearer()],
   onAPIError: {
     errorURL: defaultErrorURL,
   },
@@ -122,7 +98,7 @@ export const auth = betterAuth({
     },
   },
   account: {
-    storeStateStrategy: 'cookie',
+    storeStateStrategy: 'database',
     fields: {
       accountId: 'account_id',
       providerId: 'provider_id',
