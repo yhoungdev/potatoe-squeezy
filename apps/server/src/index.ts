@@ -181,9 +181,15 @@ app.get('/callback/:provider', async (c) => {
     return c.redirect(`${FRONTEND_APP_URL}/app`);
   }
 
-  const searchParams = new URLSearchParams(query);
-  const redirectUrl = `/api/auth/callback/${provider}?${searchParams.toString()}`;
-  return c.redirect(redirectUrl);
+  const callbackUrl = new URL(`/api/auth/callback/${provider}`, c.req.url);
+  callbackUrl.search = new URLSearchParams(query).toString();
+
+  const internalReq = new Request(callbackUrl, {
+    method: 'GET',
+    headers: c.req.raw.headers,
+  });
+
+  return await auth.handler(internalReq);
 });
 
 const PORT = process.env.PORT || 3000;

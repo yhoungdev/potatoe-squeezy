@@ -65,6 +65,15 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
   advanced: {
     useSecureCookies: cookieSecure,
+    ...(isProduction
+      ? {
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: 'potatosqueezy.xyz',
+            additionalCookies: ['oauth_state'],
+          },
+        }
+      : {}),
     defaultCookieAttributes: {
       sameSite: cookieSameSite,
       path: '/',
