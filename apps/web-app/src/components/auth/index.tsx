@@ -52,7 +52,7 @@ function AuthComponent() {
             transition={{ delay: 0.2, type: "spring" }}
             className=" transition-transform cursor-pointer text-7xl flex items-center justify-center hover:rotate-12"
           >
-            <img src="./logo/logo.png" width={150}/>
+            <img src="./logo/logo.png" width={150} />
           </motion.span>
 
           <motion.h1

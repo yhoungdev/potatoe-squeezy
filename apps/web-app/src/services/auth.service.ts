@@ -29,7 +29,7 @@ class AuthService {
     redirect: boolean;
   }> {
     void options;
-    const baseUrl = String(BASE_API_URL || '').replace(/\/+$/, '');
+    const baseUrl = String(BASE_API_URL || "").replace(/\/+$/, "");
     return {
       url: `${baseUrl}/auth/github`,
       redirect: true,
