@@ -22,8 +22,6 @@ Run migrations manually:
 bun run db:migrate
 ```
 
-If your DB already has the app tables (but Drizzle migrations haven’t been tracked), `db:migrate` will fall back to ensuring the Better Auth tables (`auth_users`, `auth_sessions`, `auth_accounts`, `auth_verifications`) exist so `/api/auth/*` works.
-
 Run with Docker dev setup:
 
 ```sh
@@ -52,11 +50,10 @@ GET /docs/openapi.json
 
 ## Authentication
 
-- Better Auth is mounted under `POST|GET /api/auth/*`.
-- GitHub OAuth callback URL must match the server callback route. This project supports either:
-  - `http://localhost:3000/callback/github` (default in code)
-  - `http://localhost:3000/api/auth/callback/github` (Better Auth native route)
-    Set `GITHUB_REDIRECT_URI` to control which one is used.
+- GitHub OAuth is handled by:
+  - `GET /auth/github` (starts OAuth)
+  - `GET /callback/github` (OAuth callback)
+- GitHub OAuth callback URL must match `GITHUB_REDIRECT_URI` (or defaults to `${API_ORIGIN}/callback/github`).
 - If you hit `email_not_found`, your GitHub auth token didn’t have access to your email. For GitHub Apps, enable **Account permissions → Email addresses: Read-only**, then re-authorize. As a fallback, set `GITHUB_ALLOW_NOREPLY_EMAIL=true` to use a `users.noreply.github.com` email.
 
 ## Routes
@@ -71,15 +68,15 @@ Returns API metadata.
 
 Checks database connectivity.
 
-## Auth (Better Auth)
+## Auth
 
-#### `GET /api/auth/get-session`
+#### `GET /auth/github`
 
-Get current session (cookie-based).
+Redirects to GitHub OAuth authorize.
 
-#### `POST /api/auth/sign-in/social`
+#### `GET /callback/github`
 
-Start social OAuth flow.
+Exchanges OAuth code, upserts user, redirects to frontend with `token`.
 
 ## Wallets
 

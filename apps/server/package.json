@@ -8,8 +8,6 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run scripts/migrate.ts",
     "push": "bun run scripts/push-db.ts",
-    "auth:generate": "bun x auth@latest generate --config ./auth.ts",
-    "auth:migrate": "bun x auth@latest migrate --config ./auth.ts",
     "db:studio": "drizzle-kit studio",
     "db:push": "bun x drizzle-kit push",
     "format": "prettier --write ."
@@ -19,7 +17,6 @@
     "@potatoe/shared": "workspace:*",
     "@hono-dev/auth-github": "^0.0.1",
     "@neondatabase/serverless": "^0.10.4",
-    "better-auth": "^1.5.5",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "hono": "^4.7.2",

@@ -150,49 +150,39 @@ const openApiSpec = {
         },
       },
     },
-    '/api/auth/sign-in/social': {
-      post: {
-        tags: ['Auth'],
-        summary: 'Start social OAuth flow via Better-auth',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['provider'],
-                properties: {
-                  provider: { type: 'string', example: 'github' },
-                  callbackURL: {
-                    type: 'string',
-                    example: 'http://localhost:3000/callback/github',
-                  },
-                },
-              },
-            },
-          },
-        },
-        responses: {
-          '200': { description: 'Returns provider authorization URL' },
-        },
-      },
-    },
-    '/api/auth/get-session': {
+    '/auth/github': {
       get: {
         tags: ['Auth'],
-        summary: 'Get current session info via Better-auth',
+        summary: 'Start GitHub OAuth flow',
+        parameters: [
+          {
+            name: 'callbackURL',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+          },
+          {
+            name: 'errorCallbackURL',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+          },
+        ],
         responses: {
-          '200': { description: 'Session and user data' },
-          '401': { description: 'Unauthorized' },
+          '302': { description: 'Redirects to GitHub authorization URL' },
         },
       },
     },
-    '/api/auth/sign-out': {
-      post: {
+    '/callback/github': {
+      get: {
         tags: ['Auth'],
-        summary: 'Logout via Better-auth',
+        summary: 'GitHub OAuth callback',
+        parameters: [
+          { name: 'code', in: 'query', required: true, schema: { type: 'string' } },
+          { name: 'state', in: 'query', required: true, schema: { type: 'string' } },
+        ],
         responses: {
-          '200': { description: 'Logout success' },
+          '302': { description: 'Redirects back to the frontend with token' },
         },
       },
     },

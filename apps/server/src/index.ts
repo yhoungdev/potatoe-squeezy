@@ -1,10 +1,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { auth } from './auth';
 import walletsRoute from './routes/wallets';
 import txRecordsRoute from './routes/tx-records';
 import { db } from './db';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { Env } from './types/env';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
@@ -17,6 +16,9 @@ import docsRoute from './routes/docs';
 import { sendTelegramMessage } from './utils/telegram-notification';
 import { TELEGRAM_CHAT_ID, FRONTEND_APP_URL } from './constants';
 import { launchBot, telegram_bot } from './config/telegraf';
+import type { User } from './types';
+import { users } from './db/schema';
+import { sign, verify } from 'hono/jwt';
 const telegram_bot_config = { launchBot, telegram_bot };
 
 const normalizeOrigin = (value: string) => {
@@ -39,16 +41,9 @@ const allowedFrontendOrigins = new Set(
   ].filter(Boolean) as string[],
 );
 
-const stripSetCookie = (res: Response) => {
-  const headers = new Headers(res.headers);
-  headers.delete('set-cookie');
-  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
-};
-
 const app = new Hono<{
   Variables: {
-    user: typeof auth.$Infer.Session.user | null;
-    session: typeof auth.$Infer.Session.session | null;
+    user: User | null;
   };
   Bindings: Env;
 }>();
@@ -80,21 +75,43 @@ app.use(
     },
     allowHeaders: ['Content-Type', 'Authorization'],
     allowMethods: ['POST', 'GET', 'OPTIONS'],
-    exposeHeaders: ['Content-Length', 'set-auth-token'],
+    exposeHeaders: ['Content-Length'],
     maxAge: 600,
     credentials: false,
   }),
 );
 
-app.use('*', async (c, next) => {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+const parseBearerToken = (header: string | undefined) => {
+  if (!header) return null;
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
+};
 
-  if (!session) {
+app.use('*', async (c, next) => {
+  const token = parseBearerToken(c.req.header('authorization'));
+  if (!token) {
     c.set('user', null);
-    c.set('session', null);
   } else {
-    c.set('user', session.user);
-    c.set('session', session.session);
+    try {
+      const payload = (await verify(
+        token,
+        process.env.JWT_SECRET!,
+        'HS256',
+      )) as Record<string, unknown>;
+      const userId = Number(payload.userId);
+      if (!Number.isFinite(userId)) {
+        c.set('user', null);
+      } else {
+        const rows = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, userId))
+          .limit(1);
+        c.set('user', rows[0] ?? null);
+      }
+    } catch {
+      c.set('user', null);
+    }
   }
 
   c.env = {
@@ -106,89 +123,274 @@ app.use('*', async (c, next) => {
   await next();
 });
 
-app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
-  const res = stripSetCookie(await auth.handler(c.req.raw));
-
-  if (res.status === 302) {
-    const location = res.headers.get('Location');
-    const token = res.headers.get('set-auth-token');
-    if (location && token) {
-      let url: URL | null = null;
-      try {
-        url = new URL(location);
-      } catch {
-        try {
-          url = new URL(location, FRONTEND_APP_URL);
-        } catch {
-          url = null;
-        }
-      }
-
-      if (url && allowedFrontendOrigins.has(url.origin)) {
-        url.searchParams.set('token', token);
-        return c.redirect(url.toString());
-      }
-    }
-  }
-  return res;
-});
-
-app.get('/auth/callback', (c) => {
-  const url = new URL(c.req.url);
-  url.pathname = '/api/auth/callback/github';
-  return c.redirect(url.toString());
-});
-
 app.get('/auth/github', async (c) => {
-  const frontend = process.env.FRONTEND_APP_URL || 'http://localhost:5173';
-  const callbackURL = `${new URL(frontend).origin}/app`;
-  const errorCallbackURL = `${new URL(frontend).origin}/status/error`;
+  const githubClientId = process.env.GITHUB_CLIENT_ID;
 
-  const internalReq = new Request(
-    new URL('/api/auth/sign-in/social', c.req.url),
+  if (!githubClientId) {
+    return c.json({ error: 'Missing GitHub client ID' }, 500);
+  }
+
+  const frontend = process.env.FRONTEND_APP_URL || 'http://localhost:5173';
+  const frontendOrigin = new URL(frontend).origin;
+  const callbackURL = c.req.query('callbackURL') || `${frontendOrigin}/app`;
+  const errorCallbackURL =
+    c.req.query('errorCallbackURL') || `${frontendOrigin}/status/error`;
+
+  let callbackOrigin: string | null = null;
+  let errorOrigin: string | null = null;
+  try {
+    callbackOrigin = new URL(callbackURL).origin;
+  } catch {}
+  try {
+    errorOrigin = new URL(errorCallbackURL).origin;
+  } catch {}
+
+  if (
+    !callbackOrigin ||
+    !errorOrigin ||
+    !allowedFrontendOrigins.has(callbackOrigin) ||
+    !allowedFrontendOrigins.has(errorOrigin)
+  ) {
+    return c.json({ error: 'Invalid callback origin' }, 400);
+  }
+
+  const apiOrigin = new URL(c.req.url).origin;
+  const redirectURI =
+    process.env.GITHUB_REDIRECT_URI || `${apiOrigin}/callback/github`;
+
+  const state = await sign(
     {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        provider: 'github',
-        callbackURL,
-        newUserCallbackURL: callbackURL,
-        errorCallbackURL,
-      }),
+      callbackURL,
+      errorCallbackURL,
+      nonce:
+        (globalThis.crypto as Crypto | undefined)?.randomUUID?.() ||
+        Math.random().toString(16).slice(2),
+      exp: Math.floor(Date.now() / 1000) + 60 * 10,
     },
+    process.env.JWT_SECRET!,
+    'HS256',
   );
 
-  const res = stripSetCookie(await auth.handler(internalReq));
+  const authorizeUrl = new URL('https://github.com/login/oauth/authorize');
+  authorizeUrl.searchParams.set('client_id', githubClientId);
+  authorizeUrl.searchParams.set('redirect_uri', redirectURI);
+  authorizeUrl.searchParams.set('scope', 'read:user user:email');
+  authorizeUrl.searchParams.set('state', state);
 
-  if (!res.ok) {
-    return res;
-  }
-
-  const data = (await res.json()) as { url?: string };
-  if (!data?.url) {
-    return c.json({ error: 'Missing OAuth redirect URL' }, 500);
-  }
-
-  return c.redirect(data.url);
+  return c.redirect(authorizeUrl.toString());
 });
 
-app.get('/callback/:provider', async (c) => {
-  const provider = c.req.param('provider');
-  const query = c.req.query();
+app.get('/callback/github', async (c) => {
+  const code = c.req.query('code');
+  const state = c.req.query('state');
 
-  if (!query.code || !query.state) {
-    return c.redirect(`${FRONTEND_APP_URL}/app`);
+  const defaultErrorURL = (() => {
+    try {
+      const origin = new URL(process.env.FRONTEND_APP_URL || FRONTEND_APP_URL)
+        .origin;
+      return `${origin}/status/error`;
+    } catch {
+      return `${FRONTEND_APP_URL}/status/error`;
+    }
+  })();
+
+  if (!code || !state) {
+    return c.redirect(defaultErrorURL);
   }
 
-  const callbackUrl = new URL(`/api/auth/callback/${provider}`, c.req.url);
-  callbackUrl.search = new URLSearchParams(query).toString();
+  let statePayload: Record<string, unknown>;
+  try {
+    statePayload = (await verify(
+      state,
+      process.env.JWT_SECRET!,
+      'HS256',
+    )) as Record<string, unknown>;
+  } catch {
+    const url = new URL(defaultErrorURL);
+    url.searchParams.set('error', 'state_mismatch');
+    return c.redirect(url.toString());
+  }
 
-  const internalReq = new Request(callbackUrl, {
-    method: 'GET',
-    headers: c.req.raw.headers,
-  });
+  const callbackURL = String(statePayload.callbackURL || '');
+  const errorCallbackURL = String(statePayload.errorCallbackURL || '');
 
-  return stripSetCookie(await auth.handler(internalReq));
+  const safeErrorURL = (() => {
+    try {
+      const url = new URL(errorCallbackURL);
+      return allowedFrontendOrigins.has(url.origin) ? url.toString() : defaultErrorURL;
+    } catch {
+      return defaultErrorURL;
+    }
+  })();
+
+  const safeCallbackURL = (() => {
+    try {
+      const url = new URL(callbackURL);
+      return allowedFrontendOrigins.has(url.origin) ? url.toString() : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  if (!safeCallbackURL) {
+    const url = new URL(safeErrorURL);
+    url.searchParams.set('error', 'invalid_callback');
+    return c.redirect(url.toString());
+  }
+
+  const githubClientId = process.env.GITHUB_CLIENT_ID;
+  const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
+  if (!githubClientId || !githubClientSecret) {
+    const url = new URL(safeErrorURL);
+    url.searchParams.set('error', 'missing_github_credentials');
+    return c.redirect(url.toString());
+  }
+
+  const apiOrigin = new URL(c.req.url).origin;
+  const redirectURI =
+    process.env.GITHUB_REDIRECT_URI || `${apiOrigin}/callback/github`;
+
+  const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      client_id: githubClientId,
+      client_secret: githubClientSecret,
+      code,
+      redirect_uri: redirectURI,
+    }),
+  }).catch(() => null);
+
+  if (!tokenRes) {
+    const url = new URL(safeErrorURL);
+    url.searchParams.set('error', 'token_exchange_failed');
+    return c.redirect(url.toString());
+  }
+
+  const tokenJson = (await tokenRes.json().catch(() => null)) as
+    | Record<string, unknown>
+    | null;
+
+  const accessToken =
+    tokenJson && typeof tokenJson.access_token === 'string'
+      ? tokenJson.access_token
+      : null;
+
+  if (!accessToken) {
+    const url = new URL(safeErrorURL);
+    url.searchParams.set('error', 'token_exchange_failed');
+    return c.redirect(url.toString());
+  }
+
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+    'User-Agent': 'potatoe-squeezy',
+    Accept: 'application/vnd.github+json',
+  };
+
+  const profileRes = await fetch('https://api.github.com/user', {
+    headers,
+  }).catch(() => null);
+
+  if (!profileRes || !profileRes.ok) {
+    const url = new URL(safeErrorURL);
+    url.searchParams.set('error', 'github_profile_failed');
+    return c.redirect(url.toString());
+  }
+
+  const profile = (await profileRes.json().catch(() => null)) as
+    | Record<string, unknown>
+    | null;
+
+  const githubId = profile?.id != null ? String(profile.id) : '';
+  const username =
+    typeof profile?.login === 'string' ? String(profile.login) : '';
+  const displayName =
+    typeof profile?.name === 'string' && profile.name
+      ? String(profile.name)
+      : username;
+  const avatarUrl =
+    typeof profile?.avatar_url === 'string' ? String(profile.avatar_url) : null;
+
+  if (!githubId || !username) {
+    const url = new URL(safeErrorURL);
+    url.searchParams.set('error', 'invalid_github_user');
+    return c.redirect(url.toString());
+  }
+
+  let emails: Array<{ email: string; primary?: boolean; verified?: boolean }> =
+    [];
+
+  try {
+    const emailsRes = await fetch('https://api.github.com/user/emails', {
+      headers,
+    });
+    if (emailsRes.ok) {
+      emails = (await emailsRes.json()) as typeof emails;
+    }
+  } catch {}
+
+  let email: string | null =
+    typeof profile?.email === 'string' ? String(profile.email) : null;
+
+  if (!email && emails.length) {
+    email = (emails.find((e) => e.primary) ?? emails[0])?.email ?? null;
+  }
+
+  const allowNoreply =
+    process.env.GITHUB_ALLOW_NOREPLY_EMAIL?.toLowerCase() === 'true';
+
+  if (!email && allowNoreply) {
+    email = `${githubId}+${username}@users.noreply.github.com`;
+  }
+
+  const userRow = await db
+    .insert(users)
+    .values({
+      githubId,
+      username,
+      email,
+      name: displayName || null,
+      avatarUrl,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: users.githubId,
+      set: {
+        username,
+        email,
+        name: displayName || null,
+        avatarUrl,
+        updatedAt: new Date(),
+      },
+    })
+    .returning();
+
+  const appUser = userRow[0];
+  if (!appUser) {
+    const url = new URL(safeErrorURL);
+    url.searchParams.set('error', 'user_sync_failed');
+    return c.redirect(url.toString());
+  }
+
+  const appToken = await sign(
+    {
+      userId: appUser.id,
+      githubId,
+      username,
+      email,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
+    },
+    process.env.JWT_SECRET!,
+    'HS256',
+  );
+
+  const url = new URL(safeCallbackURL);
+  url.searchParams.set('token', appToken);
+  return c.redirect(url.toString());
 });
 
 const PORT = process.env.PORT || 3000;

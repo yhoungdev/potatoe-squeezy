@@ -3,7 +3,6 @@ import { useUserStore } from "@/store/user.store";
 import { useNavigate } from "@tanstack/react-router";
 import { AuthService } from "@/services/auth.service";
 import UserService from "@/services/user.service";
-import Cookies from "js-cookie";
 
 function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,25 +11,6 @@ function useAuth() {
   const { authUser, setAuthUser, setUser, setWallet, clearUser } =
     useUserStore();
   const navigate = useNavigate();
-
-  const loadUserProfile = useCallback(async () => {
-    try {
-      const profile = (await UserService.fetchUserProfile()) as any;
-      if (profile) {
-        if (profile.user) {
-          setUser(profile.user);
-        }
-        if (profile.wallet) {
-          setWallet(profile.wallet);
-        }
-        if (profile.token) {
-          Cookies.set("auth-token", profile.token, { expires: 7 });
-        }
-      }
-    } catch (err) {
-      console.error("Failed to fetch user profile:", err);
-    }
-  }, [setUser, setWallet]);
 
   const setAuthUserIfChanged = useCallback(
     (nextUser: any | null) => {
@@ -43,72 +23,88 @@ function useAuth() {
   );
 
   useEffect(() => {
-    const url = new URL(window.location.href);
-    const token = url.searchParams.get("token");
-    if (token) {
-      Cookies.set("auth-token", token, { expires: 7 });
+    let cancelled = false;
 
-      url.searchParams.delete("token");
-      window.history.replaceState({}, document.title, url.pathname);
-    }
-
-    const loadSession = async () => {
+    const bootstrap = async () => {
       try {
-        const session = await AuthService.getSession();
-        if (session?.user) {
-          setAuthUserIfChanged(session.user);
-          setIsAuthenticated(true);
-          await loadUserProfile();
-        } else {
+        const token = localStorage.getItem("bearer_token");
+        if (!token) {
+          if (!cancelled) {
+            setAuthUserIfChanged(null);
+            setIsAuthenticated(false);
+          }
+          return;
+        }
+
+        const profile = (await UserService.fetchUserProfile()) as any;
+        if (!cancelled) {
+          if (profile?.user) {
+            setAuthUserIfChanged(profile.user);
+            if (profile.wallet) {
+              setWallet(profile.wallet);
+            }
+            setUser(profile.user);
+            setIsAuthenticated(true);
+          } else {
+            setAuthUserIfChanged(null);
+            setIsAuthenticated(false);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          localStorage.removeItem("bearer_token");
           setAuthUserIfChanged(null);
           setIsAuthenticated(false);
         }
-      } catch {
-        setAuthUserIfChanged(null);
-        setIsAuthenticated(false);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
-    loadSession();
-  }, [setAuthUserIfChanged, loadUserProfile]);
+    bootstrap();
 
-  const handleLogin = useCallback(() => {
-    setIsAuthenticated(true);
-    loadUserProfile();
-  }, [loadUserProfile]);
+    return () => {
+      cancelled = true;
+    };
+  }, [setAuthUserIfChanged, setUser, setWallet]);
 
   const handleLogout = useCallback(async () => {
     await AuthService.signOut();
-    Cookies.remove("auth-token");
+    localStorage.removeItem("bearer_token");
     clearUser();
-    setIsAuthenticated(false);
     navigate({ to: "/" });
   }, [clearUser, navigate]);
 
   const checkAuthStatus = useCallback(async () => {
     try {
-      const session = await AuthService.getSession();
-      const ok = !!session?.user;
+      const token = localStorage.getItem("bearer_token");
+      if (!token) {
+        setAuthUserIfChanged(null);
+        setIsAuthenticated(false);
+        return false;
+      }
+
+      const profile = (await UserService.fetchUserProfile()) as any;
+      const ok = Boolean(profile?.user);
+      setAuthUserIfChanged(profile?.user || null);
       setIsAuthenticated(ok);
-      setAuthUserIfChanged(session?.user || null);
       if (ok) {
-        await loadUserProfile();
+        if (profile.wallet) setWallet(profile.wallet);
+        setUser(profile.user);
       }
       return ok;
     } catch {
-      setIsAuthenticated(false);
+      localStorage.removeItem("bearer_token");
       setAuthUserIfChanged(null);
+      setIsAuthenticated(false);
       return false;
     }
-  }, [setAuthUserIfChanged, loadUserProfile]);
+  }, [setAuthUserIfChanged, setUser, setWallet]);
 
   return {
     isAuthenticated,
     isLoading,
     user: authUser,
-    login: handleLogin,
     logout: handleLogout,
     checkAuthStatus,
   };

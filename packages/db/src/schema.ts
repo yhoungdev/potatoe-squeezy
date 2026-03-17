@@ -245,5 +245,3 @@ export const userBadgesRelations = relations(userBadges, ({ one }) => ({
     references: [badges.id],
   }),
 }));
-
-export * from "./better-auth-schema";
