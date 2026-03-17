@@ -347,29 +347,72 @@ app.get('/callback/github', async (c) => {
     email = `${githubId}+${username}@users.noreply.github.com`;
   }
 
-  const userRow = await db
-    .insert(users)
-    .values({
-      githubId,
-      username,
-      email,
-      name: displayName || null,
-      avatarUrl,
-      updatedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: users.githubId,
-      set: {
-        username,
-        email,
-        name: displayName || null,
-        avatarUrl,
-        updatedAt: new Date(),
-      },
-    })
-    .returning();
+  const nextValues = {
+    githubId,
+    username,
+    email,
+    name: displayName || null,
+    avatarUrl,
+    updatedAt: new Date(),
+  };
 
-  const appUser = userRow[0];
+  const existingByGithubId = await db
+    .select()
+    .from(users)
+    .where(eq(users.githubId, githubId))
+    .limit(1);
+
+  let appUser: typeof users.$inferSelect | undefined;
+
+  if (existingByGithubId[0]) {
+    const updated = await db
+      .update(users)
+      .set(nextValues)
+      .where(eq(users.id, existingByGithubId[0].id))
+      .returning();
+    appUser = updated[0];
+  } else {
+    const existingByUsername = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
+
+    const legacyGithubId =
+      existingByUsername[0] &&
+      typeof existingByUsername[0].githubId === 'string' &&
+      existingByUsername[0].githubId.includes('-');
+
+    const emailMatches =
+      existingByUsername[0] &&
+      email &&
+      existingByUsername[0].email &&
+      existingByUsername[0].email.toLowerCase() === email.toLowerCase();
+
+    if (existingByUsername[0] && (legacyGithubId || emailMatches)) {
+      const updated = await db
+        .update(users)
+        .set(nextValues)
+        .where(eq(users.id, existingByUsername[0].id))
+        .returning();
+      appUser = updated[0];
+    } else {
+      let usernameCandidate = username;
+      if (existingByUsername[0]) {
+        usernameCandidate = `${username}-${githubId}`;
+      }
+
+      const inserted = await db
+        .insert(users)
+        .values({
+          ...nextValues,
+          username: usernameCandidate,
+        })
+        .returning();
+      appUser = inserted[0];
+    }
+  }
+
   if (!appUser) {
     const url = new URL(safeErrorURL);
     url.searchParams.set('error', 'user_sync_failed');
