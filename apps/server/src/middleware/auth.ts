@@ -10,15 +10,21 @@ export const auth = async (c: Context<{ Bindings: Env }>, next: Next) => {
   }
 
   const token = authHeader.split(' ')[1];
-  console.log('Received Token:', token);
 
   try {
-    const payload = await verify(token, c.env.JWT_SECRET);
-    console.log('Decoded Payload:', payload);
+    const payload = await verify(token, c.env.JWT_SECRET, 'HS256');
+
+    const userId = (payload as any).userId ?? (payload as any).sub;
+
+    if (!userId) {
+      return c.json({ error: 'Invalid token payload' }, 401);
+    }
+
     c.set('user', payload);
-    c.set('userId', payload.userId || payload.sub); 
+    c.set('userId', userId);
+
     await next();
-  } catch (error) {
+  } catch (error: any) {
     console.error('Token Verification Error:', error);
     return c.json({ error: 'Invalid token', details: error.message }, 401);
   }
