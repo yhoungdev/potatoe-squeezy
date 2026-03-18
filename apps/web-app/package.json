@@ -13,8 +13,10 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@auth/core": "^0.34.3",
     "@babel/core": "^7.27.4",
     "@babel/runtime": "^7.27.4",
+    "@hono/auth-js": "^1.1.1",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.14",

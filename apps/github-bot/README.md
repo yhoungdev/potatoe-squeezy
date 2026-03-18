@@ -9,7 +9,7 @@
 bun install
 
 # Run the bot
-bun run start
+WEBHOOK_SECRET=<github-webhook-secret> APP_ID=<app-id> PRIVATE_KEY=<pem-value> bun run start
 ```
 
 ## Docker
@@ -19,7 +19,7 @@ bun run start
 docker build -t github-bot .
 
 # 2. Start container
-docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> github-bot
+docker run -e APP_ID=<app-id> -e PRIVATE_KEY=<pem-value> -e WEBHOOK_SECRET=<github-webhook-secret> github-bot
 ```
 
 ## Contributing

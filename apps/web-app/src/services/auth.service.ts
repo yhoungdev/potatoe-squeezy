@@ -14,16 +14,10 @@ class AuthService {
     url: string;
     redirect: boolean;
   }> {
-    const callbackURL = options.callbackURL ?? `${window.location.origin}/app`;
-    const errorCallbackURL =
-      options.errorCallbackURL ?? `${window.location.origin}/status/error`;
-
-    const url = new URL(`${baseUrl}/auth/github`);
-    url.searchParams.set("callbackURL", callbackURL);
-    url.searchParams.set("errorCallbackURL", errorCallbackURL);
+    void options;
 
     return {
-      url: url.toString(),
+      url: `${baseUrl}/auth/login`,
       redirect: true,
     };
   }

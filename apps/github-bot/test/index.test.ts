@@ -33,7 +33,6 @@ describe("My Probot app", () => {
     probot = new Probot({
       appId: 123,
       privateKey,
-      // disable request throttling and retries for testing
       Octokit: ProbotOctokit.defaults({
         retry: { enabled: false },
         throttle: { enabled: false },
