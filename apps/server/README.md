@@ -51,9 +51,9 @@ GET /docs/openapi.json
 ## Authentication
 
 - GitHub OAuth is handled by:
-  - `GET /auth/github` (starts OAuth)
-  - `GET /callback/github` (OAuth callback)
-- GitHub OAuth callback URL must match `GITHUB_REDIRECT_URI` (or defaults to `${API_ORIGIN}/callback/github`).
+  - `GET /auth/login` (starts OAuth)
+  - `GET /auth/callback` (OAuth callback)
+- GitHub OAuth callback URL must match `GITHUB_CALLBACK_URL` (or `GITHUB_REDIRECT_URI` as fallback).
 - If you hit `email_not_found`, your GitHub auth token didn’t have access to your email. For GitHub Apps, enable **Account permissions → Email addresses: Read-only**, then re-authorize. As a fallback, set `GITHUB_ALLOW_NOREPLY_EMAIL=true` to use a `users.noreply.github.com` email.
 
 ## Routes
@@ -70,13 +70,13 @@ Checks database connectivity.
 
 ## Auth
 
-#### `GET /auth/github`
+#### `GET /auth/login`
 
 Redirects to GitHub OAuth authorize.
 
-#### `GET /callback/github`
+#### `GET /auth/callback`
 
-Exchanges OAuth code, upserts user, redirects to frontend with `token`.
+Exchanges OAuth code, syncs user, redirects to frontend with `token`.
 
 ## Wallets
 

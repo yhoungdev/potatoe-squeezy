@@ -150,19 +150,13 @@ const openApiSpec = {
         },
       },
     },
-    '/auth/github': {
+    '/auth/login': {
       get: {
         tags: ['Auth'],
         summary: 'Start GitHub OAuth flow',
         parameters: [
           {
-            name: 'callbackURL',
-            in: 'query',
-            required: false,
-            schema: { type: 'string' },
-          },
-          {
-            name: 'errorCallbackURL',
+            name: 'returnTo',
             in: 'query',
             required: false,
             schema: { type: 'string' },
@@ -173,16 +167,35 @@ const openApiSpec = {
         },
       },
     },
-    '/callback/github': {
+    '/auth/callback': {
       get: {
         tags: ['Auth'],
         summary: 'GitHub OAuth callback',
         parameters: [
-          { name: 'code', in: 'query', required: true, schema: { type: 'string' } },
-          { name: 'state', in: 'query', required: true, schema: { type: 'string' } },
+          {
+            name: 'code',
+            in: 'query',
+            required: true,
+            schema: { type: 'string' },
+          },
+          {
+            name: 'state',
+            in: 'query',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         responses: {
           '302': { description: 'Redirects back to the frontend with token' },
+        },
+      },
+    },
+    '/auth/logout': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Logout and clear auth cookies',
+        responses: {
+          '200': { description: 'Logout success' },
         },
       },
     },

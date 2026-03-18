@@ -82,19 +82,19 @@ try {
       'Drizzle migrations table was empty but schema existed; baselined migrations.',
     );
   } else {
-  let target = '<unknown>';
-  try {
-    const parsed = new URL(databaseUrl);
-    target = `${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}${parsed.pathname}`;
-  } catch {
-    // ignore
-  }
+    let target = '<unknown>';
+    try {
+      const parsed = new URL(databaseUrl);
+      target = `${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}${parsed.pathname}`;
+    } catch {
+      // ignore
+    }
 
-  throw new Error(
-    `Failed to run DB migrations against ${target}. ` +
-      `Start Postgres (or fix DATABASE_URL) and rerun: bun run db:migrate`,
-    { cause: err },
-  );
+    throw new Error(
+      `Failed to run DB migrations against ${target}. ` +
+        `Start Postgres (or fix DATABASE_URL) and rerun: bun run db:migrate`,
+      { cause: err },
+    );
   }
 } finally {
   await pool.end();
