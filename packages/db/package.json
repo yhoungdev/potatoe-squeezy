@@ -1,15 +1,40 @@
 {
-  "name": "@potatoe/db",
+  "name": "@repo/db",
   "version": "1.0.0",
-  "private": true,
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "description": "Database layer with PostgreSQL and Drizzle ORM",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
   "dependencies": {
-    "drizzle-orm": "^0.40.0",
-    "pg": "^8.14.0",
-    "dotenv": "^16.4.7"
+    "drizzle-orm": "^0.29.0",
+    "postgres": "^3.4.3",
+    "@types/pg": "^8.10.9"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.30.5"
-  }
+    "drizzle-kit": "^0.20.4",
+    "typescript": "^5.2.2",
+    "@types/node": "^20.8.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./schema": {
+      "import": "./dist/schema/index.js",
+      "require": "./dist/schema/index.js",
+      "types": "./dist/schema/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ]
 }
