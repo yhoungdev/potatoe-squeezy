@@ -1,15 +1,30 @@
 {
-  "name": "@potatoe/db",
-  "version": "1.0.0",
+  "name": "@workspace/db",
+  "version": "0.1.0",
   "private": true,
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./migrations": "./drizzle"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/seed.ts"
+  },
   "dependencies": {
-    "drizzle-orm": "^0.40.0",
-    "pg": "^8.14.0",
-    "dotenv": "^16.4.7"
+    "drizzle-orm": "^0.29.0",
+    "pg": "^8.11.3",
+    "postgres": "^3.4.3"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.30.5"
+    "@types/pg": "^8.10.7",
+    "drizzle-kit": "^0.20.4",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.2"
   }
 }
