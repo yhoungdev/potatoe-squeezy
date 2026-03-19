@@ -10,12 +10,17 @@ import { useUserStore } from "@/store/user.store";
 interface CelebrateUserProps {
   username: string;
   walletAddress?: string | null;
+  isOwnProfile?: boolean;
 }
 
 const MIN_AMOUNT = 0.000001;
 const MAX_AMOUNT = 1000;
 
-function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
+function CelebrateUser({
+  username,
+  walletAddress,
+  isOwnProfile = false,
+}: CelebrateUserProps) {
   const { publicKey, connected } = useWallet();
   const { authUser } = useUserStore();
   const [quantity, setQuantity] = useState<number>(0);
@@ -50,6 +55,11 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
     try {
       if (!connected) {
         toast.error("Please connect your wallet first");
+        return;
+      }
+
+      if (isOwnProfile) {
+        toast.error("You cannot zap your own profile");
         return;
       }
 
@@ -193,6 +203,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         disabled={
           !hasValidAmount ||
           !connected ||
+          isOwnProfile ||
           !hasValidRecipientWallet ||
           loading ||
           isProcessing
@@ -216,6 +227,12 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
       {connected && !hasValidRecipientWallet && (
         <p className="mt-2 text-sm text-center text-gray-400">
           This developer has not added a valid Solana wallet yet.
+        </p>
+      )}
+
+      {connected && isOwnProfile && (
+        <p className="mt-2 text-sm text-center text-gray-400">
+          You cannot zap yourself from your own profile.
         </p>
       )}
     </div>
