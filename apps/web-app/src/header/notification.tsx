@@ -1,15 +1,103 @@
 import Drawer from "@/components/popups/drawer";
-import { useQuery } from "@tanstack/react-query";
-import NotificationService from "@/services/notification.service";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import NotificationService, {
+  type UserNotification,
+} from "@/services/notification.service";
 import { Notification as NotificationIcon } from "iconsax-reactjs";
 import { formatDistanceToNow } from "date-fns";
+import { useEffect } from "react";
+import { BASE_API_URL } from "@/constant";
 
 function Notification() {
+  const queryClient = useQueryClient();
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ["userNotifications"],
     queryFn: () => NotificationService.getUserNotifications(),
     staleTime: 1000 * 60,
   });
+
+  useEffect(() => {
+    const token = localStorage.getItem("bearer_token");
+
+    if (!token || !BASE_API_URL) {
+      return;
+    }
+
+    const wsUrl = (() => {
+      try {
+        const url = new URL(BASE_API_URL);
+        url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+        url.pathname = "/ws/notifications";
+        url.searchParams.set("token", token);
+        return url.toString();
+      } catch {
+        return null;
+      }
+    })();
+
+    if (!wsUrl) {
+      return;
+    }
+
+    let socket: WebSocket | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let closedByApp = false;
+
+    const connect = () => {
+      socket = new WebSocket(wsUrl);
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+
+          if (
+            payload?.type !== "notification.created" ||
+            !payload.notification
+          ) {
+            return;
+          }
+
+          const nextNotification = payload.notification as UserNotification;
+
+          queryClient.setQueryData<UserNotification[]>(
+            ["userNotifications"],
+            (current = []) => {
+              const deduped = current.filter(
+                (item) => item.id !== nextNotification.id,
+              );
+              return [nextNotification, ...deduped].slice(0, 20);
+            },
+          );
+        } catch (error) {
+          console.error("Failed to parse realtime notification:", error);
+        }
+      };
+
+      socket.onclose = (event) => {
+        if (closedByApp) {
+          return;
+        }
+
+        if (event.code === 1008) {
+          return;
+        }
+
+        reconnectTimer = setTimeout(connect, 3000);
+      };
+    };
+
+    connect();
+
+    return () => {
+      closedByApp = true;
+
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+      }
+
+      socket?.close();
+    };
+  }, [queryClient]);
 
   return (
     <Drawer
