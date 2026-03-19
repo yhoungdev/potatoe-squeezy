@@ -9,6 +9,8 @@
     "packages/*"
   ],
   "scripts": {
+    "check:workspace-deps": "bun run scripts/check-workspace-deps.ts",
+    "preinstall": "bun run scripts/check-workspace-deps.ts",
     "dev": "bun --cwd apps/server dev & bun --cwd apps/web-app dev & bun --cwd apps/github-bot dev & bun --cwd apps/extension dev & wait",
     "start": "bun --cwd apps/server start & bun --cwd apps/web-app start & bun --cwd apps/github-bot start & bun --cwd apps/extension start & wait",
     "dev:server": "bun --cwd apps/server dev",

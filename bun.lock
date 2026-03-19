@@ -88,6 +88,7 @@
         "@babel/core": "^7.27.4",
         "@babel/runtime": "^7.27.4",
         "@hono/auth-js": "^1.1.1",
+        "@potatoe/shared": "workspace:*",
         "@radix-ui/react-alert-dialog": "^1.1.14",
         "@radix-ui/react-avatar": "^1.1.10",
         "@radix-ui/react-dialog": "^1.1.14",
@@ -220,6 +221,9 @@
     "packages/shared": {
       "name": "@potatoe/shared",
       "version": "1.0.0",
+      "dependencies": {
+        "bs58": "^6.0.0",
+      },
     },
   },
   "overrides": {

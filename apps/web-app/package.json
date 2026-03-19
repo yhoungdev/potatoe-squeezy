@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "packageManager": "bun@1.3.10",
+  "dependencyCheckIgnorePaths": [
+    "src/user/"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -34,6 +37,7 @@
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-query": "^5.80.0",
     "@tanstack/react-router": "^1.120.15",
+    "@potatoe/shared": "workspace:*",
     "@types/js-cookie": "^3.0.6",
     "@vercel/analytics": "^1.5.0",
     "@walletconnect/solana-adapter": "^0.0.8",

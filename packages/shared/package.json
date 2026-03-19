@@ -4,5 +4,8 @@
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
-  "types": "./src/index.ts"
+  "types": "./src/index.ts",
+  "dependencies": {
+    "bs58": "^6.0.0"
+  }
 }
