@@ -25,15 +25,25 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const wallets = pgTable("wallets", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id),
-  address: text("address").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const wallets = pgTable(
+  "wallets",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    chain: text("chain").notNull(),
+    address: text("address").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    userChainUnique: uniqueIndex("wallets_user_chain_unique").on(
+      table.userId,
+      table.chain,
+    ),
+  }),
+);
 
 export const transactionRecords = pgTable("transaction_records", {
   id: serial("id").primaryKey(),

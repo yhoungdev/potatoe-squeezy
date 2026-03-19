@@ -14,4 +14,27 @@ const validateSolanaAddress = (address: string): boolean => {
   }
 };
 
-export { validateSolanaAddress };
+const validateStellarAddress = (address: string): boolean => {
+  if (typeof address !== "string") return false;
+
+  const trimmed = address.trim();
+  if (trimmed.length !== 56) return false;
+
+  return /^G[A-Z2-7]{55}$/.test(trimmed);
+};
+
+const validateWalletAddress = (chain: string, address: string): boolean => {
+  const normalizedChain = chain.trim().toLowerCase();
+
+  if (normalizedChain === "solana") {
+    return validateSolanaAddress(address);
+  }
+
+  if (normalizedChain === "stellar") {
+    return validateStellarAddress(address);
+  }
+
+  return false;
+};
+
+export { validateSolanaAddress, validateStellarAddress, validateWalletAddress };

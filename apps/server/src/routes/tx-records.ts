@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { db } from '../db';
 import { transactionRecords, users } from '../db/schema';
 import { desc, eq } from 'drizzle-orm';
+import { validateSolanaAddress } from '@potatoe/shared';
 
 const txRecordsRoute = new Hono();
 
@@ -43,6 +44,13 @@ txRecordsRoute.post('/', async (c) => {
         },
         400,
       );
+    }
+
+    if (
+      !validateSolanaAddress(senderAddress) ||
+      !validateSolanaAddress(recipientAddress)
+    ) {
+      return c.json({ error: 'Invalid Solana wallet address' }, 400);
     }
 
     const newRecord = await db

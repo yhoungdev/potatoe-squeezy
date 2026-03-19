@@ -1,7 +1,7 @@
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import WalletService from "@/services/wallet.service";
 import { toast } from "sonner";
 import { useUserStore } from "@/store/user.store";
@@ -11,29 +11,52 @@ interface AddOrUpdateAddressProps {
   onUpdateAddress?: (address: string) => void;
 }
 
+const CHAIN_OPTIONS = [
+  { value: "solana", label: "Solana" },
+  { value: "stellar", label: "Stellar" },
+] as const;
+
 const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
-  const { user, wallet } = useUserStore() || {};
+  const { wallet } = useUserStore() || {};
 
   const { setWallet } = useUserStore();
   const queryClient = useQueryClient();
-  const { id } = user?.users || {};
-  const { wallets } = user || {};
+  const currentChain = wallet?.chain ?? "solana";
+  const [chain, setChain] = useState(currentChain);
+  const [address, setAddress] = useState("");
 
-  const [address, setAddress] = useState(wallet || "");
-  const hasExistingWallet = Boolean(wallets?.address);
+  const { data: walletRows = [] } = useQuery({
+    queryKey: ["userWallets"],
+    queryFn: () => WalletService.getWalletAddress(),
+  });
+
+  const selectedWallet = useMemo(
+    () =>
+      walletRows.find((row) => row.chain === chain) ??
+      (wallet?.chain === chain ? wallet : null),
+    [walletRows, chain, wallet],
+  );
+  const hasExistingWallet = Boolean(selectedWallet?.id);
+
+  useEffect(() => {
+    setAddress(selectedWallet?.address ?? "");
+  }, [selectedWallet?.address]);
 
   const addWalletMutation = useMutation({
-    mutationFn: (address: string) =>
+    mutationFn: () =>
       WalletService.addWallet({
-        userId: id,
+        chain,
         address,
       }),
-    onSuccess: () => {
+    onSuccess: (savedWallet) => {
       toast.success("Wallet address saved successfully.");
-      setWallet(address);
+      setWallet(savedWallet);
       onUpdateAddress?.(address);
       queryClient.invalidateQueries({
         queryKey: ["userProfile"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["userWallets"],
       });
     },
     onError: () => {
@@ -44,15 +67,18 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
   const updateWalletMutation = useMutation({
     mutationFn: () =>
       WalletService.updateWallet({
-        walletId: wallets?.id,
+        chain,
         address,
       }),
-    onSuccess: () => {
+    onSuccess: (savedWallet) => {
       toast.success("Wallet address updated successfully.");
       onUpdateAddress?.(address);
-      setWallet(address);
+      setWallet(savedWallet);
       queryClient.invalidateQueries({
         queryKey: ["userProfile"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["userWallets"],
       });
     },
     onError: (error: any) => {
@@ -63,10 +89,10 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
   const handleSaveOrUpdate = () => {
     if (!address) return;
 
-    if (hasExistingWallet && wallets?.id) {
+    if (hasExistingWallet) {
       updateWalletMutation.mutate();
     } else {
-      addWalletMutation.mutate(address);
+      addWalletMutation.mutate();
     }
   };
 
@@ -75,8 +101,23 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
 
   return (
     <div className="pt-4 space-y-4">
+      <select
+        value={chain}
+        onChange={(e) => setChain(e.target.value)}
+        className="w-full rounded-md border border-white/10 bg-gray-900/50 px-3 py-3 text-white outline-none"
+      >
+        {CHAIN_OPTIONS.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+            className="bg-gray-950 text-white"
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
       <Input
-        placeholder="Enter your Solana wallet address"
+        placeholder={`Enter your ${chain} wallet address`}
         value={address}
         onChange={(e) => setAddress(e.target.value)}
         className="bg-gray-900/50 border-white/10 text-white !py-4"

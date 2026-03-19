@@ -4,11 +4,11 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useTipSol } from "@/hooks/useTipSol";
 import { toast } from "sonner";
 import TransactionService from "@/services/transaction.service";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { validateSolanaAddress } from "@potatoe/shared";
 
 interface CelebrateUserProps {
   username: string;
-  walletAddress: string;
+  walletAddress?: string | null;
 }
 
 const MIN_AMOUNT = 0.000001;
@@ -22,9 +22,13 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const predefinedAmount = useMemo(() => [0.5, 1, 1.5, 2], []);
+  const hasValidRecipientWallet = useMemo(
+    () => validateSolanaAddress(walletAddress ?? ""),
+    [walletAddress],
+  );
 
   const { sendTip, loading } = useTipSol({
-    recipientAddress: walletAddress,
+    recipientAddress: walletAddress ?? "",
     recipientName: username,
   });
 
@@ -50,6 +54,11 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
       const amountToSend = customAmount ? parseFloat(customAmount) : quantity;
       const validationError = validateAmount(amountToSend);
 
+      if (!hasValidRecipientWallet) {
+        toast.error(`${username} has not added a valid zap wallet yet`);
+        return;
+      }
+
       if (validationError) {
         toast.error(validationError);
         return;
@@ -65,7 +74,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
             amount: amountToSend,
             senderAddress: publicKey?.toString() || "",
             senderId: null,
-            recipientAddress: walletAddress,
+            recipientAddress: walletAddress ?? "",
             recipientId: null,
             txHash: success.explorerUrl,
             note: message || null,
@@ -179,7 +188,13 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
           ${hasValidAmount && connected ? "bg-red-400 hover:bg-red-500" : "bg-gray-600"}
         `}
         onClick={handleZap}
-        disabled={!hasValidAmount || !connected || loading || isProcessing}
+        disabled={
+          !hasValidAmount ||
+          !connected ||
+          !hasValidRecipientWallet ||
+          loading ||
+          isProcessing
+        }
       >
         {isProcessing || loading ? (
           <span className="flex items-center gap-2">
@@ -193,6 +208,12 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
       {!connected && (
         <p className="text-sm text-center mt-2 text-gray-400">
           Connect your wallet to send tips
+        </p>
+      )}
+
+      {connected && !hasValidRecipientWallet && (
+        <p className="mt-2 text-sm text-center text-gray-400">
+          This developer has not added a valid Solana wallet yet.
         </p>
       )}
     </div>

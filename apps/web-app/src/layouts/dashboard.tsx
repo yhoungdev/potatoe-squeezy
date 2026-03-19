@@ -36,7 +36,7 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
 
   return (
     <div>
-      {wallet === undefined && (
+      {!wallet && (
         <div
           style={{
             background: "linear-gradient(64deg, #a43d3c, #ad4b4a, #e67271)",

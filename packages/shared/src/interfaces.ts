@@ -21,6 +21,7 @@ export interface IPotatoeUser {
 export interface IWallet {
   id: number;
   userId: number;
+  chain: string;
   address: string;
   createdAt: string;
   updatedAt: string;

@@ -57,6 +57,7 @@ const openApiSpec = {
         properties: {
           id: { type: 'integer' },
           userId: { type: 'integer' },
+          chain: { type: 'string', enum: ['solana', 'stellar'] },
           address: { type: 'string' },
           createdAt: { type: 'string', format: 'date-time' },
           updatedAt: { type: 'string', format: 'date-time' },
@@ -206,16 +207,16 @@ const openApiSpec = {
     '/wallet': {
       post: {
         tags: ['Wallets'],
-        summary: 'Create wallet for user',
+        summary: 'Create or replace wallet for a chain',
         requestBody: {
           required: true,
           content: {
             'application/json': {
               schema: {
                 type: 'object',
-                required: ['userId', 'address'],
+                required: ['chain', 'address'],
                 properties: {
-                  userId: { type: 'integer' },
+                  chain: { type: 'string', enum: ['solana', 'stellar'] },
                   address: { type: 'string' },
                 },
               },
@@ -236,16 +237,16 @@ const openApiSpec = {
       },
       put: {
         tags: ['Wallets'],
-        summary: 'Update existing wallet address',
+        summary: 'Update wallet for a chain',
         requestBody: {
           required: true,
           content: {
             'application/json': {
               schema: {
                 type: 'object',
-                required: ['walletId', 'address'],
+                required: ['chain', 'address'],
                 properties: {
-                  walletId: { type: 'integer' },
+                  chain: { type: 'string', enum: ['solana', 'stellar'] },
                   address: { type: 'string' },
                 },
               },
@@ -265,18 +266,10 @@ const openApiSpec = {
         },
       },
     },
-    '/wallet/user/{userId}': {
+    '/wallet/user': {
       get: {
         tags: ['Wallets'],
-        summary: 'List wallets by user id',
-        parameters: [
-          {
-            name: 'userId',
-            in: 'path',
-            required: true,
-            schema: { type: 'integer' },
-          },
-        ],
+        summary: 'List authenticated user wallets',
         responses: {
           '200': {
             description: 'Wallet list',

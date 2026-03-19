@@ -1,53 +1,108 @@
 import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { db } from '../db';
-import { wallets } from '../db/schema';
+import { users, wallets } from '../db/schema';
 import { auth } from '../middleware/auth';
 import type { Env } from '../types/env';
-import { validateSolanaAddress } from '@potatoe/shared';
+import { validateWalletAddress } from '@potatoe/shared';
 
 const walletsRoute = new Hono<{ Bindings: Env }>();
 
 walletsRoute.use('*', auth);
 
-walletsRoute.post('/', async (c) => {
-  try {
-    const userId = c.get('userId') as number | string | undefined;
-    const { address } = await c.req.json<{ address: string }>();
+const normalizeChain = (value: unknown) =>
+  String(value ?? '')
+    .trim()
+    .toLowerCase();
 
-    if (!userId) {
-      return c.json({ error: 'No userId in token' }, 401);
-    }
+const syncPrimaryWallet = async (userId: number) => {
+  const rows = await db
+    .select({
+      chain: wallets.chain,
+      address: wallets.address,
+    })
+    .from(wallets)
+    .where(eq(wallets.userId, userId))
+    .orderBy(asc(wallets.chain), asc(wallets.id));
 
-    if (!address) {
-      return c.json({ error: 'Wallet address is required' }, 400);
-    }
+  const primary =
+    rows.find((wallet) => wallet.chain === 'solana') ?? rows[0] ?? null;
 
-    if (!validateSolanaAddress(address)) {
-      return c.json({ error: 'Invalid Solana wallet address' }, 400);
-    }
+  await db
+    .update(users)
+    .set({
+      network: primary?.chain ?? null,
+      walletAddress: primary?.address ?? null,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, userId));
 
-    const newWallet = await db
+  return primary;
+};
+
+const upsertWallet = async ({
+  userId,
+  chain,
+  address,
+}: {
+  userId: number;
+  chain: string;
+  address: string;
+}) => {
+  const normalizedChain = normalizeChain(chain);
+  const normalizedAddress = address.trim();
+
+  if (!normalizedChain || !normalizedAddress) {
+    throw new Error('Wallet chain and address are required');
+  }
+
+  if (!validateWalletAddress(normalizedChain, normalizedAddress)) {
+    throw new Error(`Invalid ${normalizedChain} wallet address`);
+  }
+
+  const existing = await db
+    .select()
+    .from(wallets)
+    .where(and(eq(wallets.userId, userId), eq(wallets.chain, normalizedChain)))
+    .limit(1);
+
+  let wallet;
+
+  if (existing[0]) {
+    const updated = await db
+      .update(wallets)
+      .set({
+        address: normalizedAddress,
+        updatedAt: new Date(),
+      })
+      .where(eq(wallets.id, existing[0].id))
+      .returning();
+
+    wallet = updated[0];
+  } else {
+    const inserted = await db
       .insert(wallets)
       .values({
-        userId: Number(userId),
-        address: address.trim(),
+        userId,
+        chain: normalizedChain,
+        address: normalizedAddress,
         updatedAt: new Date(),
       })
       .returning();
 
-    return c.json(newWallet[0]);
-  } catch (error) {
-    console.error('Error adding wallet:', error);
-    return c.json({ error: 'Internal server error' }, 500);
+    wallet = inserted[0];
   }
-});
 
-walletsRoute.put('/', async (c) => {
+  await syncPrimaryWallet(userId);
+
+  return wallet;
+};
+
+walletsRoute.post('/', async (c) => {
   try {
-    const userId = c.get('userId');
-    const { walletId, address } = await c.req.json<{
-      walletId: number;
+    const userId = c.get('userId') as number | string | undefined;
+    const { chain, address } = await c.req.json<{
+      chain: string;
       address: string;
     }>();
 
@@ -55,31 +110,59 @@ walletsRoute.put('/', async (c) => {
       return c.json({ error: 'No userId in token' }, 401);
     }
 
-    if (!walletId || !address) {
-      return c.json({ error: 'Wallet ID and address are required' }, 400);
+    const wallet = await upsertWallet({
+      userId: Number(userId),
+      chain,
+      address,
+    });
+
+    return c.json(wallet);
+  } catch (error) {
+    console.error('Error adding wallet:', error);
+    return c.json(
+      {
+        error: error instanceof Error ? error.message : 'Internal server error',
+      },
+      error instanceof Error &&
+        (error.message.startsWith('Invalid') ||
+          error.message.includes('required'))
+        ? 400
+        : 500,
+    );
+  }
+});
+
+walletsRoute.put('/', async (c) => {
+  try {
+    const userId = c.get('userId') as number | string | undefined;
+    const { chain, address } = await c.req.json<{
+      chain: string;
+      address: string;
+    }>();
+
+    if (!userId) {
+      return c.json({ error: 'No userId in token' }, 401);
     }
 
-    if (!validateSolanaAddress(address)) {
-      return c.json({ error: 'Invalid Solana wallet address' }, 400);
-    }
+    const wallet = await upsertWallet({
+      userId: Number(userId),
+      chain,
+      address,
+    });
 
-    const updatedWallet = await db
-      .update(wallets)
-      .set({
-        address: address.trim(),
-        updatedAt: new Date(),
-      })
-      .where(eq(wallets.id, walletId))
-      .returning();
-
-    if (!updatedWallet[0]) {
-      return c.json({ error: 'Wallet not found' }, 404);
-    }
-
-    return c.json(updatedWallet[0]);
+    return c.json(wallet);
   } catch (error) {
     console.error('Error updating wallet:', error);
-    return c.json({ error: 'Internal server error' }, 500);
+    return c.json(
+      {
+        error: error instanceof Error ? error.message : 'Internal server error',
+      },
+      error instanceof Error &&
+        (error.message.startsWith('Invalid') ||
+          error.message.includes('required'))
+        ? 400
+        : 500,
+    );
   }
 });
 
@@ -94,7 +177,8 @@ walletsRoute.get('/user', async (c) => {
     const userWallets = await db
       .select()
       .from(wallets)
-      .where(eq(wallets.userId, Number(userId)));
+      .where(eq(wallets.userId, Number(userId)))
+      .orderBy(asc(wallets.chain), asc(wallets.id));
 
     return c.json(userWallets);
   } catch (error) {

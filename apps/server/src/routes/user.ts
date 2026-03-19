@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { db } from '../db';
 import type { Env } from '../types/env';
-import { eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { users, wallets } from '../db/schema';
 import type { User } from '../types';
 
@@ -71,11 +71,18 @@ userRoute.get('/profile', async (c) => {
       .select()
       .from(wallets)
       .where(eq(wallets.userId, user.id))
+      .orderBy(asc(wallets.chain), asc(wallets.id))
       .execute();
+
+    const primaryWallet =
+      userWallets.find((wallet) => wallet.chain === 'solana') ??
+      userWallets[0] ??
+      null;
 
     return c.json({
       user,
-      wallet: userWallets[0] || null,
+      wallet: primaryWallet,
+      wallets: userWallets,
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -149,11 +156,18 @@ userRoute.put('/profile', async (c) => {
       .select()
       .from(wallets)
       .where(eq(wallets.userId, updated[0].id))
+      .orderBy(asc(wallets.chain), asc(wallets.id))
       .execute();
+
+    const primaryWallet =
+      userWallets.find((wallet) => wallet.chain === 'solana') ??
+      userWallets[0] ??
+      null;
 
     return c.json({
       user: updated[0],
-      wallet: userWallets[0] || null,
+      wallet: primaryWallet,
+      wallets: userWallets,
     });
   } catch (error) {
     console.error('Error updating user profile:', error);
@@ -166,7 +180,10 @@ userRoute.get('/all', async (c) => {
     const usersList = await db
       .select()
       .from(users)
-      .leftJoin(wallets, eq(users.id, wallets.userId))
+      .leftJoin(
+        wallets,
+        and(eq(users.id, wallets.userId), eq(wallets.chain, 'solana')),
+      )
       .execute();
 
     if (!usersList || usersList.length === 0) {

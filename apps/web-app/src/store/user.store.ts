@@ -4,6 +4,7 @@ import { persist, devtools } from "zustand/middleware";
 interface Wallet {
   id: number;
   userId: number;
+  chain: string;
   address: string;
   createdAt: string;
   updatedAt: string;
@@ -27,7 +28,7 @@ interface UserState {
   isLoading: boolean;
   setUser: (user: User) => void;
   setAuthUser: (user: any) => void;
-  setWallet: (wallet: Wallet) => void;
+  setWallet: (wallet: Wallet | null) => void;
   clearUser: () => void;
   setLoading: (status: boolean) => void;
   updateWalletAddress: (address: string) => void;

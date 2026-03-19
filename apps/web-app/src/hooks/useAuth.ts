@@ -40,9 +40,7 @@ function useAuth() {
         if (!cancelled) {
           if (profile?.user) {
             setAuthUserIfChanged(profile.user);
-            if (profile.wallet) {
-              setWallet(profile.wallet);
-            }
+            setWallet(profile.wallet ?? null);
             setUser(profile.user);
             setIsAuthenticated(true);
           } else {
@@ -89,7 +87,7 @@ function useAuth() {
       setAuthUserIfChanged(profile?.user || null);
       setIsAuthenticated(ok);
       if (ok) {
-        if (profile.wallet) setWallet(profile.wallet);
+        setWallet(profile.wallet ?? null);
         setUser(profile.user);
       }
       return ok;

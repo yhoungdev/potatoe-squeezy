@@ -82,13 +82,13 @@ Exchanges OAuth code, syncs user, redirects to frontend with `token`.
 
 #### `POST /wallet`
 
-Create wallet.
+Create or replace a wallet for a chain.
 
 Body:
 
 ```json
 {
-  "userId": 1,
+  "chain": "solana",
   "address": "wallet-address"
 }
 ```
@@ -100,13 +100,13 @@ Response:
 
 #### `PUT /wallet`
 
-Update wallet address.
+Update wallet address for a chain.
 
 Body:
 
 ```json
 {
-  "walletId": 1,
+  "chain": "solana",
   "address": "new-wallet-address"
 }
 ```
@@ -116,9 +116,9 @@ Response:
 - `200` updated wallet
 - `400` missing fields
 
-#### `GET /wallet/user/:userId`
+#### `GET /wallet/user`
 
-Fetch wallets by user id.
+Fetch authenticated user's wallets.
 
 Response:
 

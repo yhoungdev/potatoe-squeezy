@@ -22,6 +22,27 @@
       "when": 1773993600000,
       "tag": "0002_user_profile_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773916823230,
+      "tag": "0003_melted_silver_samurai",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774076400000,
+      "tag": "0004_wallet_chain_support",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773918108662,
+      "tag": "0005_damp_supreme_intelligence",
+      "breakpoints": true
     }
   ]
 }
