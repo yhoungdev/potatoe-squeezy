@@ -3,6 +3,7 @@ import { db } from '../db';
 import { addresses, transactionRecords, users } from '../db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { validateSolanaAddress } from '@potatoe/shared';
+import { broadcastNotification } from '../services/realtime-notifications';
 
 const txRecordsRoute = new Hono();
 
@@ -105,6 +106,31 @@ txRecordsRoute.post('/', async (c) => {
             : null,
       })
       .returning();
+
+    const senderUser = resolvedSenderId
+      ? await db
+          .select({
+            username: users.username,
+            avatarUrl: users.avatarUrl,
+          })
+          .from(users)
+          .where(eq(users.id, resolvedSenderId))
+          .limit(1)
+      : [];
+
+    if (resolvedRecipientId) {
+      broadcastNotification(resolvedRecipientId, {
+        id: newRecord[0].id,
+        title: 'Wallet funded',
+        message: `You received ${newRecord[0].amount} SOL in your wallet.`,
+        amount: String(newRecord[0].amount),
+        senderAddress: newRecord[0].senderAddress,
+        recipientAddress: newRecord[0].recipientAddress,
+        txHash: newRecord[0].txHash ?? null,
+        createdAt: newRecord[0].createdAt,
+        sender: senderUser[0] ?? null,
+      });
+    }
 
     return c.json(newRecord[0]);
   } catch (error) {

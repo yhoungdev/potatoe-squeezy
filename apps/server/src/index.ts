@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { upgradeWebSocket, websocket } from 'hono/bun';
 import { cors } from 'hono/cors';
 import walletsRoute from './routes/wallets';
 import txRecordsRoute from './routes/tx-records';
@@ -21,6 +22,10 @@ import { launchBot, telegram_bot } from './config/telegraf';
 import type { User } from './types';
 import { users } from './db/schema';
 import { verify } from 'hono/jwt';
+import {
+  addNotificationSocket,
+  removeNotificationSocket,
+} from './services/realtime-notifications';
 const telegram_bot_config = { launchBot, telegram_bot };
 
 const normalizeOrigin = (value: string) => {
@@ -55,9 +60,13 @@ const app = new Hono<{
 app.use(logger());
 app.use(prettyJSON());
 
-app.use(
-  '*',
-  cors({
+app.use('*', async (c, next) => {
+  if (c.req.path.startsWith('/ws/')) {
+    await next();
+    return;
+  }
+
+  return cors({
     origin: (origin) => {
       const allowedOrigins = new Set(
         [
@@ -82,8 +91,8 @@ app.use(
     exposeHeaders: ['Content-Length'],
     maxAge: 600,
     credentials: false,
-  }),
-);
+  })(c, next);
+});
 
 const parseBearerToken = (header: string | undefined) => {
   if (!header) return null;
@@ -92,7 +101,8 @@ const parseBearerToken = (header: string | undefined) => {
 };
 
 app.use('*', async (c, next) => {
-  const token = parseBearerToken(c.req.header('authorization'));
+  const token =
+    parseBearerToken(c.req.header('authorization')) || c.req.query('token');
   if (!token) {
     c.set('user', null);
   } else {
@@ -126,6 +136,39 @@ app.use('*', async (c, next) => {
   };
   await next();
 });
+
+app.get(
+  '/ws/notifications',
+  upgradeWebSocket((c) => {
+    const user = c.get('user');
+    const userId = user?.id ?? null;
+
+    return {
+      onOpen(_event, ws) {
+        if (!userId) {
+          ws.close(1008, 'Unauthorized');
+          return;
+        }
+
+        addNotificationSocket(userId, ws);
+      },
+      onClose(_event, ws) {
+        if (!userId) {
+          return;
+        }
+
+        removeNotificationSocket(userId, ws);
+      },
+      onError(_event, ws) {
+        if (!userId) {
+          return;
+        }
+
+        removeNotificationSocket(userId, ws);
+      },
+    };
+  }),
+);
 
 const PORT = process.env.PORT || 3000;
 
@@ -188,4 +231,5 @@ logger();
 export default {
   port: Number(PORT),
   fetch: app.fetch,
+  websocket,
 };
