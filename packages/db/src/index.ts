@@ -21,7 +21,7 @@ export const db = drizzle(client, { schema });
 
 // Migration utility
 export const runMigrations = async () => {
-  await migrate(db, { migrationsFolder: './migrations' });
+  await migrate(db, { migrationsFolder: './drizzle' });
 };
 
 // Export schema and types
