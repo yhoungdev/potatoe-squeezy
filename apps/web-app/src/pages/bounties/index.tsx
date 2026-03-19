@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DefaultDashboard from "@/layouts/dashboard";
 import ApiClient from "@/util/api";
 import API_ENDPOINTS from "@/enums/API_ENUM";
+import { PlusCircle, RefreshCw } from "lucide-react";
 
 type Bounty = {
   id: string;
@@ -20,42 +21,107 @@ type Bounty = {
 function BountyExplorerPage() {
   const [bounties, setBounties] = useState<Bounty[]>([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [repo, setRepo] = useState("");
+  const [issueNumber, setIssueNumber] = useState("");
+
+  const fetchBounties = async () => {
+    setLoading(true);
+    try {
+      const rows = await ApiClient.get<Bounty[]>(
+        `${API_ENDPOINTS.BOUNTIES}?limit=50`,
+      );
+      setBounties(rows);
+    } catch (error) {
+      console.error("Failed to fetch bounties:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const run = async () => {
-      setLoading(true);
-      try {
-        const rows = await ApiClient.get<Bounty[]>(
-          `${API_ENDPOINTS.BOUNTIES}?status=open&limit=50`,
-        );
-        setBounties(rows);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    run();
+    fetchBounties();
   }, []);
+
+  const handleSync = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!repo || !issueNumber) return;
+
+    setSyncing(true);
+    try {
+      await ApiClient.post(API_ENDPOINTS.BOUNTIES_SYNC, {
+        repo,
+        issueNumber: parseInt(issueNumber),
+      });
+      setRepo("");
+      setIssueNumber("");
+      fetchBounties();
+    } catch (error) {
+      console.error("Sync failed:", error);
+      alert("Failed to sync bounty. Make sure it has the 'bounty' or 'open bounty' label.");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   return (
     <DefaultDashboard>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Bounty Explorer</h1>
-          <p className="text-sm text-gray-400">
-            Open escrowed bounties across Solana and Stellar
-          </p>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-white">
+              Bounty Explorer
+            </h1>
+            <p className="text-sm text-gray-400">
+              Issues tagged as bounties by Potatoe Squeezy Bot
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleSync}
+            className="flex items-center gap-2 p-2 border rounded-xl border-gray-800 bg-black/20"
+          >
+            <input
+              type="text"
+              placeholder="owner/repo"
+              value={repo}
+              onChange={(e) => setRepo(e.target.value)}
+              className="w-32 px-3 py-1 text-sm text-white bg-transparent outline-none md:w-48"
+              required
+            />
+            <input
+              type="number"
+              placeholder="Issue #"
+              value={issueNumber}
+              onChange={(e) => setIssueNumber(e.target.value)}
+              className="w-20 px-3 py-1 text-sm text-white bg-transparent outline-none"
+              required
+            />
+            <button
+              type="submit"
+              disabled={syncing}
+              className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-black bg-white rounded-lg hover:bg-gray-200 disabled:opacity-50"
+            >
+              {syncing ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <PlusCircle className="w-4 h-4" />
+              )}
+              Sync
+            </button>
+          </form>
         </div>
 
         {loading && (
           <div className="py-16 text-center border border-gray-800 rounded-xl bg-black/20 text-gray-400">
+            <RefreshCw className="w-8 h-8 mx-auto mb-4 animate-spin" />
             Loading bounties
           </div>
         )}
 
         {!loading && bounties.length === 0 && (
           <div className="py-16 text-center border border-gray-800 rounded-xl bg-black/20 text-gray-400">
-            No open bounties found
+            No bounties found. Sync one above!
           </div>
         )}
 
@@ -70,19 +136,38 @@ function BountyExplorerPage() {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1">
-                  <p className="text-sm text-gray-400">{bounty.repo}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-gray-400">{bounty.repo}</p>
+                    {bounty.status === "pending" && (
+                      <span className="px-2 py-0.5 text-[10px] font-bold tracking-wider text-yellow-500 uppercase bg-yellow-500/10 rounded-full border border-yellow-500/20">
+                        Pending Escrow
+                      </span>
+                    )}
+                    {bounty.status === "open" && (
+                      <span className="px-2 py-0.5 text-[10px] font-bold tracking-wider text-green-500 uppercase bg-green-500/10 rounded-full border border-green-500/20">
+                        Open
+                      </span>
+                    )}
+                  </div>
                   <h2 className="text-lg font-medium text-white">
                     Issue #{bounty.issueNumber}
                   </h2>
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
-                    <img
-                      src={
-                        bounty.creatorAvatarUrl ||
-                        "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-                      }
-                      className="w-5 h-5 rounded-full"
-                    />
-                    <span>{bounty.creatorUsername}</span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <img
+                        src={
+                          bounty.creatorAvatarUrl ||
+                          "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                        }
+                        className="w-5 h-5 rounded-full"
+                        alt={bounty.creatorUsername}
+                      />
+                      <span>{bounty.creatorUsername}</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium text-gray-400 bg-gray-400/10 rounded-full border border-gray-400/20">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                      Potatoe Bot Verified
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">

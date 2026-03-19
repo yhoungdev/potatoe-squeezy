@@ -423,6 +423,56 @@ const processPullRequestEvent = async (
   }
 };
 
+const handleIssueLabeled = async (payload: Record<string, unknown>) => {
+  const issue = payload.issue as Record<string, unknown> | undefined;
+  const repository = payload.repository as Record<string, unknown> | undefined;
+  const label = payload.label as Record<string, unknown> | undefined;
+
+  const labelName = String(label?.name ?? '').toLowerCase();
+  if (labelName !== 'bounty' && labelName !== 'open bounty') {
+    return;
+  }
+
+  const repo = String(repository?.full_name ?? '');
+  const issueNumber = Number(issue?.number ?? 0);
+
+  if (!repo || !issueNumber) {
+    return;
+  }
+
+  // Check if bounty already exists
+  const existing = await db
+    .select()
+    .from(bounties)
+    .where(and(eq(bounties.repo, repo), eq(bounties.issueNumber, issueNumber)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    return;
+  }
+
+  const creator = await ensureGitHubUser(
+    (issue?.user as Record<string, unknown>) || {},
+  );
+
+  if (!creator) {
+    return;
+  }
+
+  // Auto-create bounty record in "pending" status if labeled
+  await db.insert(bounties).values({
+    id: crypto.randomUUID(),
+    repo,
+    issueNumber,
+    creatorId: creator.id,
+    amount: '0',
+    token: 'SOL',
+    network: creator.network || 'solana',
+    status: 'pending',
+    escrowTxHash: '',
+  });
+};
+
 githubWebhookRoute.post('/webhook', async (c) => {
   const secret = process.env.GITHUB_WEBHOOK_SECRET;
 
@@ -462,6 +512,10 @@ githubWebhookRoute.post('/webhook', async (c) => {
   try {
     if (eventType === 'issue_comment') {
       await handleBountyCommand(payload);
+    }
+
+    if (eventType === 'issues' && payload.action === 'labeled') {
+      await handleIssueLabeled(payload);
     }
 
     if (eventType === 'pull_request') {

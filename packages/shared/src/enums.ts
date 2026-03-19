@@ -34,4 +34,5 @@ export enum API_ENDPOINTS {
   LEADERBOARD_WEEKLY = "/leaderboard/weekly",
   LEADERBOARD_STREAKS = "/leaderboard/streaks",
   BOUNTIES = "/bounties",
+  BOUNTIES_SYNC = "/bounties/sync",
 }

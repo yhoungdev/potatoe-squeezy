@@ -151,8 +151,8 @@ function LeaderboardPage() {
           </p>
         </div>
 
-        <Tabs defaultValue="global" className="space-y-4">
-          <TabsList className="bg-gray-900 border border-gray-800">
+        <Tabs defaultValue="global" className="space-y-4 ">
+          <TabsList className="  bg-transparent">
             <TabsTrigger value="global">Global</TabsTrigger>
             <TabsTrigger value="weekly">Weekly</TabsTrigger>
             <TabsTrigger value="streaks">Streaks</TabsTrigger>
