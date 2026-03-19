@@ -1,8 +1,8 @@
 import { InferSelectModel } from 'drizzle-orm';
-import { users, wallets } from './db/schema';
+import { addresses, users } from './db/schema';
 
 export type User = InferSelectModel<typeof users>;
-export type Wallet = InferSelectModel<typeof wallets>;
+export type Wallet = InferSelectModel<typeof addresses>;
 
 export interface UserWithWallets extends User {
   wallets: Wallet[];

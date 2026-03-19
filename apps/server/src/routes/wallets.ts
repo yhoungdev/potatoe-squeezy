@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { and, asc, eq } from 'drizzle-orm';
 import { db } from '../db';
-import { users, wallets } from '../db/schema';
+import { addresses, users } from '../db/schema';
 import { auth } from '../middleware/auth';
 import type { Env } from '../types/env';
 import { validateWalletAddress } from '@potatoe/shared';
@@ -18,12 +18,12 @@ const normalizeChain = (value: unknown) =>
 const syncPrimaryWallet = async (userId: number) => {
   const rows = await db
     .select({
-      chain: wallets.chain,
-      address: wallets.address,
+      chain: addresses.chain,
+      address: addresses.address,
     })
-    .from(wallets)
-    .where(eq(wallets.userId, userId))
-    .orderBy(asc(wallets.chain), asc(wallets.id));
+    .from(addresses)
+    .where(eq(addresses.userId, userId))
+    .orderBy(asc(addresses.chain), asc(addresses.id));
 
   const primary =
     rows.find((wallet) => wallet.chain === 'solana') ?? rows[0] ?? null;
@@ -62,26 +62,28 @@ const upsertWallet = async ({
 
   const existing = await db
     .select()
-    .from(wallets)
-    .where(and(eq(wallets.userId, userId), eq(wallets.chain, normalizedChain)))
+    .from(addresses)
+    .where(
+      and(eq(addresses.userId, userId), eq(addresses.chain, normalizedChain)),
+    )
     .limit(1);
 
   let wallet;
 
   if (existing[0]) {
     const updated = await db
-      .update(wallets)
+      .update(addresses)
       .set({
         address: normalizedAddress,
         updatedAt: new Date(),
       })
-      .where(eq(wallets.id, existing[0].id))
+      .where(eq(addresses.id, existing[0].id))
       .returning();
 
     wallet = updated[0];
   } else {
     const inserted = await db
-      .insert(wallets)
+      .insert(addresses)
       .values({
         userId,
         chain: normalizedChain,
@@ -176,9 +178,9 @@ walletsRoute.get('/user', async (c) => {
 
     const userWallets = await db
       .select()
-      .from(wallets)
-      .where(eq(wallets.userId, Number(userId)))
-      .orderBy(asc(wallets.chain), asc(wallets.id));
+      .from(addresses)
+      .where(eq(addresses.userId, Number(userId)))
+      .orderBy(asc(addresses.chain), asc(addresses.id));
 
     return c.json(userWallets);
   } catch (error) {

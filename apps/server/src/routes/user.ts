@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { db } from '../db';
 import type { Env } from '../types/env';
 import { and, asc, eq } from 'drizzle-orm';
-import { users, wallets } from '../db/schema';
+import { addresses, users } from '../db/schema';
 import type { User } from '../types';
 
 const userRoute = new Hono<{
@@ -69,9 +69,9 @@ userRoute.get('/profile', async (c) => {
 
     const userWallets = await db
       .select()
-      .from(wallets)
-      .where(eq(wallets.userId, user.id))
-      .orderBy(asc(wallets.chain), asc(wallets.id))
+      .from(addresses)
+      .where(eq(addresses.userId, user.id))
+      .orderBy(asc(addresses.chain), asc(addresses.id))
       .execute();
 
     const primaryWallet =
@@ -154,9 +154,9 @@ userRoute.put('/profile', async (c) => {
 
     const userWallets = await db
       .select()
-      .from(wallets)
-      .where(eq(wallets.userId, updated[0].id))
-      .orderBy(asc(wallets.chain), asc(wallets.id))
+      .from(addresses)
+      .where(eq(addresses.userId, updated[0].id))
+      .orderBy(asc(addresses.chain), asc(addresses.id))
       .execute();
 
     const primaryWallet =
@@ -181,8 +181,8 @@ userRoute.get('/all', async (c) => {
       .select()
       .from(users)
       .leftJoin(
-        wallets,
-        and(eq(users.id, wallets.userId), eq(wallets.chain, 'solana')),
+        addresses,
+        and(eq(users.id, addresses.userId), eq(addresses.chain, 'solana')),
       )
       .execute();
 
