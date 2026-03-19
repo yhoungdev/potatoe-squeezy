@@ -178,7 +178,30 @@ userRoute.put('/profile', async (c) => {
 userRoute.get('/all', async (c) => {
   try {
     const usersList = await db
-      .select()
+      .select({
+        users: {
+          id: users.id,
+          githubId: users.githubId,
+          username: users.username,
+          email: users.email,
+          name: users.name,
+          displayName: users.displayName,
+          avatarUrl: users.avatarUrl,
+          twitterUrl: users.twitterUrl,
+          network: users.network,
+          walletAddress: users.walletAddress,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
+        wallets: {
+          id: addresses.id,
+          userId: addresses.userId,
+          chain: addresses.chain,
+          address: addresses.address,
+          createdAt: addresses.createdAt,
+          updatedAt: addresses.updatedAt,
+        },
+      })
       .from(users)
       .leftJoin(
         addresses,

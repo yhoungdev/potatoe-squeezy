@@ -46,7 +46,7 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
     mutationFn: () =>
       WalletService.addWallet({
         chain,
-        address,
+        address: address.trim(),
       }),
     onSuccess: (savedWallet) => {
       toast.success("Wallet address saved successfully.");
@@ -68,7 +68,7 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
     mutationFn: () =>
       WalletService.updateWallet({
         chain,
-        address,
+        address: address.trim(),
       }),
     onSuccess: (savedWallet) => {
       toast.success("Wallet address updated successfully.");
@@ -87,7 +87,7 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
   });
 
   const handleSaveOrUpdate = () => {
-    if (!address) return;
+    if (!address.trim()) return;
 
     if (hasExistingWallet) {
       updateWalletMutation.mutate();
@@ -126,7 +126,7 @@ const AddOrUpdateAddress = ({ onUpdateAddress }: AddOrUpdateAddressProps) => {
         <Button
           onClick={handleSaveOrUpdate}
           className="w-full"
-          disabled={isLoading || !address}
+          disabled={isLoading || !address.trim()}
         >
           {hasExistingWallet ? "Update" : "Save"}
         </Button>
