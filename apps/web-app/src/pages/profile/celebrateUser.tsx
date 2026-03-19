@@ -5,17 +5,24 @@ import { useTipSol } from "@/hooks/useTipSol";
 import { toast } from "sonner";
 import TransactionService from "@/services/transaction.service";
 import { validateSolanaAddress } from "@potatoe/shared";
+import { useUserStore } from "@/store/user.store";
 
 interface CelebrateUserProps {
   username: string;
   walletAddress?: string | null;
+  isOwnProfile?: boolean;
 }
 
 const MIN_AMOUNT = 0.000001;
 const MAX_AMOUNT = 1000;
 
-function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
+function CelebrateUser({
+  username,
+  walletAddress,
+  isOwnProfile = false,
+}: CelebrateUserProps) {
   const { publicKey, connected } = useWallet();
+  const { authUser } = useUserStore();
   const [quantity, setQuantity] = useState<number>(0);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
@@ -51,6 +58,11 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         return;
       }
 
+      if (isOwnProfile) {
+        toast.error("You cannot zap your own profile");
+        return;
+      }
+
       const amountToSend = customAmount ? parseFloat(customAmount) : quantity;
       const validationError = validateAmount(amountToSend);
 
@@ -73,7 +85,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
           await TransactionService.createTransactionRecord({
             amount: amountToSend,
             senderAddress: publicKey?.toString() || "",
-            senderId: null,
+            senderId: authUser?.id ?? null,
             recipientAddress: walletAddress ?? "",
             recipientId: null,
             txHash: success.explorerUrl,
@@ -191,6 +203,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         disabled={
           !hasValidAmount ||
           !connected ||
+          isOwnProfile ||
           !hasValidRecipientWallet ||
           loading ||
           isProcessing
@@ -214,6 +227,12 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
       {connected && !hasValidRecipientWallet && (
         <p className="mt-2 text-sm text-center text-gray-400">
           This developer has not added a valid Solana wallet yet.
+        </p>
+      )}
+
+      {connected && isOwnProfile && (
+        <p className="mt-2 text-sm text-center text-gray-400">
+          You cannot zap yourself from your own profile.
         </p>
       )}
     </div>

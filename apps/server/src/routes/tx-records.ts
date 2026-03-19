@@ -1,10 +1,30 @@
 import { Hono } from 'hono';
 import { db } from '../db';
-import { transactionRecords, users } from '../db/schema';
+import { addresses, transactionRecords, users } from '../db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { validateSolanaAddress } from '@potatoe/shared';
 
 const txRecordsRoute = new Hono();
+
+const findUserIdByAddress = async (address: string) => {
+  const addressMatch = await db
+    .select({ userId: addresses.userId })
+    .from(addresses)
+    .where(eq(addresses.address, address))
+    .limit(1);
+
+  if (addressMatch[0]?.userId) {
+    return addressMatch[0].userId;
+  }
+
+  const userMatch = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.walletAddress, address))
+    .limit(1);
+
+  return userMatch[0]?.id ?? null;
+};
 
 txRecordsRoute.get('/', async (c) => {
   try {
@@ -13,7 +33,11 @@ txRecordsRoute.get('/', async (c) => {
         id: transactionRecords.id,
         amount: transactionRecords.amount,
         senderAddress: transactionRecords.senderAddress,
+        senderId: transactionRecords.senderId,
         recipientAddress: transactionRecords.recipientAddress,
+        recipientId: transactionRecords.recipientId,
+        txHash: transactionRecords.txHash,
+        note: transactionRecords.note,
         createdAt: transactionRecords.createdAt,
         sender: {
           username: users.username,
@@ -34,8 +58,16 @@ txRecordsRoute.get('/', async (c) => {
 
 txRecordsRoute.post('/', async (c) => {
   try {
-    const { amount, senderAddress, senderId, recipientAddress, recipientId } =
-      await c.req.json();
+    const authUser = c.get('user');
+    const {
+      amount,
+      senderAddress,
+      senderId,
+      recipientAddress,
+      recipientId,
+      txHash,
+      note,
+    } = await c.req.json();
 
     if (!amount || !senderAddress || !recipientAddress) {
       return c.json(
@@ -53,14 +85,24 @@ txRecordsRoute.post('/', async (c) => {
       return c.json({ error: 'Invalid Solana wallet address' }, 400);
     }
 
+    const resolvedSenderId =
+      authUser?.id ?? senderId ?? (await findUserIdByAddress(senderAddress));
+    const resolvedRecipientId =
+      recipientId ?? (await findUserIdByAddress(recipientAddress));
+
     const newRecord = await db
       .insert(transactionRecords)
       .values({
         amount,
         senderAddress,
-        senderId,
+        senderId: resolvedSenderId,
         recipientAddress,
-        recipientId,
+        recipientId: resolvedRecipientId,
+        txHash: typeof txHash === 'string' ? txHash : null,
+        note:
+          typeof note === 'string' && note.trim().length > 0
+            ? note.trim()
+            : null,
       })
       .returning();
 

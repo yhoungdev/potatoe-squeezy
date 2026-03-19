@@ -19,6 +19,15 @@ type ProfileResponse = {
     totalPoints: string;
     updatedAt: string | null;
   };
+  tipping: {
+    totalTipsSent: string;
+    sentTipCount: number;
+    rankBadge: {
+      name: string;
+      minTips: number;
+      maxTips: number | null;
+    } | null;
+  };
   badges: {
     id: string;
     name: string;
@@ -128,6 +137,22 @@ function DeveloperProfilePage({ username }: { username: string }) {
               <p className="text-xs text-gray-400">Current Streak</p>
               <p className="text-xl font-semibold text-white">
                 {data.stats.consecutiveDays}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="p-4 border rounded-xl border-gray-800 bg-black/30">
+              <p className="text-xs text-gray-400">Giver Rank</p>
+              <p className="text-xl font-semibold text-white">
+                {data.tipping.rankBadge?.name || "No giver rank yet"}
+              </p>
+            </div>
+            <div className="p-4 border rounded-xl border-gray-800 bg-black/30">
+              <p className="text-xs text-gray-400">Tips Sent</p>
+              <p className="text-xl font-semibold text-white">
+                {data.tipping.sentTipCount} tips · {data.tipping.totalTipsSent}{" "}
+                SOL
               </p>
             </div>
           </div>

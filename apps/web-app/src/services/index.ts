@@ -1,3 +1,4 @@
 import { AuthService } from "./auth.service";
+import NotificationService from "./notification.service";
 import UserService from "./user.service";
-export { AuthService, UserService };
+export { AuthService, NotificationService, UserService };

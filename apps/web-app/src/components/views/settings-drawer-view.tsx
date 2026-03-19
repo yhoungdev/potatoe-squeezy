@@ -11,8 +11,7 @@ import { Button } from "@/components/ui/button.tsx";
 const SettingsDrawerView = () => {
   const { user } = useUserStore() || {};
 
-  const { username: profile_name } = user?.users || {};
-  const { address } = user?.wallets || {};
+  const profile_name = user?.username ?? "";
 
   const { logout } = useAuth();
 
@@ -33,12 +32,7 @@ const SettingsDrawerView = () => {
   };
   return (
     <div className={"relative"}>
-      <AddressAndBadge
-        username={profile_name}
-        onUpdateAddress={() => {}}
-        onCopyBadge={copyBadgeCode}
-        currentAddress={address}
-      />
+      <AddressAndBadge username={profile_name} onCopyBadge={copyBadgeCode} />
       <div className="mt-[4em] ">
         <ProductHuntBadge />
 

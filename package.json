@@ -32,5 +32,8 @@
   "overrides": {
     "eslint": "^8.57.1",
     "typescript": "~5.8.3"
+  },
+  "dependencies": {
+    "iconsax-reactjs": "^0.0.8"
   }
 }

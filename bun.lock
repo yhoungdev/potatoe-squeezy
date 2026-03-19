@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "potato-monorepo",
+      "dependencies": {
+        "iconsax-reactjs": "^0.0.8",
+      },
       "devDependencies": {
         "@potatoe/shared": "workspace:*",
         "prettier": "^3.5.3",
@@ -120,6 +123,7 @@
         "crypto-browserify": "^3.12.1",
         "date-fns": "^4.1.0",
         "framer-motion": "^12.16.0",
+        "iconsax-reactjs": "^0.0.8",
         "js-cookie": "^3.0.5",
         "latest": "^0.2.0",
         "lucid": "^2.21.0",
@@ -3178,6 +3182,8 @@
     "humanize-url": ["humanize-url@1.0.1", "", { "dependencies": { "normalize-url": "^1.0.0", "strip-url-auth": "^1.0.0" } }, "sha512-RtgTzXCPVb/te+e82NDhAc5paj+DuKSratIGAr+v+HZK24eAQ8LMoBGYoL7N/O+9iEc33AKHg45dOMKw3DNldQ=="],
 
     "iceberg-js": ["iceberg-js@0.8.1", "", {}, "sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA=="],
+
+    "iconsax-reactjs": ["iconsax-reactjs@0.0.8", "", { "peerDependencies": { "react": "*" } }, "sha512-cb+uTMxbkSFNbu8ZclX7BWQVfOWQt8+m/PsDjnsm/H+mcYrnfTYMjHxiof1FB43k7UAgt1ds+0oFeMVKdqyslw=="],
 
     "iconv-lite": ["iconv-lite@0.4.24", "", { "dependencies": { "safer-buffer": ">= 2.1.2 < 3" } }, "sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA=="],
 

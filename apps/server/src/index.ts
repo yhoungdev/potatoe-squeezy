@@ -13,6 +13,7 @@ import publicUsersRoute from './routes/public-users';
 import bountiesRoute from './routes/bounties';
 import githubWebhookRoute from './routes/github-webhook';
 import docsRoute from './routes/docs';
+import notificationsRoute from './routes/notifications';
 import { authRouter } from './routes/auth';
 import { sendTelegramMessage } from './utils/telegram-notification';
 import { TELEGRAM_CHAT_ID } from './constants';
@@ -167,6 +168,7 @@ const routes = [
   { path: '/auth', handler: authRouter },
   { path: '/wallet', handler: walletsRoute },
   { path: '/user', handler: userRoute },
+  { path: '/notifications', handler: notificationsRoute },
   { path: '/tx-records', handler: txRecordsRoute },
   { path: '/leaderboard', handler: leaderboardRoute },
   { path: '/users', handler: publicUsersRoute },

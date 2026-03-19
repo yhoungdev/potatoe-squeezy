@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import React, { Fragment, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowDownRightIcon,
   ArrowUpRightIcon,
@@ -26,6 +26,9 @@ function WalletTransactionTable() {
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedTransactionId, setExpandedTransactionId] = useState<
+    number | null
+  >(null);
   const { wallet } = useUserStore();
 
   useEffect(() => {
@@ -49,6 +52,9 @@ function WalletTransactionTable() {
     if (!wallet) return "Unknown";
     return tx.recipientAddress === wallet.address ? "Received" : "Sent";
   };
+
+  const formatAddress = (address: string) =>
+    `${address.slice(0, 4)}...${address.slice(-4)}`;
 
   if (isLoading) {
     return (
@@ -119,59 +125,128 @@ function WalletTransactionTable() {
               <TableBody>
                 {transactions.map((tx) => {
                   const type = getTransactionType(tx);
+                  const isExpanded = expandedTransactionId === tx.id;
                   const displayAddress =
                     type === "Received"
                       ? tx.senderAddress
                       : tx.recipientAddress;
                   return (
-                    <motion.tr
-                      key={tx.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="transition-colors border-white/10 hover:bg-white/5"
-                    >
-                      <TableCell className="flex items-center gap-2 font-medium">
-                        <span
-                          className={`p-1.5 rounded-full ${
+                    <Fragment key={tx.id}>
+                      <motion.tr
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        onClick={() =>
+                          setExpandedTransactionId((currentId) =>
+                            currentId === tx.id ? null : tx.id,
+                          )
+                        }
+                        className="cursor-pointer transition-colors border-white/10 hover:bg-white/5"
+                      >
+                        <TableCell className="flex items-center gap-2 font-medium">
+                          <span
+                            className={`p-1.5 rounded-full ${
+                              type === "Received"
+                                ? "bg-green-500/20 text-green-400"
+                                : "bg-red-500/20 text-red-400"
+                            }`}
+                          >
+                            {type === "Received" ? (
+                              <ArrowDownRightIcon className="w-4 h-4" />
+                            ) : (
+                              <ArrowUpRightIcon className="w-4 h-4" />
+                            )}
+                          </span>
+                        </TableCell>
+                        <TableCell
+                          className={`font-mono font-medium ${
                             type === "Received"
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-purple-500/20 text-purple-400"
+                              ? "text-green-400"
+                              : "text-red-400"
                           }`}
                         >
-                          {type === "Received" ? (
-                            <ArrowDownRightIcon className="w-4 h-4" />
-                          ) : (
-                            <ArrowUpRightIcon className="w-4 h-4" />
-                          )}
-                        </span>
-                        {/*<span className="text-gray-300">{type}</span>*/}
-                      </TableCell>
-                      <TableCell
-                        className={`font-mono font-medium ${
-                          type === "Received"
-                            ? "text-green-400"
-                            : "text-purple-400"
-                        }`}
-                      >
-                        {type === "Received" ? "+" : "-"}
-                        {tx.amount} SOL
-                      </TableCell>
-                      <TableCell className="font-mono text-gray-400">
-                        {displayAddress.slice(0, 4)}...
-                        {displayAddress.slice(-4)}
-                      </TableCell>
-                      <TableCell className="text-gray-400">
-                        <div
-                          className="flex items-center gap-2"
-                          title={format(new Date(tx.createdAt), "PPpp")}
-                        >
-                          <ClockIcon className="w-4 h-4 text-gray-500" />
-                          {formatDistanceToNow(new Date(tx.createdAt), {
-                            addSuffix: true,
-                          })}
-                        </div>
-                      </TableCell>
-                    </motion.tr>
+                          {type === "Received" ? "+" : "-"}
+                          {tx.amount} SOL
+                        </TableCell>
+                        <TableCell className="font-mono text-gray-400">
+                          {formatAddress(displayAddress)}
+                        </TableCell>
+                        <TableCell className="text-gray-400">
+                          <div
+                            className="flex items-center gap-2"
+                            title={format(new Date(tx.createdAt), "PPpp")}
+                          >
+                            <ClockIcon className="w-4 h-4 text-gray-500" />
+                            {formatDistanceToNow(new Date(tx.createdAt), {
+                              addSuffix: true,
+                            })}
+                          </div>
+                        </TableCell>
+                      </motion.tr>
+                      <AnimatePresence initial={false}>
+                        {isExpanded ? (
+                          <motion.tr
+                            key={`${tx.id}-details`}
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="border-white/10 bg-white/[0.03]"
+                          >
+                            <TableCell colSpan={4} className="px-4 py-4">
+                              <div className="grid gap-3 text-sm text-gray-300 md:grid-cols-2">
+                                <div>
+                                  <p className="mb-1 text-xs uppercase tracking-[0.2em] text-gray-500">
+                                    Type
+                                  </p>
+                                  <p className="font-medium text-white">
+                                    {type}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="mb-1 text-xs uppercase tracking-[0.2em] text-gray-500">
+                                    Timestamp
+                                  </p>
+                                  <p className="font-medium text-white">
+                                    {format(new Date(tx.createdAt), "PPpp")}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="mb-1 text-xs uppercase tracking-[0.2em] text-gray-500">
+                                    From
+                                  </p>
+                                  <p className="font-mono break-all text-white">
+                                    {tx.senderAddress}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="mb-1 text-xs uppercase tracking-[0.2em] text-gray-500">
+                                    To
+                                  </p>
+                                  <p className="font-mono break-all text-white">
+                                    {tx.recipientAddress}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="mb-1 text-xs uppercase tracking-[0.2em] text-gray-500">
+                                    Transaction Hash
+                                  </p>
+                                  <p className="font-mono break-all text-white">
+                                    {tx.txHash}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="mb-1 text-xs uppercase tracking-[0.2em] text-gray-500">
+                                    Note
+                                  </p>
+                                  <p className="text-white">
+                                    {tx.note?.trim() || "No note added"}
+                                  </p>
+                                </div>
+                              </div>
+                            </TableCell>
+                          </motion.tr>
+                        ) : null}
+                      </AnimatePresence>
+                    </Fragment>
                   );
                 })}
               </TableBody>
