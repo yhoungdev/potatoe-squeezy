@@ -1,14 +1,17 @@
 import { Hono } from 'hono';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
 import { db } from '../db';
 import {
+  addresses,
   badges,
   bounties,
   contributions,
   developerStats,
+  transactionRecords,
   userBadges,
   users,
 } from '../db/schema';
+import { getTipperRank } from '@potatoe/shared';
 
 const publicUsersRoute = new Hono();
 
@@ -35,6 +38,28 @@ publicUsersRoute.get('/:username/profile', async (c) => {
   }
 
   const user = userRows[0];
+
+  const userWallets = await db
+    .select({ address: addresses.address })
+    .from(addresses)
+    .where(eq(addresses.userId, user.id));
+
+  const walletAddresses = userWallets.map((wallet) => wallet.address);
+
+  const sentTipRows = await db
+    .select({
+      totalTipsSent: sql<string>`coalesce(sum(${transactionRecords.amount}), 0)`,
+      sentTipCount: sql<number>`cast(count(*) as int)`,
+    })
+    .from(transactionRecords)
+    .where(
+      or(
+        eq(transactionRecords.senderId, user.id),
+        walletAddresses.length > 0
+          ? inArray(transactionRecords.senderAddress, walletAddresses)
+          : sql`false`,
+      ),
+    );
 
   const statsRows = await db
     .select({
@@ -129,6 +154,11 @@ publicUsersRoute.get('/:username/profile', async (c) => {
       updatedAt: null,
     },
     badges: badgesRows,
+    tipping: {
+      totalTipsSent: sentTipRows[0]?.totalTipsSent ?? '0',
+      sentTipCount: sentTipRows[0]?.sentTipCount ?? 0,
+      rankBadge: getTipperRank(sentTipRows[0]?.sentTipCount ?? 0),
+    },
     recentContributions,
     createdBounties,
     earnedNetworks: networkSet,

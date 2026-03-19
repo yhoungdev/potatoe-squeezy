@@ -5,6 +5,7 @@ import { useTipSol } from "@/hooks/useTipSol";
 import { toast } from "sonner";
 import TransactionService from "@/services/transaction.service";
 import { validateSolanaAddress } from "@potatoe/shared";
+import { useUserStore } from "@/store/user.store";
 
 interface CelebrateUserProps {
   username: string;
@@ -16,6 +17,7 @@ const MAX_AMOUNT = 1000;
 
 function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
   const { publicKey, connected } = useWallet();
+  const { authUser } = useUserStore();
   const [quantity, setQuantity] = useState<number>(0);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
@@ -73,7 +75,7 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
           await TransactionService.createTransactionRecord({
             amount: amountToSend,
             senderAddress: publicKey?.toString() || "",
-            senderId: null,
+            senderId: authUser?.id ?? null,
             recipientAddress: walletAddress ?? "",
             recipientId: null,
             txHash: success.explorerUrl,

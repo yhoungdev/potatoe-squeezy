@@ -1,9 +1,10 @@
 import { Hono } from 'hono';
 import { db } from '../db';
 import type { Env } from '../types/env';
-import { and, asc, eq } from 'drizzle-orm';
-import { addresses, users } from '../db/schema';
+import { and, asc, eq, inArray, or, sql } from 'drizzle-orm';
+import { addresses, transactionRecords, users } from '../db/schema';
 import type { User } from '../types';
+import { getTipperRank } from '@potatoe/shared';
 
 const userRoute = new Hono<{
   Bindings: Env;
@@ -59,6 +60,54 @@ const normalizeTwitterUrl = (value: unknown) => {
   }
 };
 
+const getUserTipTotals = async ({
+  userId,
+  walletAddresses,
+}: {
+  userId: number;
+  walletAddresses: string[];
+}) => {
+  const [receivedRows, sentRows] = await Promise.all([
+    db
+      .select({
+        totalTipsReceived: sql<string>`coalesce(sum(${transactionRecords.amount}), 0)`,
+        receivedTipCount: sql<number>`cast(count(*) as int)`,
+      })
+      .from(transactionRecords)
+      .where(
+        or(
+          eq(transactionRecords.recipientId, userId),
+          walletAddresses.length > 0
+            ? inArray(transactionRecords.recipientAddress, walletAddresses)
+            : sql`false`,
+        ),
+      ),
+    db
+      .select({
+        totalTipsSent: sql<string>`coalesce(sum(${transactionRecords.amount}), 0)`,
+        sentTipCount: sql<number>`cast(count(*) as int)`,
+      })
+      .from(transactionRecords)
+      .where(
+        or(
+          eq(transactionRecords.senderId, userId),
+          walletAddresses.length > 0
+            ? inArray(transactionRecords.senderAddress, walletAddresses)
+            : sql`false`,
+        ),
+      ),
+  ]);
+
+  return {
+    totalTipsReceived: receivedRows[0]?.totalTipsReceived ?? '0',
+    totalTipsSent: sentRows[0]?.totalTipsSent ?? '0',
+    totalTokensSent: sentRows[0]?.totalTipsSent ?? '0',
+    sentTipCount: sentRows[0]?.sentTipCount ?? 0,
+    receivedTipCount: receivedRows[0]?.receivedTipCount ?? 0,
+    rankBadge: getTipperRank(sentRows[0]?.sentTipCount ?? 0),
+  };
+};
+
 userRoute.get('/profile', async (c) => {
   try {
     const user = c.get('user');
@@ -79,10 +128,17 @@ userRoute.get('/profile', async (c) => {
       userWallets[0] ??
       null;
 
+    const walletAddresses = userWallets.map((wallet) => wallet.address);
+    const tipTotals = await getUserTipTotals({
+      userId: user.id,
+      walletAddresses,
+    });
+
     return c.json({
       user,
       wallet: primaryWallet,
       wallets: userWallets,
+      ...tipTotals,
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -163,11 +219,17 @@ userRoute.put('/profile', async (c) => {
       userWallets.find((wallet) => wallet.chain === 'solana') ??
       userWallets[0] ??
       null;
+    const walletAddresses = userWallets.map((wallet) => wallet.address);
+    const tipTotals = await getUserTipTotals({
+      userId: updated[0].id,
+      walletAddresses,
+    });
 
     return c.json({
       user: updated[0],
       wallet: primaryWallet,
       wallets: userWallets,
+      ...tipTotals,
     });
   } catch (error) {
     console.error('Error updating user profile:', error);
