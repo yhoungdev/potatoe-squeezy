@@ -45,6 +45,26 @@ export const wallets = pgTable(
   }),
 );
 
+export const addresses = pgTable(
+  "addresses",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    chain: text("chain").notNull(),
+    address: text("address").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    userChainUnique: uniqueIndex("addresses_user_chain_unique").on(
+      table.userId,
+      table.chain,
+    ),
+  }),
+);
+
 export const transactionRecords = pgTable("transaction_records", {
   id: serial("id").primaryKey(),
   amount: numeric("amount").notNull(),
@@ -179,6 +199,7 @@ export const webhookEvents = pgTable("webhook_events", {
 
 export const usersRelations = relations(users, ({ many, one }) => ({
   wallets: many(wallets),
+  addresses: many(addresses),
   tipsSent: many(tips, { relationName: "sent_tips" }),
   tipsReceived: many(tips, { relationName: "received_tips" }),
   bountiesCreated: many(bounties),
@@ -190,6 +211,13 @@ export const usersRelations = relations(users, ({ many, one }) => ({
 export const walletsRelations = relations(wallets, ({ one }) => ({
   user: one(users, {
     fields: [wallets.userId],
+    references: [users.id],
+  }),
+}));
+
+export const addressesRelations = relations(addresses, ({ one }) => ({
+  user: one(users, {
+    fields: [addresses.userId],
     references: [users.id],
   }),
 }));
