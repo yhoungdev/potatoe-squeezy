@@ -8,6 +8,20 @@
       "when": 1773731145191,
       "tag": "0000_cute_captain_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773907200000,
+      "tag": "0001_verified_bounties",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773993600000,
+      "tag": "0002_user_profile_fields",
+      "breakpoints": true
     }
   ]
 }

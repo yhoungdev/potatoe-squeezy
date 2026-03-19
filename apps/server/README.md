@@ -139,6 +139,24 @@ Response:
 - `200` user profile with wallet join
 - `404` user not found
 
+#### `PUT /user/profile`
+
+Update authenticated user profile fields.
+
+Body:
+
+```json
+{
+  "displayName": "Obi Abo",
+  "twitterUrl": "https://x.com/obiabo"
+}
+```
+
+Response:
+
+- `200` updated user profile with wallet join
+- `400` validation error
+
 #### `GET /user/all`
 
 List all users with wallet joins.
@@ -239,7 +257,7 @@ Response for leaderboard routes:
 
 #### `GET /bounties`
 
-List bounties.
+List verified bounties only.
 
 Query params:
 
@@ -248,7 +266,7 @@ Query params:
 
 Response:
 
-- `200` array of bounties with creator metadata and merged contribution count
+- `200` array of Potatoe Squeezy bot-verified bounties with creator metadata and merged contribution count
 
 ## GitHub Webhook
 

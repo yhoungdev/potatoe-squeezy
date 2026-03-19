@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import DefaultDashboard from "@/layouts/dashboard";
 import ApiClient from "@/util/api";
 import API_ENDPOINTS from "@/enums/API_ENUM";
-import { PlusCircle, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
 type Bounty = {
   id: string;
@@ -21,9 +21,6 @@ type Bounty = {
 function BountyExplorerPage() {
   const [bounties, setBounties] = useState<Bounty[]>([]);
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
-  const [repo, setRepo] = useState("");
-  const [issueNumber, setIssueNumber] = useState("");
 
   const fetchBounties = async () => {
     setLoading(true);
@@ -43,27 +40,6 @@ function BountyExplorerPage() {
     fetchBounties();
   }, []);
 
-  const handleSync = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!repo || !issueNumber) return;
-
-    setSyncing(true);
-    try {
-      await ApiClient.post(API_ENDPOINTS.BOUNTIES_SYNC, {
-        repo,
-        issueNumber: parseInt(issueNumber),
-      });
-      setRepo("");
-      setIssueNumber("");
-      fetchBounties();
-    } catch (error) {
-      console.error("Sync failed:", error);
-      alert("Failed to sync bounty. Make sure it has the 'bounty' or 'open bounty' label.");
-    } finally {
-      setSyncing(false);
-    }
-  };
-
   return (
     <DefaultDashboard>
       <div className="space-y-6">
@@ -73,43 +49,10 @@ function BountyExplorerPage() {
               Bounty Explorer
             </h1>
             <p className="text-sm text-gray-400">
-              Issues tagged as bounties by Potatoe Squeezy Bot
+              Verified bounty issues recognized automatically by Potatoe Squeezy
+              Bot
             </p>
           </div>
-
-          <form
-            onSubmit={handleSync}
-            className="flex items-center gap-2 p-2 border rounded-xl border-gray-800 bg-black/20"
-          >
-            <input
-              type="text"
-              placeholder="owner/repo"
-              value={repo}
-              onChange={(e) => setRepo(e.target.value)}
-              className="w-32 px-3 py-1 text-sm text-white bg-transparent outline-none md:w-48"
-              required
-            />
-            <input
-              type="number"
-              placeholder="Issue #"
-              value={issueNumber}
-              onChange={(e) => setIssueNumber(e.target.value)}
-              className="w-20 px-3 py-1 text-sm text-white bg-transparent outline-none"
-              required
-            />
-            <button
-              type="submit"
-              disabled={syncing}
-              className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-black bg-white rounded-lg hover:bg-gray-200 disabled:opacity-50"
-            >
-              {syncing ? (
-                <RefreshCw className="w-4 h-4 animate-spin" />
-              ) : (
-                <PlusCircle className="w-4 h-4" />
-              )}
-              Sync
-            </button>
-          </form>
         </div>
 
         {loading && (
@@ -121,7 +64,7 @@ function BountyExplorerPage() {
 
         {!loading && bounties.length === 0 && (
           <div className="py-16 text-center border border-gray-800 rounded-xl bg-black/20 text-gray-400">
-            No bounties found. Sync one above!
+            No verified bot-backed bounties found yet.
           </div>
         )}
 

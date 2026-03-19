@@ -112,6 +112,10 @@ const openApiSpec = {
           },
           escrowTxHash: { type: 'string' },
           payoutTxHash: { type: ['string', 'null'] },
+          isVerified: { type: 'boolean' },
+          verificationSource: { type: ['string', 'null'] },
+          verifiedAt: { type: ['string', 'null'], format: 'date-time' },
+          botActorLogin: { type: ['string', 'null'] },
           createdAt: { type: 'string', format: 'date-time' },
         },
       },
@@ -299,6 +303,31 @@ const openApiSpec = {
           '404': { description: 'User not found' },
         },
       },
+      put: {
+        tags: ['Users'],
+        summary: 'Update authenticated user profile',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  displayName: { type: ['string', 'null'] },
+                  twitterUrl: { type: ['string', 'null'] },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Updated profile with wallet join' },
+          '400': { description: 'Validation error' },
+          '401': { description: 'Unauthorized' },
+          '404': { description: 'User not found' },
+        },
+      },
     },
     '/user/all': {
       get: {
@@ -461,7 +490,7 @@ const openApiSpec = {
     '/bounties': {
       get: {
         tags: ['Bounties'],
-        summary: 'List bounties',
+        summary: 'List verified bounties',
         parameters: [
           {
             name: 'status',
@@ -479,7 +508,7 @@ const openApiSpec = {
         ],
         responses: {
           '200': {
-            description: 'Bounty list',
+            description: 'Verified Potatoe Squeezy bounty list',
             content: {
               'application/json': {
                 schema: {

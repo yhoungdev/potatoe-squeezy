@@ -8,6 +8,12 @@ import { getEscrowService } from '../services/escrow';
 import { DeveloperStatsService } from '../services/developer-stats';
 import { BadgeService } from '../services/badges';
 import { toUsd } from '../services/pricing';
+import {
+  getBotLogin,
+  hasBountyLabel,
+  isPotatoeBotComment,
+  parseBountyCommand,
+} from '../services/bounty-verification';
 
 const githubWebhookRoute = new Hono();
 
@@ -113,26 +119,157 @@ const ensureGitHubUser = async (payloadUser: Record<string, unknown>) => {
   return inserted[0];
 };
 
+const upsertVerifiedBounty = async ({
+  repo,
+  issueNumber,
+  creatorId,
+  amount,
+  token,
+  network,
+  status,
+  verificationSource,
+  botActorLogin,
+}: {
+  repo: string;
+  issueNumber: number;
+  creatorId: number;
+  amount: string;
+  token: string;
+  network: string;
+  status: string;
+  verificationSource: string;
+  botActorLogin?: string | null;
+}) => {
+  const existing = await db
+    .select()
+    .from(bounties)
+    .where(and(eq(bounties.repo, repo), eq(bounties.issueNumber, issueNumber)))
+    .limit(1);
+
+  const verifiedAt = new Date();
+
+  if (existing.length === 0) {
+    const inserted = await db
+      .insert(bounties)
+      .values({
+        id: crypto.randomUUID(),
+        repo,
+        issueNumber,
+        creatorId,
+        amount,
+        token,
+        network,
+        status,
+        escrowTxHash: '',
+        isVerified: true,
+        verificationSource,
+        verifiedAt,
+        botActorLogin: botActorLogin ?? null,
+      })
+      .returning();
+
+    return inserted[0];
+  }
+
+  const current = existing[0];
+  const nextAmount = amount !== '0' ? amount : String(current.amount ?? '0');
+  const nextToken = amount !== '0' ? token : current.token;
+  const nextNetwork = current.network || network;
+  const nextStatus =
+    current.status === 'completed' || current.status === 'cancelled'
+      ? current.status
+      : current.escrowTxHash
+        ? 'open'
+        : nextAmount === '0'
+          ? 'pending'
+          : status;
+
+  const updated = await db
+    .update(bounties)
+    .set({
+      creatorId,
+      amount: nextAmount,
+      token: nextToken,
+      network: nextNetwork,
+      status: nextStatus,
+      isVerified: true,
+      verificationSource,
+      verifiedAt,
+      botActorLogin: botActorLogin ?? current.botActorLogin ?? null,
+    })
+    .where(eq(bounties.id, current.id))
+    .returning();
+
+  return updated[0];
+};
+
+const handleBotBountyVerificationComment = async (
+  payload: Record<string, unknown>,
+) => {
+  const comment = payload.comment as Record<string, unknown> | undefined;
+  const issue = payload.issue as Record<string, unknown> | undefined;
+  const repository = payload.repository as Record<string, unknown> | undefined;
+
+  if (!isPotatoeBotComment(comment) || !hasBountyLabel(issue)) {
+    return;
+  }
+
+  const repo = String(repository?.full_name ?? '');
+  const issueNumber = Number(issue?.number ?? 0);
+
+  if (!repo || !issueNumber) {
+    return;
+  }
+
+  const creator = await ensureGitHubUser(
+    (issue?.user as Record<string, unknown>) || {},
+  );
+
+  if (!creator) {
+    return;
+  }
+
+  await upsertVerifiedBounty({
+    repo,
+    issueNumber,
+    creatorId: creator.id,
+    amount: '0',
+    token: 'SOL',
+    network: creator.network || 'solana',
+    status: 'pending',
+    verificationSource: 'bot_comment',
+    botActorLogin: getBotLogin(comment?.user as Record<string, unknown>),
+  });
+};
+
 const handleBountyCommand = async (payload: Record<string, unknown>) => {
   const comment = payload.comment as Record<string, unknown> | undefined;
   const issue = payload.issue as Record<string, unknown> | undefined;
   const repository = payload.repository as Record<string, unknown> | undefined;
 
-  const commentBody = String(comment?.body ?? '').trim();
-  const match = commentBody.match(
-    /^\/bounty\s+(\d+(?:\.\d+)?)\s+([a-zA-Z0-9]+)$/i,
+  const parsedCommand = parseBountyCommand(
+    typeof comment?.body === 'string' ? comment.body : undefined,
   );
 
-  if (!match) {
+  if (!parsedCommand) {
     return;
   }
 
-  const amount = Number(match[1]);
-  const token = match[2].toUpperCase();
+  const amount = parsedCommand.amount;
+  const token = parsedCommand.token;
   const repo = String(repository?.full_name ?? '');
   const issueNumber = Number(issue?.number ?? 0);
 
   if (!repo || !issueNumber || amount <= 0) {
+    return;
+  }
+
+  if (!hasBountyLabel(issue)) {
+    await postGitHubComment(
+      repo,
+      issueNumber,
+      'Add the `bounty` label before opening a Potatoe Squeezy bounty.',
+    );
     return;
   }
 
@@ -166,12 +303,16 @@ const handleBountyCommand = async (payload: Record<string, unknown>) => {
   }
 
   const existing = await db
-    .select()
+    .select({
+      id: bounties.id,
+      amount: bounties.amount,
+      status: bounties.status,
+    })
     .from(bounties)
     .where(and(eq(bounties.repo, repo), eq(bounties.issueNumber, issueNumber)))
     .limit(1);
 
-  if (existing.length > 0) {
+  if (existing.length > 0 && Number(existing[0].amount) > 0) {
     await postGitHubComment(
       repo,
       issueNumber,
@@ -180,22 +321,17 @@ const handleBountyCommand = async (payload: Record<string, unknown>) => {
     return;
   }
 
-  const created = await db
-    .insert(bounties)
-    .values({
-      id: crypto.randomUUID(),
-      repo,
-      issueNumber,
-      creatorId: creator.id,
-      amount: amount.toString(),
-      token,
-      network: creator.network,
-      status: 'pending',
-      escrowTxHash: '',
-    })
-    .returning();
-
-  const bounty = created[0];
+  const bounty = await upsertVerifiedBounty({
+    repo,
+    issueNumber,
+    creatorId: creator.id,
+    amount: amount.toString(),
+    token,
+    network: creator.network,
+    status: 'pending',
+    verificationSource: 'bounty_command',
+    botActorLogin: null,
+  });
   const escrowService = getEscrowService(bounty.network);
 
   try {
@@ -256,6 +392,7 @@ const attachContributionForPR = async (payload: Record<string, unknown>) => {
       and(
         eq(bounties.repo, repo),
         inArray(bounties.issueNumber, issueNumbers),
+        eq(bounties.isVerified, true),
         eq(bounties.status, 'open'),
       ),
     );
@@ -332,6 +469,7 @@ const processMergedPR = async (payload: Record<string, unknown>) => {
       and(
         eq(bounties.repo, repo),
         inArray(bounties.issueNumber, issueNumbers),
+        eq(bounties.isVerified, true),
         eq(bounties.status, 'open'),
       ),
     );
@@ -423,56 +561,6 @@ const processPullRequestEvent = async (
   }
 };
 
-const handleIssueLabeled = async (payload: Record<string, unknown>) => {
-  const issue = payload.issue as Record<string, unknown> | undefined;
-  const repository = payload.repository as Record<string, unknown> | undefined;
-  const label = payload.label as Record<string, unknown> | undefined;
-
-  const labelName = String(label?.name ?? '').toLowerCase();
-  if (labelName !== 'bounty' && labelName !== 'open bounty') {
-    return;
-  }
-
-  const repo = String(repository?.full_name ?? '');
-  const issueNumber = Number(issue?.number ?? 0);
-
-  if (!repo || !issueNumber) {
-    return;
-  }
-
-  // Check if bounty already exists
-  const existing = await db
-    .select()
-    .from(bounties)
-    .where(and(eq(bounties.repo, repo), eq(bounties.issueNumber, issueNumber)))
-    .limit(1);
-
-  if (existing.length > 0) {
-    return;
-  }
-
-  const creator = await ensureGitHubUser(
-    (issue?.user as Record<string, unknown>) || {},
-  );
-
-  if (!creator) {
-    return;
-  }
-
-  // Auto-create bounty record in "pending" status if labeled
-  await db.insert(bounties).values({
-    id: crypto.randomUUID(),
-    repo,
-    issueNumber,
-    creatorId: creator.id,
-    amount: '0',
-    token: 'SOL',
-    network: creator.network || 'solana',
-    status: 'pending',
-    escrowTxHash: '',
-  });
-};
-
 githubWebhookRoute.post('/webhook', async (c) => {
   const secret = process.env.GITHUB_WEBHOOK_SECRET;
 
@@ -511,11 +599,8 @@ githubWebhookRoute.post('/webhook', async (c) => {
 
   try {
     if (eventType === 'issue_comment') {
+      await handleBotBountyVerificationComment(payload);
       await handleBountyCommand(payload);
-    }
-
-    if (eventType === 'issues' && payload.action === 'labeled') {
-      await handleIssueLabeled(payload);
     }
 
     if (eventType === 'pull_request') {

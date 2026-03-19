@@ -41,10 +41,12 @@ export class LeaderboardService {
         difficultySum: sql<number>`cast(coalesce(sum(${contributions.difficulty}), 0) as int)`,
       })
       .from(contributions)
+      .innerJoin(bounties, eq(contributions.bountyId, bounties.id))
       .where(
         and(
           eq(contributions.contributorId, userId),
           eq(contributions.merged, true),
+          eq(bounties.isVerified, true),
         ),
       );
 
@@ -95,7 +97,8 @@ export class LeaderboardService {
         difficultySum: sql<number>`cast(coalesce(sum(${contributions.difficulty}), 0) as int)`,
       })
       .from(contributions)
-      .where(eq(contributions.merged, true))
+      .innerJoin(bounties, eq(contributions.bountyId, bounties.id))
+      .where(and(eq(contributions.merged, true), eq(bounties.isVerified, true)))
       .groupBy(contributions.contributorId);
 
     const aggregateMap = new Map<
@@ -151,6 +154,7 @@ export class LeaderboardService {
         and(
           eq(contributions.merged, true),
           gte(contributions.createdAt, since),
+          eq(bounties.isVerified, true),
         ),
       );
 
@@ -228,7 +232,8 @@ export class LeaderboardService {
         difficultySum: sql<number>`cast(coalesce(sum(${contributions.difficulty}), 0) as int)`,
       })
       .from(contributions)
-      .where(eq(contributions.merged, true))
+      .innerJoin(bounties, eq(contributions.bountyId, bounties.id))
+      .where(and(eq(contributions.merged, true), eq(bounties.isVerified, true)))
       .groupBy(contributions.contributorId);
 
     const aggregateMap = new Map<

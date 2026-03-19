@@ -19,7 +19,9 @@ publicUsersRoute.get('/:username/profile', async (c) => {
     .select({
       id: users.id,
       username: users.username,
+      displayName: users.displayName,
       avatarUrl: users.avatarUrl,
+      twitterUrl: users.twitterUrl,
       walletAddress: users.walletAddress,
       network: users.network,
       createdAt: users.createdAt,
@@ -75,7 +77,12 @@ publicUsersRoute.get('/:username/profile', async (c) => {
     })
     .from(contributions)
     .innerJoin(bounties, eq(contributions.bountyId, bounties.id))
-    .where(eq(contributions.contributorId, user.id))
+    .where(
+      and(
+        eq(contributions.contributorId, user.id),
+        eq(bounties.isVerified, true),
+      ),
+    )
     .orderBy(desc(contributions.createdAt))
     .limit(20);
 
@@ -91,7 +98,7 @@ publicUsersRoute.get('/:username/profile', async (c) => {
       createdAt: bounties.createdAt,
     })
     .from(bounties)
-    .where(eq(bounties.creatorId, user.id))
+    .where(and(eq(bounties.creatorId, user.id), eq(bounties.isVerified, true)))
     .orderBy(desc(bounties.createdAt))
     .limit(20);
 
@@ -103,6 +110,7 @@ publicUsersRoute.get('/:username/profile', async (c) => {
       and(
         eq(contributions.contributorId, user.id),
         eq(contributions.merged, true),
+        eq(bounties.isVerified, true),
       ),
     );
 

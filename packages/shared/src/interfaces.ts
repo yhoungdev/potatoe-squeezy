@@ -10,8 +10,10 @@ export interface IPotatoeUser {
   githubId: string;
   username: string;
   email: string | null;
-  name: string;
-  avatarUrl: string;
+  name: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
+  twitterUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }

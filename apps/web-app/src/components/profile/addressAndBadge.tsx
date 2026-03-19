@@ -18,9 +18,7 @@ const AddressAndBadge = ({ username, onCopyBadge }: AddressAndBadgeProps) => {
         title="Update Wallet Address"
         trigger={
           <div className="flex items-center justify-between p-4 transition-all duration-200 border cursor-pointer bg-gray-900/50 hover:bg-gray-900/70 rounded-xl border-white/5 hover:border-purple-500/30">
-            <h4 className="text-sm text-gray-300">
-               Add/Update Wallet Address
-            </h4>
+            <h4 className="text-sm text-gray-300">Add/Update Wallet Address</h4>
             <ChevronRight className="text-gray-400" />
           </div>
         }
@@ -42,7 +40,7 @@ const AddressAndBadge = ({ username, onCopyBadge }: AddressAndBadgeProps) => {
             variant="h6"
             className="text-sm text-center text-gray-300"
           >
-            Your Tip Badge 
+            Your Tip Badge
           </Typography>
           <div className="flex justify-center p-4 border bg-gray-900/50 rounded-xl border-white/5">
             <TipBadge username={username} />

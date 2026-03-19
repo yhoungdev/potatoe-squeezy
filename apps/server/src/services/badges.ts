@@ -57,6 +57,7 @@ export class BadgeService {
         and(
           eq(contributions.contributorId, userId),
           eq(contributions.merged, true),
+          eq(bounties.isVerified, true),
         ),
       );
 
