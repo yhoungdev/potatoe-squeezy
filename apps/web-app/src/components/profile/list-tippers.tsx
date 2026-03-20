@@ -12,7 +12,7 @@ export default function ListTippers() {
   });
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-3 mt-6">
       <div>
         <Typography as="h2" variant="h5" className="text-white">
           List Tippers

@@ -53,7 +53,6 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
                 </span>
               </p>
             }
-            //closeOnOverlayClick={!!address}
           >
             <AddOrUpdateAddress />
           </ModalLayout>
