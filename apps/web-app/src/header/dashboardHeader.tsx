@@ -14,9 +14,10 @@ function DashboardHeader() {
           "w-full mx-auto mt-2 flex items-center gap-2 justify-between"
         }
       >
-        <div>
+        <div className="border-3 border-white rounded-md">
           <a href={"/app"}>
-            <img src={"/logo/logo.png"} width={70} />
+            <img src={"/logo/logo.png"} 
+            width={40}  className="rounded-md"/>
           </a>
         </div>
 
