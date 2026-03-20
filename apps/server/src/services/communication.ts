@@ -77,7 +77,7 @@ class CommunicationChannel {
     const safeIntro = this.escapeHtml(intro);
     const actionUrl = ctaUrl || this.appUrl;
 
-    return `
+   return `
       <!DOCTYPE html>
       <html lang="en">
         <head>
@@ -94,11 +94,9 @@ class CommunicationChannel {
               <td align="center">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background-color:#ffffff;border:1px solid #fed7aa;border-radius:20px;overflow:hidden;">
                   <tr>
-                    <td style="background:linear-gradient(135deg,#f97316 0%,#ea580c 100%);padding:28px 32px;color:#ffffff;">
-                      <div style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.88;">
-                        Potatoe Squeezy
-                      </div>
-                      <h1 style="margin:12px 0 0;font-size:28px;line-height:1.2;color:#ffffff;">
+                    <td style="background:black;padding:28px 32px;color:#ffffff;">
+                        <img width="50px" src="https://coffee-major-wallaby-86.mypinata.cloud/ipfs/bafybeiacyzm65sw3dbuy6d37ainhhvadnh6cp5f5wmrok5hxizo6dwk23y" alt="🍟"/>
+                      <h1 style="margin:12px 0 0;font-size:18px;line-height:1.2;color:#ffffff;">
                         ${safeTitle}
                       </h1>
                     </td>
@@ -218,7 +216,7 @@ class CommunicationChannel {
           }
         `,
         ctaLabel: 'View Your Dashboard',
-        ctaUrl: `${this.appUrl}/app`,
+        ctaUrl: `https://www.potatosqueezy.xyz/app`,
       }),
     });
   }
@@ -262,7 +260,7 @@ class CommunicationChannel {
           </table>
         `,
         ctaLabel: 'Manage Profile',
-        ctaUrl: `${this.appUrl}/app`,
+        ctaUrl: `https://www.potatosqueezy.xyz/app`,
       }),
     });
   }
