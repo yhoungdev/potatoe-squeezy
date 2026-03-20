@@ -1,5 +1,3 @@
-
-
 const truncateString = (str: string, maxLength: number): string => {
   if (maxLength <= 3) return str.slice(0, maxLength);
   if (str.length <= maxLength) {
@@ -19,17 +17,15 @@ const truncateMiddle = (str: string, maxLength: number): string => {
   return str.slice(0, start) + "..." + str.slice(end);
 };
 
-
 const shortenAddress = (
   address: string,
   start: number = 6,
-  end: number = 4
+  end: number = 4,
 ): string => {
   if (!address) return "";
   if (address.length <= start + end) return address;
   return address.slice(0, start) + "..." + address.slice(-end);
 };
-
 
 const normalizeAddress = (address: string, prefix: string = "0x"): string => {
   const trimmed = address.trim();
@@ -41,12 +37,11 @@ const normalizeAddress = (address: string, prefix: string = "0x"): string => {
   return lower;
 };
 
-
 const maskString = (
   str: string,
   visibleStart: number = 2,
   visibleEnd: number = 2,
-  maskChar: string = "*"
+  maskChar: string = "*",
 ): string => {
   if (!str) return "";
   if (str.length <= visibleStart + visibleEnd) {
@@ -71,24 +66,20 @@ const toSlug = (str: string): string => {
     .replace(/^-+|-+$/g, "");
 };
 
-
 const normalizeHandle = (handle: string): string => {
   return handle
     .trim()
-    .replace(/^@+/, "") 
-    .replace(/[^a-zA-Z0-9._]+/g, "") 
-    .slice(0, 32); 
+    .replace(/^@+/, "")
+    .replace(/[^a-zA-Z0-9._]+/g, "")
+    .slice(0, 32);
 };
-
 
 const toTitleCase = (str: string): string => {
   return str
     .toLowerCase()
     .split(/\s+/)
-    .map(word =>
-      word.length === 0
-        ? ""
-        : word.charAt(0).toUpperCase() + word.slice(1)
+    .map((word) =>
+      word.length === 0 ? "" : word.charAt(0).toUpperCase() + word.slice(1),
     )
     .join(" ");
 };
@@ -101,7 +92,7 @@ const highlight = (
   term: string,
   prefix: string = "<mark>",
   suffix: string = "</mark>",
-  caseSensitive: boolean = false
+  caseSensitive: boolean = false,
 ): string => {
   if (!term) return str;
 
@@ -109,13 +100,13 @@ const highlight = (
   const flags = caseSensitive ? "g" : "gi";
   const regex = new RegExp(escaped, flags);
 
-  return str.replace(regex, match => `${prefix}${match}${suffix}`);
+  return str.replace(regex, (match) => `${prefix}${match}${suffix}`);
 };
 
 const truncateAtWord = (
   str: string,
   maxLength: number,
-  suffix: string = "..."
+  suffix: string = "...",
 ): string => {
   if (str.length <= maxLength) return str;
   if (maxLength <= suffix.length) return str.slice(0, maxLength);
@@ -133,7 +124,6 @@ const truncateAtWord = (
 const normalizeWhitespace = (str: string): string => {
   return str.trim().replace(/\s+/g, " ");
 };
-
 
 const isSameAddress = (a: string, b: string): boolean => {
   return normalizeAddress(a) === normalizeAddress(b);

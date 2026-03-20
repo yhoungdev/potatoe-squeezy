@@ -1,5 +1,3 @@
-
-
 const formatNumber = (num: number, decimals: number = 2): string => {
   return num.toFixed(decimals);
 };
@@ -8,7 +6,7 @@ const formatCurrency = (
   num: number,
   currency: string = "USD",
   locale: string = "en-US",
-  decimals: number = 2
+  decimals: number = 2,
 ): string => {
   const int = Intl.NumberFormat(locale, {
     style: "currency",
@@ -22,7 +20,7 @@ const formatCurrency = (
 const formatPercent = (
   num: number,
   decimals: number = 2,
-  locale: string = "en-US"
+  locale: string = "en-US",
 ): string => {
   const int = Intl.NumberFormat(locale, {
     style: "percent",
@@ -35,7 +33,7 @@ const formatPercent = (
 const formatCompact = (
   num: number,
   decimals: number = 2,
-  locale: string = "en-US"
+  locale: string = "en-US",
 ): string => {
   const int = Intl.NumberFormat(locale, {
     notation: "compact",
@@ -47,7 +45,7 @@ const formatCompact = (
 const formatWithThousands = (
   num: number,
   decimals: number = 2,
-  locale: string = "en-US"
+  locale: string = "en-US",
 ): string => {
   const int = Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
@@ -60,12 +58,12 @@ const formatAccountingCurrency = (
   num: number,
   currency: string = "USD",
   locale: string = "en-US",
-  decimals: number = 2
+  decimals: number = 2,
 ): string => {
   const int = Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    currencySign: "accounting", 
+    currencySign: "accounting",
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
@@ -75,12 +73,12 @@ const formatAccountingCurrency = (
 const formatSignedNumber = (
   num: number,
   decimals: number = 2,
-  locale: string = "en-US"
+  locale: string = "en-US",
 ): string => {
   const int = Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-    signDisplay: "always", 
+    signDisplay: "always",
   });
   return int.format(num);
 };

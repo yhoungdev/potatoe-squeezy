@@ -25,6 +25,7 @@ publicUsersRoute.get('/:username/profile', async (c) => {
       displayName: users.displayName,
       avatarUrl: users.avatarUrl,
       twitterUrl: users.twitterUrl,
+      tippersPublic: users.tippersPublic,
       walletAddress: users.walletAddress,
       network: users.network,
       createdAt: users.createdAt,
@@ -162,6 +163,54 @@ publicUsersRoute.get('/:username/profile', async (c) => {
     recentContributions,
     createdBounties,
     earnedNetworks: networkSet,
+  });
+});
+
+publicUsersRoute.get('/:username/tippers', async (c) => {
+  const username = c.req.param('username');
+
+  const userRows = await db
+    .select({
+      id: users.id,
+      tippersPublic: users.tippersPublic,
+    })
+    .from(users)
+    .where(eq(users.username, username))
+    .limit(1);
+
+  if (userRows.length === 0) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
+  const user = userRows[0];
+
+  if (!user.tippersPublic) {
+    return c.json({ isPublic: false, tippers: [] });
+  }
+
+  const rows = await db
+    .select({
+      userId: users.id,
+      username: users.username,
+      displayName: users.displayName,
+      avatarUrl: users.avatarUrl,
+      totalAmount: sql<string>`coalesce(sum(${transactionRecords.amount}), 0)`,
+      tipCount: sql<number>`cast(count(*) as int)`,
+      lastTippedAt: sql<Date | null>`max(${transactionRecords.createdAt})`,
+    })
+    .from(transactionRecords)
+    .innerJoin(users, eq(users.id, transactionRecords.senderId))
+    .where(eq(transactionRecords.recipientId, user.id))
+    .groupBy(users.id, users.username, users.displayName, users.avatarUrl)
+    .orderBy(
+      desc(sql`coalesce(sum(${transactionRecords.amount}), 0)`),
+      desc(sql`max(${transactionRecords.createdAt})`),
+    )
+    .limit(20);
+
+  return c.json({
+    isPublic: true,
+    tippers: rows,
   });
 });
 

@@ -70,6 +70,7 @@ export enum API_ENDPOINTS {
   USER_ALL = "/user/all",
   USER_WALLET = "/wallet",
   USER_NOTIFICATIONS = "/notifications",
+  USER_PUBLIC_TIPPERS = "/users",
 
   TRANSACTION_RECORDS = "/tx-records",
   TRANSACTION_TIPPERS = "/tx-records/tippers",
