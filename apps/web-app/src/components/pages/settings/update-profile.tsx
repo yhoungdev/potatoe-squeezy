@@ -14,17 +14,24 @@ const UpdateProfile = () => {
   const setUser = useUserStore((state) => state.setUser);
   const [displayName, setDisplayName] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
+  const [tippersPublic, setTippersPublic] = useState(false);
 
   useEffect(() => {
     setDisplayName(profile?.user?.displayName ?? "");
     setTwitterUrl(profile?.user?.twitterUrl ?? "");
-  }, [profile?.user?.displayName, profile?.user?.twitterUrl]);
+    setTippersPublic(Boolean(profile?.user?.tippersPublic));
+  }, [
+    profile?.user?.displayName,
+    profile?.user?.twitterUrl,
+    profile?.user?.tippersPublic,
+  ]);
 
   const updateProfileMutation = useMutation({
     mutationFn: () =>
       UserService.updateUserProfile({
         displayName: displayName.trim() || null,
         twitterUrl: twitterUrl.trim() || null,
+        tippersPublic,
       }),
     onSuccess: (response) => {
       setAuthUser(response.user);
@@ -54,6 +61,16 @@ const UpdateProfile = () => {
         onChange={(e) => setTwitterUrl(e.target.value)}
         className="border-white/10 bg-gray-900/50 text-white !py-4"
       />
+
+      <label className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gray-900/50 px-4 py-3 text-sm text-white">
+        <span>Show my tippers on my public profile</span>
+        <input
+          type="checkbox"
+          checked={tippersPublic}
+          onChange={(e) => setTippersPublic(e.target.checked)}
+          className="h-4 w-4"
+        />
+      </label>
 
       <Button
         onClick={() => updateProfileMutation.mutate()}

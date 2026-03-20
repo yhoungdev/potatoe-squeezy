@@ -157,6 +157,7 @@ userRoute.put('/profile', async (c) => {
     const body = await c.req.json<{
       displayName?: string | null;
       twitterUrl?: string | null;
+      tippersPublic?: boolean;
     }>();
 
     const updates: Partial<typeof users.$inferInsert> = {
@@ -196,6 +197,10 @@ userRoute.put('/profile', async (c) => {
 
     if (body.twitterUrl !== undefined) {
       updates.twitterUrl = twitterUrl;
+    }
+
+    if (body.tippersPublic !== undefined) {
+      updates.tippersPublic = Boolean(body.tippersPublic);
     }
 
     const updated = await db

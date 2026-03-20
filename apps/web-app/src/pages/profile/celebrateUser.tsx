@@ -1,11 +1,16 @@
 import { useState, useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useTipSol } from "@/hooks/useTipSol";
 import { toast } from "sonner";
 import TransactionService from "@/services/transaction.service";
 import { validateSolanaAddress } from "@potatoe/shared";
 import { useUserStore } from "@/store/user.store";
+import UserService from "@/services/user.service";
 
 interface CelebrateUserProps {
   username: string;
@@ -37,6 +42,11 @@ function CelebrateUser({
   const { sendTip, loading } = useTipSol({
     recipientAddress: walletAddress ?? "",
     recipientName: username,
+  });
+  const { data: publicTippers, isLoading: isLoadingTippers } = useQuery({
+    queryKey: ["publicTippers", username],
+    queryFn: () => UserService.fetchPublicTippers(username),
+    enabled: Boolean(username) && !isOwnProfile,
   });
 
   const hasValidAmount = useMemo(() => {
@@ -235,6 +245,77 @@ function CelebrateUser({
           You cannot zap yourself from your own profile.
         </p>
       )}
+
+      {!isOwnProfile && publicTippers?.isPublic ? (
+        <div className="mt-6 space-y-3">
+          <h3 className="text-center text-sm font-semibold text-white">
+            People who tipped @{username}
+          </h3>
+
+          {isLoadingTippers ? (
+            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-gray-400">
+              Loading tippers...
+            </div>
+          ) : publicTippers.tippers.length === 0 ? (
+            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-gray-400">
+              No public tippers yet.
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+              {publicTippers.tippers.map((tipper) => {
+                const displayName =
+                  tipper.displayName?.trim() || tipper.username;
+
+                return (
+                  <Link
+                    key={tipper.userId}
+                    to="/app/dev/$username"
+                    params={{ username: tipper.username }}
+                    className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 transition-colors last:border-b-0 hover:bg-white/5"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage
+                          src={tipper.avatarUrl ?? undefined}
+                          alt={displayName}
+                        />
+                        <AvatarFallback>
+                          {displayName.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-white">
+                          {displayName}
+                        </p>
+                        <p className="truncate text-xs text-gray-400">
+                          @{tipper.username}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-white">
+                        {tipper.totalAmount} SOL
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {tipper.tipCount} tip{tipper.tipCount === 1 ? "" : "s"}
+                        {tipper.lastTippedAt
+                          ? ` · ${formatDistanceToNow(
+                              new Date(tipper.lastTippedAt),
+                              {
+                                addSuffix: true,
+                              },
+                            )}`
+                          : ""}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

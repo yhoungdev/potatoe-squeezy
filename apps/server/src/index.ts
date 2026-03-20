@@ -87,7 +87,7 @@ app.use('*', async (c, next) => {
       return allowedOrigins.has(normalized) ? origin : null;
     },
     allowHeaders: ['Content-Type', 'Authorization'],
-    allowMethods: ['POST', 'GET', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     exposeHeaders: ['Content-Length'],
     maxAge: 600,
     credentials: false,
@@ -128,12 +128,12 @@ app.use('*', async (c, next) => {
     }
   }
 
-  c.env = {
+  Object.assign(c.env, {
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID!,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET!,
     JWT_SECRET: process.env.JWT_SECRET!,
     DB: db,
-  };
+  });
   await next();
 });
 

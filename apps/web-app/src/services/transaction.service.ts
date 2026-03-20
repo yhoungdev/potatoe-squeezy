@@ -13,10 +13,27 @@ interface TransactionRecord {
   createdAt: string;
 }
 
+export interface TipperRecord {
+  userId: number;
+  username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  totalAmount: string;
+  tipCount: number;
+  lastTippedAt: string | null;
+}
+
 class TransactionService {
   static async getTransactionRecords(): Promise<TransactionRecord[]> {
     const response = await ApiClient.get<TransactionRecord[]>(
       API_ENDPOINTS.TRANSACTION_RECORDS,
+    );
+    return response;
+  }
+
+  static async getTippers(): Promise<TipperRecord[]> {
+    const response = await ApiClient.get<TipperRecord[]>(
+      API_ENDPOINTS.TRANSACTION_TIPPERS,
     );
     return response;
   }

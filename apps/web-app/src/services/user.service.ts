@@ -4,6 +4,7 @@ import ApiClient from "@/util/api";
 export interface UpdateUserProfilePayload {
   displayName?: string | null;
   twitterUrl?: string | null;
+  tippersPublic?: boolean;
 }
 
 export interface UserRankBadge {
@@ -22,6 +23,21 @@ export interface UserProfileResponse {
   sentTipCount: number;
   receivedTipCount: number;
   rankBadge: UserRankBadge | null;
+}
+
+export interface PublicTipperRecord {
+  userId: number;
+  username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  totalAmount: string;
+  tipCount: number;
+  lastTippedAt: string | null;
+}
+
+export interface PublicTippersResponse {
+  isPublic: boolean;
+  tippers: PublicTipperRecord[];
 }
 
 class UserService {
@@ -46,6 +62,13 @@ class UserService {
     const response = await ApiClient.put<UserProfileResponse>(
       API_ENDPOINTS.USER_PROFILE,
       data,
+    );
+    return response;
+  }
+
+  static async fetchPublicTippers(username: string) {
+    const response = await ApiClient.get<PublicTippersResponse>(
+      `${API_ENDPOINTS.USER_PUBLIC_TIPPERS}/${username}/tippers`,
     );
     return response;
   }

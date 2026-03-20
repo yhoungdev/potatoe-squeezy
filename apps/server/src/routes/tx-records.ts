@@ -1,11 +1,18 @@
 import { Hono } from 'hono';
 import { db } from '../db';
 import { addresses, transactionRecords, users } from '../db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, or, sql } from 'drizzle-orm';
 import { validateSolanaAddress } from '@potatoe/shared';
 import { broadcastNotification } from '../services/realtime-notifications';
+import type { Env } from '../types/env';
+import type { User } from '../types';
 
-const txRecordsRoute = new Hono();
+const txRecordsRoute = new Hono<{
+  Bindings: Env;
+  Variables: {
+    user: User | null;
+  };
+}>();
 
 const findUserIdByAddress = async (address: string) => {
   const addressMatch = await db
@@ -29,6 +36,12 @@ const findUserIdByAddress = async (address: string) => {
 
 txRecordsRoute.get('/', async (c) => {
   try {
+    const user = c.get('user');
+
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
     const records = await db
       .select({
         id: transactionRecords.id,
@@ -47,12 +60,53 @@ txRecordsRoute.get('/', async (c) => {
       })
       .from(transactionRecords)
       .leftJoin(users, eq(users.id, transactionRecords.senderId))
+      .where(
+        or(
+          eq(transactionRecords.senderId, user.id),
+          eq(transactionRecords.recipientId, user.id),
+        ),
+      )
       .orderBy(desc(transactionRecords.createdAt))
       .limit(50);
 
     return c.json(records);
   } catch (error) {
     console.error('Error fetching transaction records:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+txRecordsRoute.get('/tippers', async (c) => {
+  try {
+    const user = c.get('user');
+
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const rows = await db
+      .select({
+        userId: users.id,
+        username: users.username,
+        displayName: users.displayName,
+        avatarUrl: users.avatarUrl,
+        totalAmount: sql<string>`coalesce(sum(${transactionRecords.amount}), 0)`,
+        tipCount: sql<number>`cast(count(*) as int)`,
+        lastTippedAt: sql<Date | null>`max(${transactionRecords.createdAt})`,
+      })
+      .from(transactionRecords)
+      .innerJoin(users, eq(users.id, transactionRecords.senderId))
+      .where(eq(transactionRecords.recipientId, user.id))
+      .groupBy(users.id, users.username, users.displayName, users.avatarUrl)
+      .orderBy(
+        desc(sql`coalesce(sum(${transactionRecords.amount}), 0)`),
+        desc(sql`max(${transactionRecords.createdAt})`),
+      )
+      .limit(20);
+
+    return c.json(rows);
+  } catch (error) {
+    console.error('Error fetching tippers:', error);
     return c.json({ error: 'Internal server error' }, 500);
   }
 });

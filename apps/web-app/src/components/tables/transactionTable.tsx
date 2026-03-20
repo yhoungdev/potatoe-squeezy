@@ -21,6 +21,8 @@ import TransactionService, {
 } from "@/services/transaction.service";
 import { format, formatDistanceToNow } from "date-fns";
 import { useUserStore } from "@/store/user.store";
+import { shortenAddress, truncateMiddle } from "@potatoe/shared";
+import moment from "moment";
 
 function WalletTransactionTable() {
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
@@ -206,7 +208,9 @@ function WalletTransactionTable() {
                                     Timestamp
                                   </p>
                                   <p className="font-medium text-white">
-                                    {format(new Date(tx.createdAt), "PPpp")}
+                                    {moment(tx.createdAt)
+                                      .startOf("day")
+                                      .fromNow()}
                                   </p>
                                 </div>
                                 <div>
@@ -214,7 +218,7 @@ function WalletTransactionTable() {
                                     From
                                   </p>
                                   <p className="font-mono break-all text-white">
-                                    {tx.senderAddress}
+                                    {shortenAddress(tx.senderAddress, 6, 4)}
                                   </p>
                                 </div>
                                 <div>
@@ -222,7 +226,7 @@ function WalletTransactionTable() {
                                     To
                                   </p>
                                   <p className="font-mono break-all text-white">
-                                    {tx.recipientAddress}
+                                    {shortenAddress(tx.recipientAddress, 6, 4)}
                                   </p>
                                 </div>
                                 <div>
@@ -230,7 +234,7 @@ function WalletTransactionTable() {
                                     Transaction Hash
                                   </p>
                                   <p className="font-mono break-all text-white">
-                                    {tx.txHash}
+                                    {truncateMiddle(tx.txHash, 20)}
                                   </p>
                                 </div>
                                 <div>

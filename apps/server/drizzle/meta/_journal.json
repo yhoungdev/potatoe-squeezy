@@ -57,6 +57,20 @@
       "when": 1773918815026,
       "tag": "0007_smooth_galactus",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1774243200000,
+      "tag": "0008_public_tippers",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1773963088925,
+      "tag": "0009_narrow_zemo",
+      "breakpoints": true
     }
   ]
 }
