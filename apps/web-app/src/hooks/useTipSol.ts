@@ -8,7 +8,7 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { toast } from "sonner";
-import { RPC_URL } from "@/constant";
+import { RPC_URL, SOLANA_EXPLORER_CLUSTER } from "@/constant";
 import { validateSolanaAddress } from "@potatoe/shared";
 
 interface TipSolParams {
@@ -88,7 +88,7 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
       const signature = await sendTransaction(transaction, connection);
       await connection.confirmTransaction(signature, "confirmed");
 
-      const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+      const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=${SOLANA_EXPLORER_CLUSTER}`;
 
       return { success: true, transactionHash: signature, explorerUrl };
     } catch (error: any) {
