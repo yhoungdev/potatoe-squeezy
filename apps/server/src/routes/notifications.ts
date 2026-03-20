@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { and, desc, eq, inArray, or } from 'drizzle-orm';
+import { and, desc, eq, gt, inArray, or } from 'drizzle-orm';
 import { db } from '../db';
 import { addresses, transactionRecords, users } from '../db/schema';
 import type { Env } from '../types/env';
@@ -26,6 +26,18 @@ notificationsRoute.get('/', async (c) => {
       .where(eq(addresses.userId, user.id));
 
     const walletAddresses = userWallets.map((wallet) => wallet.address);
+    const recipientCondition = or(
+      eq(transactionRecords.recipientId, user.id),
+      walletAddresses.length > 0
+        ? inArray(transactionRecords.recipientAddress, walletAddresses)
+        : eq(transactionRecords.recipientId, user.id),
+    );
+    const visibilityCondition = user.notificationsClearedAt
+      ? and(
+          recipientCondition,
+          gt(transactionRecords.createdAt, user.notificationsClearedAt),
+        )
+      : recipientCondition;
 
     const rows = await db
       .select({
@@ -42,16 +54,7 @@ notificationsRoute.get('/', async (c) => {
       })
       .from(transactionRecords)
       .leftJoin(users, eq(users.id, transactionRecords.senderId))
-      .where(
-        and(
-          or(
-            eq(transactionRecords.recipientId, user.id),
-            walletAddresses.length > 0
-              ? inArray(transactionRecords.recipientAddress, walletAddresses)
-              : eq(transactionRecords.recipientId, user.id),
-          ),
-        ),
-      )
+      .where(visibilityCondition)
       .orderBy(desc(transactionRecords.createdAt))
       .limit(20);
 
@@ -70,6 +73,37 @@ notificationsRoute.get('/', async (c) => {
     return c.json(notifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+notificationsRoute.delete('/', async (c) => {
+  try {
+    const user = c.get('user');
+
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const clearedAt = new Date();
+
+    const updated = await db
+      .update(users)
+      .set({
+        notificationsClearedAt: clearedAt,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id))
+      .returning({
+        notificationsClearedAt: users.notificationsClearedAt,
+      });
+
+    return c.json({
+      success: true,
+      notificationsClearedAt: updated[0]?.notificationsClearedAt ?? clearedAt,
+    });
+  } catch (error) {
+    console.error('Error clearing notifications:', error);
     return c.json({ error: 'Internal server error' }, 500);
   }
 });

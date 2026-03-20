@@ -23,6 +23,14 @@ class NotificationService {
     );
     return response;
   }
+
+  static async clearUserNotifications() {
+    const response = await ApiClient.delete<{
+      success: boolean;
+      notificationsClearedAt: string;
+    }>(API_ENDPOINTS.USER_NOTIFICATIONS);
+    return response;
+  }
 }
 
 export default NotificationService;

@@ -5,6 +5,7 @@ import { and, asc, eq, inArray, or, sql } from 'drizzle-orm';
 import { addresses, transactionRecords, users } from '../db/schema';
 import type { User } from '../types';
 import { getTipperRank } from '@potatoe/shared';
+import communicationChannel from '../services/communication';
 
 const userRoute = new Hono<{
   Bindings: Env;
@@ -58,6 +59,19 @@ const normalizeTwitterUrl = (value: unknown) => {
   } catch {
     return null;
   }
+};
+
+const normalizeEmail = (value: unknown) => {
+  const raw = normalizeOptionalText(value);
+
+  if (!raw) {
+    return null;
+  }
+
+  const normalized = raw.toLowerCase();
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  return emailPattern.test(normalized) ? normalized : null;
 };
 
 const getUserTipTotals = async ({
@@ -156,6 +170,7 @@ userRoute.put('/profile', async (c) => {
 
     const body = await c.req.json<{
       displayName?: string | null;
+      email?: string | null;
       twitterUrl?: string | null;
       tippersPublic?: boolean;
     }>();
@@ -164,6 +179,7 @@ userRoute.put('/profile', async (c) => {
       updatedAt: new Date(),
     };
     const displayName = normalizeOptionalText(body.displayName);
+    const email = normalizeEmail(body.email);
     const twitterUrl = normalizeTwitterUrl(body.twitterUrl);
 
     if (
@@ -175,6 +191,15 @@ userRoute.put('/profile', async (c) => {
         { error: 'Display name must be 80 characters or fewer' },
         400,
       );
+    }
+
+    if (
+      body.email !== undefined &&
+      body.email !== null &&
+      body.email.trim() !== '' &&
+      email === null
+    ) {
+      return c.json({ error: 'Email must be a valid email address' }, 400);
     }
 
     if (
@@ -193,6 +218,10 @@ userRoute.put('/profile', async (c) => {
 
     if (body.displayName !== undefined) {
       updates.displayName = displayName;
+    }
+
+    if (body.email !== undefined) {
+      updates.email = email;
     }
 
     if (body.twitterUrl !== undefined) {
@@ -229,6 +258,23 @@ userRoute.put('/profile', async (c) => {
       userId: updated[0].id,
       walletAddresses,
     });
+
+    if (updated[0].email) {
+      void communicationChannel
+        .sendProfileUpdatedEmail({
+          user: {
+            email: updated[0].email,
+            username: updated[0].username,
+            name: updated[0].name,
+          },
+          displayName: updated[0].displayName,
+          twitterUrl: updated[0].twitterUrl,
+          tippersPublic: updated[0].tippersPublic,
+        })
+        .catch((error) => {
+          console.error('Failed to send profile updated email:', error);
+        });
+    }
 
     return c.json({
       user: updated[0],
