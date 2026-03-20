@@ -20,7 +20,7 @@ export default function ExploreUsers() {
       >
         <div className="space-y-8">
           <div className="space-y-2 text-center">
-            <h1 className="text-3xl font-bold text-transparent bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text">
+            <h1 className="text-3xl font-bold text-transparent bg-gradient-to-r from-gray-400 to-gray-600 bg-clip-text">
               Find GitHub Users
             </h1>
             <p className="text-gray-400">

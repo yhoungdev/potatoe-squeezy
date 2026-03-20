@@ -31,21 +31,9 @@ function DashboardHeader() {
         </a>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex flex-col rounded-md bg-gray-900/80 px-3 py-2 text-xs text-gray-100 sm:flex-row sm:items-center sm:gap-3 sm:text-sm">
-            <div>
-              <span className="text-gray-400">Received:</span>{" "}
-              <span className="font-medium">{totalReceived} SOL</span>
-            </div>
-            <span className="hidden text-gray-600 sm:inline">|</span>
-            <div>
-              <span className="text-gray-400">Sent:</span>{" "}
-              <span className="font-medium">{totalSent} SOL</span>
-            </div>
-          </div>
-
-          <div className="rounded-md border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-100 sm:text-sm">
+          {/* <div className="rounded-md border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-100 sm:text-sm">
             {rankName}
-          </div>
+          </div> */}
           <Drawer
             title="Settings"
             trigger={
