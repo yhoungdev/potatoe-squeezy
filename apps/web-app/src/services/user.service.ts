@@ -3,6 +3,7 @@ import ApiClient from "@/util/api";
 
 export interface UpdateUserProfilePayload {
   displayName?: string | null;
+  email?: string | null;
   twitterUrl?: string | null;
   tippersPublic?: boolean;
 }

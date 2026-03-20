@@ -12,6 +12,7 @@ import {
 } from '../constants';
 import { sendTelegramNotification } from '../utils/telegram-notification';
 import { NOTIFICATION_TYPE } from '../enums';
+import communicationChannel from '../services/communication';
 const telegramifyMarkdown = require('telegramify-markdown');
 
 export const authRouter = new Hono<{ Bindings: Env }>();
@@ -126,6 +127,17 @@ authRouter.get('/callback', async (c) => {
       const message = telegramifyMarkdown(rawMessage.trim(), 'escape');
 
       await sendTelegramNotification(TELEGRAM_CHAT_ID, message);
+      if (user.email) {
+        void communicationChannel
+          .sendSignupEmail({
+            email: user.email,
+            username: user.username,
+            name: user.name,
+          })
+          .catch((error) => {
+            console.error('Failed to send signup email:', error);
+          });
+      }
     } else {
       const result = await c.env.DB.update(users)
         .set({

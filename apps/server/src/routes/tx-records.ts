@@ -6,6 +6,7 @@ import { validateSolanaAddress } from '@potatoe/shared';
 import { broadcastNotification } from '../services/realtime-notifications';
 import type { Env } from '../types/env';
 import type { User } from '../types';
+import communicationChannel from '../services/communication';
 
 const txRecordsRoute = new Hono<{
   Bindings: Env;
@@ -164,11 +165,25 @@ txRecordsRoute.post('/', async (c) => {
     const senderUser = resolvedSenderId
       ? await db
           .select({
+            email: users.email,
+            name: users.name,
             username: users.username,
             avatarUrl: users.avatarUrl,
           })
           .from(users)
           .where(eq(users.id, resolvedSenderId))
+          .limit(1)
+      : [];
+
+    const recipientUser = resolvedRecipientId
+      ? await db
+          .select({
+            email: users.email,
+            name: users.name,
+            username: users.username,
+          })
+          .from(users)
+          .where(eq(users.id, resolvedRecipientId))
           .limit(1)
       : [];
 
@@ -184,6 +199,20 @@ txRecordsRoute.post('/', async (c) => {
         createdAt: newRecord[0].createdAt,
         sender: senderUser[0] ?? null,
       });
+
+      if (recipientUser[0]?.email) {
+        void communicationChannel
+          .sendTipReceivedEmail({
+            recipient: recipientUser[0],
+            sender: senderUser[0] ?? null,
+            amount: String(newRecord[0].amount),
+            txHash: newRecord[0].txHash ?? null,
+            note: newRecord[0].note ?? null,
+          })
+          .catch((error) => {
+            console.error('Failed to send tip email:', error);
+          });
+      }
     }
 
     return c.json(newRecord[0]);

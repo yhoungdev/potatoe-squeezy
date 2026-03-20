@@ -13,15 +13,18 @@ const UpdateProfile = () => {
   const setAuthUser = useUserStore((state) => state.setAuthUser);
   const setUser = useUserStore((state) => state.setUser);
   const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
   const [tippersPublic, setTippersPublic] = useState(false);
 
   useEffect(() => {
     setDisplayName(profile?.user?.displayName ?? "");
+    setEmail(profile?.user?.email ?? "");
     setTwitterUrl(profile?.user?.twitterUrl ?? "");
     setTippersPublic(Boolean(profile?.user?.tippersPublic));
   }, [
     profile?.user?.displayName,
+    profile?.user?.email,
     profile?.user?.twitterUrl,
     profile?.user?.tippersPublic,
   ]);
@@ -30,6 +33,7 @@ const UpdateProfile = () => {
     mutationFn: () =>
       UserService.updateUserProfile({
         displayName: displayName.trim() || null,
+        email: email.trim() || null,
         twitterUrl: twitterUrl.trim() || null,
         tippersPublic,
       }),
@@ -52,6 +56,14 @@ const UpdateProfile = () => {
         value={displayName}
         onChange={(e) => setDisplayName(e.target.value)}
         maxLength={80}
+        className="border-white/10 bg-gray-900/50 text-white !py-4"
+      />
+
+      <Input
+        type="email"
+        placeholder="Email address"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         className="border-white/10 bg-gray-900/50 text-white !py-4"
       />
 
