@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useTipSol } from "@/hooks/useTipSol";
 import { toast } from "sonner";
+import ConnectWalletButton from "@/button/connectWalletButton";
 import TransactionService from "@/services/transaction.service";
 import { validateSolanaAddress } from "@potatoe/shared";
 import { useUserStore } from "@/store/user.store";
@@ -229,9 +230,14 @@ function CelebrateUser({
       </Button>
 
       {!connected && (
-        <p className="text-sm text-center mt-2 text-gray-400">
-          Connect your wallet to send tips
-        </p>
+        <>
+          <p className="text-sm text-center mt-2 text-gray-400">
+            Connect your wallet to send tips
+          </p>
+          <div className="mt-3 flex justify-center">
+            <ConnectWalletButton>Connect Wallet</ConnectWalletButton>
+          </div>
+        </>
       )}
 
       {connected && !hasValidRecipientWallet && (

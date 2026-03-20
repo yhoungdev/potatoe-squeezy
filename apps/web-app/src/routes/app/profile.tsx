@@ -8,7 +8,7 @@ export const Route = createFileRoute("/app/profile")({
 
 function RouteComponent() {
   return (
-    <DefaultDashboard>
+    <DefaultDashboard showTabs={false}>
       <UserProfileCard />
     </DefaultDashboard>
   );

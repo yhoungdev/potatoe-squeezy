@@ -77,7 +77,7 @@ class CommunicationChannel {
     const safeIntro = this.escapeHtml(intro);
     const actionUrl = ctaUrl || this.appUrl;
 
-   return `
+    return `
       <!DOCTYPE html>
       <html lang="en">
         <head>

@@ -16,6 +16,7 @@ import { getTipperRank } from '@potatoe/shared';
 const publicUsersRoute = new Hono();
 const SEARCH_CACHE_TTL_MS = 1000 * 60 * 10;
 const USER_CACHE_TTL_MS = 1000 * 60 * 30;
+const DISCOVER_QUERY = 'followers:>1000 repos:>20 sort:followers-desc';
 
 type CachedValue<T> = {
   value: T;
@@ -114,12 +115,8 @@ publicUsersRoute.get('/github/search', async (c) => {
   const q = c.req.query('q')?.trim() ?? '';
   const limitRaw = c.req.query('limit');
   const limit = Math.min(Math.max(Number(limitRaw ?? 10), 1), 20);
-
-  if (!q) {
-    return c.json({ error: 'Search query is required' }, 400);
-  }
-
-  const cacheKey = `${q.toLowerCase()}:${limit}`;
+  const effectiveQuery = q || DISCOVER_QUERY;
+  const cacheKey = `${effectiveQuery.toLowerCase()}:${limit}`;
   const cached = getCachedValue(githubSearchCache, cacheKey);
 
   if (cached) {
@@ -129,7 +126,7 @@ publicUsersRoute.get('/github/search', async (c) => {
   try {
     const searchResponse = await fetch(
       `https://api.github.com/search/users?q=${encodeURIComponent(
-        q,
+        effectiveQuery,
       )}&per_page=${limit}`,
       {
         headers: getGitHubHeaders(),
@@ -149,7 +146,9 @@ publicUsersRoute.get('/github/search', async (c) => {
     };
 
     const users = await Promise.all(
-      (searchResult.items ?? []).map((item) => fetchGitHubUserDetail(item.login)),
+      (searchResult.items ?? []).map((item) =>
+        fetchGitHubUserDetail(item.login),
+      ),
     );
 
     setCachedValue(githubSearchCache, cacheKey, users, SEARCH_CACHE_TTL_MS);

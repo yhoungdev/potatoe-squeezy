@@ -16,7 +16,7 @@ const GeneralGithubUsers = () => {
   } = useQuery<GitHubUser[]>({
     queryKey: ["githubUsersSearch", submittedQuery],
     queryFn: () => GithubService.searchUsers(submittedQuery, 10),
-    enabled: submittedQuery.trim().length > 0,
+    enabled: true,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
     retry: 1,
@@ -27,7 +27,7 @@ const GeneralGithubUsers = () => {
     const trimmedQuery = searchQuery.trim();
 
     if (!trimmedQuery) {
-      toast.error("Please enter a GitHub username");
+      setSubmittedQuery("");
       return;
     }
 
@@ -35,12 +35,16 @@ const GeneralGithubUsers = () => {
   };
 
   useEffect(() => {
-    if (!submittedQuery || isFetching) {
+    if (isFetching) {
       return;
     }
 
     if (error) {
       toast.error("Failed to fetch GitHub users");
+      return;
+    }
+
+    if (!submittedQuery) {
       return;
     }
 

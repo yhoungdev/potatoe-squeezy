@@ -9,7 +9,7 @@ export interface GitHubUser {
 }
 
 class GithubService {
-  static async searchUsers(query: string, limit = 10): Promise<GitHubUser[]> {
+  static async searchUsers(query = "", limit = 10): Promise<GitHubUser[]> {
     const response = await ApiClient.get<GitHubUser[]>(
       API_ENDPOINTS.GITHUB_USER_SEARCH,
       {
