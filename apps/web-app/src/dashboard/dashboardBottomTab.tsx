@@ -29,7 +29,7 @@ function DashboardBottomTab() {
                 hover:bg-white/5
                 ${
                   isActive
-                    ? "bg-primary   text-red-400 border border-primary/20"
+                    ? "bg-primary   text-orange-500 border border-primary/20"
                     : "text-muted-foreground hover:text-primary"
                 }
               `}
