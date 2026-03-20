@@ -20,6 +20,7 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   twitterUrl: text("twitter_url"),
   tippersPublic: boolean("tippers_public").notNull().default(false),
+  notificationsClearedAt: timestamp("notifications_cleared_at"),
   network: text("network"),
   walletAddress: text("wallet_address"),
   createdAt: timestamp("created_at").defaultNow(),

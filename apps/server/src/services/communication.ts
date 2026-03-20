@@ -32,9 +32,7 @@ class CommunicationChannel {
     this.resend = process.env.RESEND_API_KEY
       ? new Resend(process.env.RESEND_API_KEY)
       : null;
-    this.from =
-      process.env.RESEND_FROM_EMAIL ||
-      'Potatoe Squeezy <onboarding@resend.dev>';
+    this.from = process.env.RESEND_FROM_EMAIL || 'Potatoe Squeezy ';
   }
 
   private canSendTo(email: string | null | undefined): email is string {
@@ -95,7 +93,8 @@ class CommunicationChannel {
       return;
     }
 
-    const senderName = sender?.name?.trim() || sender?.username?.trim() || 'A supporter';
+    const senderName =
+      sender?.name?.trim() || sender?.username?.trim() || 'A supporter';
 
     await this.sendMail({
       to: recipient.email,

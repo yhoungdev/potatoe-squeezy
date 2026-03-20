@@ -1,5 +1,5 @@
 import Drawer from "@/components/popups/drawer";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NotificationService, {
   type UserNotification,
 } from "@/services/notification.service";
@@ -14,6 +14,12 @@ function Notification() {
     queryKey: ["userNotifications"],
     queryFn: () => NotificationService.getUserNotifications(),
     staleTime: 1000 * 60,
+  });
+  const clearNotificationsMutation = useMutation({
+    mutationFn: () => NotificationService.clearUserNotifications(),
+    onSuccess: () => {
+      queryClient.setQueryData<UserNotification[]>(["userNotifications"], []);
+    },
   });
 
   useEffect(() => {
@@ -117,6 +123,21 @@ function Notification() {
       }
     >
       <div className="space-y-3 pt-4">
+        {notifications.length > 0 ? (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => clearNotificationsMutation.mutate()}
+              disabled={clearNotificationsMutation.isPending}
+              className="text-xs font-medium text-red-300 transition-colors hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {clearNotificationsMutation.isPending
+                ? "Clearing..."
+                : "Clear all"}
+            </button>
+          </div>
+        ) : null}
+
         {isLoading ? (
           <div className="rounded-xl border border-white/10 bg-gray-900/50 p-4 text-sm text-gray-400">
             Loading notifications...
