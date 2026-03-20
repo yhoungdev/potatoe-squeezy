@@ -71,6 +71,7 @@ export enum API_ENDPOINTS {
   USER_WALLET = "/wallet",
   USER_NOTIFICATIONS = "/notifications",
   USER_PUBLIC_TIPPERS = "/users",
+  GITHUB_USER_SEARCH = "/users/github/search",
 
   TRANSACTION_RECORDS = "/tx-records",
   TRANSACTION_TIPPERS = "/tx-records/tippers",

@@ -10,9 +10,13 @@ import { useUserStore } from "../../store/user.ts";
 interface IDashboardProps {
   children: React.ReactNode;
   title?: string;
+  showTabs?: boolean;
 }
 
-const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
+const DefaultDashboard = ({
+  children,
+  showTabs = true,
+}: IDashboardProps): React.JSX.Element => {
   const { isAuthenticated, checkAuthStatus } = useAuth();
   const navigate = useNavigate();
   const { wallet } = useUserStore();
@@ -61,7 +65,7 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
       <div className="container mx-auto px-4">
         <DashboardHeader />
         <div className="my-8 w-full lg:w-[700px] mx-auto">{children}</div>
-        <DashboardBottomTab />
+        {showTabs && <DashboardBottomTab />}
       </div>
     </div>
   );

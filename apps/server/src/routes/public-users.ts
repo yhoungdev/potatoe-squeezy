@@ -14,6 +14,151 @@ import {
 import { getTipperRank } from '@potatoe/shared';
 
 const publicUsersRoute = new Hono();
+const SEARCH_CACHE_TTL_MS = 1000 * 60 * 10;
+const USER_CACHE_TTL_MS = 1000 * 60 * 30;
+const DISCOVER_QUERY = 'followers:>1000 repos:>20 sort:followers-desc';
+
+type CachedValue<T> = {
+  value: T;
+  expiresAt: number;
+};
+
+type GitHubSearchItem = {
+  login: string;
+  avatar_url: string;
+};
+
+type GitHubUserDetail = {
+  login: string;
+  avatar_url: string;
+  name: string | null;
+  bio: string | null;
+};
+
+const githubSearchCache = new Map<string, CachedValue<GitHubUserDetail[]>>();
+const githubUserCache = new Map<string, CachedValue<GitHubUserDetail>>();
+
+const getCachedValue = <T>(cache: Map<string, CachedValue<T>>, key: string) => {
+  const entry = cache.get(key);
+
+  if (!entry) {
+    return null;
+  }
+
+  if (entry.expiresAt <= Date.now()) {
+    cache.delete(key);
+    return null;
+  }
+
+  return entry.value;
+};
+
+const setCachedValue = <T>(
+  cache: Map<string, CachedValue<T>>,
+  key: string,
+  value: T,
+  ttlMs: number,
+) => {
+  cache.set(key, {
+    value,
+    expiresAt: Date.now() + ttlMs,
+  });
+};
+
+const getGitHubHeaders = () => {
+  const token =
+    process.env.GITHUB_BOT_TOKEN ||
+    process.env.GITHUB_APP_TOKEN ||
+    process.env.GITHUB_TOKEN;
+
+  return {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'potatoe-squeezy',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
+const fetchGitHubUserDetail = async (login: string) => {
+  const cached = getCachedValue(githubUserCache, login.toLowerCase());
+
+  if (cached) {
+    return cached;
+  }
+
+  const response = await fetch(`https://api.github.com/users/${login}`, {
+    headers: getGitHubHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch GitHub user ${login}`);
+  }
+
+  const data = (await response.json()) as GitHubUserDetail;
+  const normalized = {
+    login: data.login,
+    avatar_url: data.avatar_url,
+    name: data.name,
+    bio: data.bio,
+  };
+
+  setCachedValue(
+    githubUserCache,
+    login.toLowerCase(),
+    normalized,
+    USER_CACHE_TTL_MS,
+  );
+
+  return normalized;
+};
+
+publicUsersRoute.get('/github/search', async (c) => {
+  const q = c.req.query('q')?.trim() ?? '';
+  const limitRaw = c.req.query('limit');
+  const limit = Math.min(Math.max(Number(limitRaw ?? 10), 1), 20);
+  const effectiveQuery = q || DISCOVER_QUERY;
+  const cacheKey = `${effectiveQuery.toLowerCase()}:${limit}`;
+  const cached = getCachedValue(githubSearchCache, cacheKey);
+
+  if (cached) {
+    return c.json(cached);
+  }
+
+  try {
+    const searchResponse = await fetch(
+      `https://api.github.com/search/users?q=${encodeURIComponent(
+        effectiveQuery,
+      )}&per_page=${limit}`,
+      {
+        headers: getGitHubHeaders(),
+      },
+    );
+
+    if (!searchResponse.ok) {
+      const message =
+        searchResponse.status === 403
+          ? 'GitHub rate limit reached. Please try again shortly.'
+          : 'Failed to fetch GitHub users';
+      return c.json({ error: message }, searchResponse.status);
+    }
+
+    const searchResult = (await searchResponse.json()) as {
+      items?: GitHubSearchItem[];
+    };
+
+    const users = await Promise.all(
+      (searchResult.items ?? []).map((item) =>
+        fetchGitHubUserDetail(item.login),
+      ),
+    );
+
+    setCachedValue(githubSearchCache, cacheKey, users, SEARCH_CACHE_TTL_MS);
+
+    return c.json(users);
+  } catch (error) {
+    console.error('Error fetching GitHub users:', error);
+    return c.json({ error: 'Failed to fetch GitHub users' }, 500);
+  }
+});
 
 publicUsersRoute.get('/:username/profile', async (c) => {
   const username = c.req.param('username');

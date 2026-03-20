@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import CelebrateUser from "./celebrateUser";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProfilePanel from "@/components/profile/profilePanel";
-import WalletNotConnected from "@/components/fallbacks/wallet-no-connect";
 import { useWallet } from "@solana/wallet-adapter-react";
 import useExtractUserWallet from "@/hooks/extract-user-wallet";
 import { useUserStore } from "@/store/user.store";
@@ -77,12 +76,8 @@ function UserProfileCard() {
     );
   }
 
-  if (!connected) {
-    return <WalletNotConnected />;
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center gap-6 mt-8 lg:flex-row">
+    <div className="  flex flex-col items-center gap-6 mt-8">
       <ProfilePanel
         name={userData.name || userData.login}
         username={userData.login}
