@@ -8,9 +8,9 @@ class BountyBot {
     this.context = context;
   }
 
-  async handleComment() {
+  async handleComment(overrideBody?: string) {
     const { comment: commentContext, sender } = this.context.payload;
-    const { body } = commentContext;
+    const body = overrideBody ?? commentContext.body;
     console.log(body);
 
     if (body.startsWith(COMMANDS.BOUNTY)) {

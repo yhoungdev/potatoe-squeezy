@@ -11,6 +11,7 @@ const COMMANDS = {
   CANCEL_BOUNTY: "/cancel-bounty",
   EDIT_BOUNTY: "/edit-bounty",
   HELP: "/help",
+  HUMAN: "/human",
 } as const;
 
 export default COMMANDS;
