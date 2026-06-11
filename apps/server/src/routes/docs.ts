@@ -402,6 +402,57 @@ const openApiSpec = {
         },
       },
     },
+    '/tx-records/agent-settlements': {
+      post: {
+        tags: ['Transactions'],
+        summary: 'Record x402 or MPP agent settlement callback',
+        parameters: [
+          {
+            name: 'x-agent-settlement-secret',
+            in: 'header',
+            required: true,
+            schema: { type: 'string' },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: [
+                  'amount',
+                  'senderAddress',
+                  'senderName',
+                  'paymentProtocol',
+                ],
+                properties: {
+                  amount: { type: 'number' },
+                  senderAddress: { type: 'string' },
+                  senderName: { type: 'string' },
+                  senderAvatarUrl: { type: 'string' },
+                  paymentProtocol: {
+                    type: 'string',
+                    enum: ['x402', 'mpp'],
+                  },
+                  recipientId: { type: 'integer' },
+                  recipientUsername: { type: 'string' },
+                  recipientAddress: { type: 'string' },
+                  txHash: { type: 'string' },
+                  note: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Agent settlement recorded' },
+          '400': { description: 'Validation error' },
+          '401': { description: 'Unauthorized callback' },
+          '503': { description: 'Agent settlements disabled' },
+        },
+      },
+    },
     '/leaderboard/global': {
       get: {
         tags: ['Leaderboards'],

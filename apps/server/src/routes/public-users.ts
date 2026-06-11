@@ -335,18 +335,36 @@ publicUsersRoute.get('/:username/tippers', async (c) => {
 
   const rows = await db
     .select({
+      identityKey: sql<string>`coalesce(cast(${transactionRecords.senderId} as text), ${transactionRecords.senderAddress})`,
       userId: users.id,
-      username: users.username,
-      displayName: users.displayName,
-      avatarUrl: users.avatarUrl,
+      username: sql<string>`coalesce(${users.username}, ${transactionRecords.senderName}, concat('wallet:', left(${transactionRecords.senderAddress}, 4), '...', right(${transactionRecords.senderAddress}, 4)))`,
+      profileUsername: users.username,
+      displayName: sql<
+        string | null
+      >`coalesce(${users.displayName}, ${transactionRecords.senderName})`,
+      avatarUrl: sql<
+        string | null
+      >`coalesce(${users.avatarUrl}, ${transactionRecords.senderAvatarUrl})`,
+      senderType: sql<string>`coalesce(${transactionRecords.senderType}, 'human')`,
+      senderAddress: transactionRecords.senderAddress,
       totalAmount: sql<string>`coalesce(sum(${transactionRecords.amount}), 0)`,
       tipCount: sql<number>`cast(count(*) as int)`,
       lastTippedAt: sql<Date | null>`max(${transactionRecords.createdAt})`,
     })
     .from(transactionRecords)
-    .innerJoin(users, eq(users.id, transactionRecords.senderId))
+    .leftJoin(users, eq(users.id, transactionRecords.senderId))
     .where(eq(transactionRecords.recipientId, user.id))
-    .groupBy(users.id, users.username, users.displayName, users.avatarUrl)
+    .groupBy(
+      users.id,
+      users.username,
+      users.displayName,
+      users.avatarUrl,
+      transactionRecords.senderId,
+      transactionRecords.senderAddress,
+      transactionRecords.senderName,
+      transactionRecords.senderAvatarUrl,
+      transactionRecords.senderType,
+    )
     .orderBy(
       desc(sql`coalesce(sum(${transactionRecords.amount}), 0)`),
       desc(sql`max(${transactionRecords.createdAt})`),

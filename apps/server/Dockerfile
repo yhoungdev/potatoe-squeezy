@@ -8,7 +8,9 @@ RUN curl -fsSL https://bun.sh/install | bash && \
     echo "export PATH=\"/root/.bun/bin:\$PATH\"" >> /root/.bashrc
 
 ENV PATH="/root/.bun/bin:$PATH"
-    
+
+# This Dockerfile must be built from the repository root:
+# docker build -f apps/server/Dockerfile .
 COPY package.json ./
 COPY bun.lock* ./
 COPY apps/server/package.json apps/server/package.json
@@ -25,4 +27,6 @@ RUN bun install --frozen-lockfile
 COPY . .
 
 WORKDIR /app/apps/server
-CMD ["bun", "run", "src/index.ts"]
+EXPOSE 3000
+
+CMD ["bun", "run", "start"]
