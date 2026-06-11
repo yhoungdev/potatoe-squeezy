@@ -16,7 +16,6 @@
     "@hono-dev/auth-github": "^0.0.1",
     "@neondatabase/serverless": "^0.10.4",
     "@potatoe/db": "workspace:*",
-    "@potatoe/shared": "workspace:*",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "hono": "^4.7.2",
