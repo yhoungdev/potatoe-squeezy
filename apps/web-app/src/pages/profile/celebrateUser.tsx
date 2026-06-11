@@ -1,31 +1,53 @@
 import { useState, useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useTipSol } from "@/hooks/useTipSol";
 import { toast } from "sonner";
+import ConnectWalletButton from "@/button/connectWalletButton";
 import TransactionService from "@/services/transaction.service";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { validateSolanaAddress } from "@potatoe/shared";
+import { useUserStore } from "@/store/user.store";
+import UserService from "@/services/user.service";
 
 interface CelebrateUserProps {
   username: string;
-  walletAddress: string;
+  walletAddress?: string | null;
+  isOwnProfile?: boolean;
 }
 
 const MIN_AMOUNT = 0.000001;
 const MAX_AMOUNT = 1000;
 
-function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
+function CelebrateUser({
+  username,
+  walletAddress,
+  isOwnProfile = false,
+}: CelebrateUserProps) {
   const { publicKey, connected } = useWallet();
+  const { authUser } = useUserStore();
   const [quantity, setQuantity] = useState<number>(0);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const predefinedAmount = useMemo(() => [0.5, 1, 1.5, 2], []);
+  const hasValidRecipientWallet = useMemo(
+    () => validateSolanaAddress(walletAddress ?? ""),
+    [walletAddress],
+  );
 
   const { sendTip, loading } = useTipSol({
-    recipientAddress: walletAddress,
+    recipientAddress: walletAddress ?? "",
     recipientName: username,
+  });
+  const { data: publicTippers, isLoading: isLoadingTippers } = useQuery({
+    queryKey: ["publicTippers", username],
+    queryFn: () => UserService.fetchPublicTippers(username),
+    enabled: Boolean(username) && !isOwnProfile,
   });
 
   const hasValidAmount = useMemo(() => {
@@ -47,8 +69,18 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
         return;
       }
 
+      if (isOwnProfile) {
+        toast.error("You cannot zap your own profile");
+        return;
+      }
+
       const amountToSend = customAmount ? parseFloat(customAmount) : quantity;
       const validationError = validateAmount(amountToSend);
+
+      if (!hasValidRecipientWallet) {
+        toast.error(`${username} has not added a valid zap wallet yet`);
+        return;
+      }
 
       if (validationError) {
         toast.error(validationError);
@@ -64,8 +96,8 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
           await TransactionService.createTransactionRecord({
             amount: amountToSend,
             senderAddress: publicKey?.toString() || "",
-            senderId: null,
-            recipientAddress: walletAddress,
+            senderId: authUser?.id ?? null,
+            recipientAddress: walletAddress ?? "",
             recipientId: null,
             txHash: success.explorerUrl,
             note: message || null,
@@ -179,7 +211,14 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
           ${hasValidAmount && connected ? "bg-red-400 hover:bg-red-500" : "bg-gray-600"}
         `}
         onClick={handleZap}
-        disabled={!hasValidAmount || !connected || loading || isProcessing}
+        disabled={
+          !hasValidAmount ||
+          !connected ||
+          isOwnProfile ||
+          !hasValidRecipientWallet ||
+          loading ||
+          isProcessing
+        }
       >
         {isProcessing || loading ? (
           <span className="flex items-center gap-2">
@@ -191,10 +230,119 @@ function CelebrateUser({ username, walletAddress }: CelebrateUserProps) {
       </Button>
 
       {!connected && (
-        <p className="text-sm text-center mt-2 text-gray-400">
-          Connect your wallet to send tips
+        <>
+          <p className="text-sm text-center mt-2 text-gray-400">
+            Connect your wallet to send tips
+          </p>
+          <div className="mt-3 flex justify-center">
+            <ConnectWalletButton>Connect Wallet</ConnectWalletButton>
+          </div>
+        </>
+      )}
+
+      {connected && !hasValidRecipientWallet && (
+        <p className="mt-2 text-sm text-center text-gray-400">
+          This developer has not added a valid Solana wallet yet.
         </p>
       )}
+
+      {connected && isOwnProfile && (
+        <p className="mt-2 text-sm text-center text-gray-400">
+          You cannot zap yourself from your own profile.
+        </p>
+      )}
+
+      {!isOwnProfile && publicTippers?.isPublic ? (
+        <div className="mt-6 space-y-3">
+          <h3 className="text-center text-sm font-semibold text-white">
+            People who tipped @{username}
+          </h3>
+
+          {isLoadingTippers ? (
+            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-gray-400">
+              Loading tippers...
+            </div>
+          ) : publicTippers.tippers.length === 0 ? (
+            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-gray-400">
+              No public tippers yet.
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+              {publicTippers.tippers.map((tipper) => {
+                const displayName =
+                  tipper.displayName?.trim() || tipper.username;
+                const canOpenProfile = Boolean(tipper.profileUsername);
+                const rowContent = (
+                  <>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage
+                          src={tipper.avatarUrl ?? undefined}
+                          alt={displayName}
+                        />
+                        <AvatarFallback>
+                          {displayName.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-white">
+                          {displayName}
+                        </p>
+                        <p className="truncate text-xs text-gray-400">
+                          {canOpenProfile
+                            ? `@${tipper.profileUsername}`
+                            : tipper.senderType === "agent"
+                              ? "Agent tipper"
+                              : tipper.username}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-white">
+                        {tipper.totalAmount} SOL
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {tipper.tipCount} tip{tipper.tipCount === 1 ? "" : "s"}
+                        {tipper.lastTippedAt
+                          ? ` · ${formatDistanceToNow(
+                              new Date(tipper.lastTippedAt),
+                              {
+                                addSuffix: true,
+                              },
+                            )}`
+                          : ""}
+                      </p>
+                    </div>
+                  </>
+                );
+
+                if (canOpenProfile && tipper.profileUsername) {
+                  return (
+                    <Link
+                      key={tipper.identityKey}
+                      to="/app/dev/$username"
+                      params={{ username: tipper.profileUsername }}
+                      className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 transition-colors last:border-b-0 hover:bg-white/5"
+                    >
+                      {rowContent}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <div
+                    key={tipper.identityKey}
+                    className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 last:border-b-0"
+                  >
+                    {rowContent}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

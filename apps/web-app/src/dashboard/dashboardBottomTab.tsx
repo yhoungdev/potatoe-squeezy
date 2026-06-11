@@ -11,7 +11,7 @@ function DashboardBottomTab() {
   }, []);
 
   return (
-    <nav className="fixed w-[180px] bottom-3 left-1/2 -translate-x-1/2 z-50">
+    <nav className="fixed w-[340px] max-w-[95vw] bottom-3 left-1/2 -translate-x-1/2 z-50">
       <div
         className="flex items-center justify-between gap-2 px-4  bg-black/40 backdrop-blur-xl 
         border border-white/10 rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)]"
@@ -29,7 +29,7 @@ function DashboardBottomTab() {
                 hover:bg-white/5
                 ${
                   isActive
-                    ? "bg-primary   text-red-400 border border-primary/20"
+                    ? "bg-primary   text-orange-500 border border-primary/20"
                     : "text-muted-foreground hover:text-primary"
                 }
               `}

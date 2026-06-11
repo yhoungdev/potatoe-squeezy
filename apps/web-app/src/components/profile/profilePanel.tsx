@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Typography from "../typography";
+import { SentAndReceivedTokenPanel } from "./profile-misc";
 interface ProfilePanelProps {
   name: string;
   username: string;
@@ -33,12 +34,20 @@ function ProfilePanel({
                 {username?.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <Typography variant="h4">{name}</Typography>
-            <Typography variant="caption" color="secondary">
+            <Typography variant="h4" className="text-center">
+              {name}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="secondary"
+              className="text-center"
+            >
               @{username}
             </Typography>
 
             <Typography className="text-xs">{userBio}</Typography>
+
+            <SentAndReceivedTokenPanel />
           </div>
         </div>
       </motion.div>

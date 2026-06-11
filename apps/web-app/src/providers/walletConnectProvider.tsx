@@ -14,9 +14,10 @@ import {
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import { ReactNode } from "@tanstack/react-router";
+import { SOLANA_NETWORK } from "@/constant";
 
 const WalletAdapterProvider = ({ children }: { children: ReactNode }) => {
-  const network = WalletAdapterNetwork.Mainnet;
+  const network = SOLANA_NETWORK as WalletAdapterNetwork;
 
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 

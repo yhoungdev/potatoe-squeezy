@@ -1,21 +1,39 @@
 {
   "name": "potato-monorepo",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
-  "workspaces": [],
+  "packageManager": "bun@1.3.10",
+  "workspaces": [
+    "apps/*",
+    "libs/*",
+    "packages/*"
+  ],
   "scripts": {
-    "format": "prettier --write ./",
-    "start": "concurrently \"cd apps/web-app && pnpm dev\" \"cd apps/server && pnpm dev\""
+    "check:workspace-deps": "bun run scripts/check-workspace-deps.ts",
+    "preinstall": "bun run scripts/check-workspace-deps.ts",
+    "dev": "bun --cwd apps/server dev & bun --cwd apps/web-app dev & bun --cwd apps/github-bot dev & bun --cwd apps/extension dev & wait",
+    "start": "bun --cwd apps/server start & bun --cwd apps/web-app start & bun --cwd apps/github-bot start & bun --cwd apps/extension start & wait",
+    "dev:server": "bun --cwd apps/server dev",
+    "start:server": "bun --cwd apps/server start",
+    "dev:web": "bun --cwd apps/web-app dev",
+    "build:web": "bun --cwd apps/web-app build",
+    "dev:bot": "bun --cwd apps/github-bot dev",
+    "start:bot": "bun --cwd apps/github-bot start",
+    "dev:extension": "bun --cwd apps/extension dev",
+    "build:extension": "bun --cwd apps/extension build",
+    "build": "bun --filter '*' run build",
+    "format": "prettier --write ."
   },
   "private": true,
-  "dependencies": {
-    "@radix-ui/react-alert-dialog": "^1.1.6",
-    "dotenv": "^16.4.7",
-    "lucid": "^2.21.0",
-    "prettier": "^3.4.2"
-  },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@potatoe/shared": "workspace:*",
+    "prettier": "^3.5.3"
+  },
+  "overrides": {
+    "eslint": "^8.57.1",
+    "typescript": "~5.8.3"
+  },
+  "dependencies": {
+    "iconsax-reactjs": "^0.0.8"
   }
 }

@@ -10,19 +10,27 @@ import { useUserStore } from "../../store/user.ts";
 interface IDashboardProps {
   children: React.ReactNode;
   title?: string;
+  showTabs?: boolean;
 }
 
-const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
+const DefaultDashboard = ({
+  children,
+  showTabs = true,
+}: IDashboardProps): React.JSX.Element => {
   const { isAuthenticated, checkAuthStatus } = useAuth();
   const navigate = useNavigate();
   const { wallet } = useUserStore();
 
   useEffect(() => {
-    const isValid = checkAuthStatus();
-    if (!isValid) {
-      navigate({ to: "/" });
-    }
-  }, []);
+    let cancelled = false;
+    checkAuthStatus().then((isValid) => {
+      if (cancelled) return;
+      if (!isValid) navigate({ to: "/" });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [checkAuthStatus, navigate]);
 
   console.log(wallet);
 
@@ -32,13 +40,12 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
 
   return (
     <div>
-      {wallet === undefined && (
+      {!wallet && (
         <div
-          className="py-2 text-center text-white "
           style={{
             background: "linear-gradient(64deg, #a43d3c, #ad4b4a, #e67271)",
           }}
-          className={"w-full bg-gray-900 text-center py-2"}
+          className="w-full text-center py-2 text-white"
         >
           <ModalLayout
             title="Add a wallet address to continue"
@@ -50,7 +57,6 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
                 </span>
               </p>
             }
-            //closeOnOverlayClick={!!address}
           >
             <AddOrUpdateAddress />
           </ModalLayout>
@@ -59,7 +65,7 @@ const DefaultDashboard = ({ children }: IDashboardProps): React.JSX.Element => {
       <div className="container mx-auto px-4">
         <DashboardHeader />
         <div className="my-8 w-full lg:w-[700px] mx-auto">{children}</div>
-        <DashboardBottomTab />
+        {showTabs && <DashboardBottomTab />}
       </div>
     </div>
   );

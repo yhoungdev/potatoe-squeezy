@@ -1,0 +1,6 @@
+{
+  "installCommand": "cd apps/web-app && bun install",
+  "buildCommand": "cd apps/web-app && bun run build",
+  "outputDirectory": "apps/web-app/dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}

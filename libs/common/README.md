@@ -7,7 +7,7 @@
 ## Install
 
 ```bash
-npm install --save common
+bun add common
 ```
 
 ## Usage

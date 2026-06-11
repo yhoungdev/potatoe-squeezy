@@ -1,6 +1,9 @@
 import { Probot } from "probot";
 import { handleIssueOpened, handleIssueComment } from "./controllers/index.ts";
-import { bountyController } from "./controllers/index.ts";
+import {
+  handleBountyLabeled,
+  handleMergedBountyPullRequest,
+} from "./controllers/index.ts";
 
 export default (app: Probot) => {
   app.log.info("App started 🎉");
@@ -9,5 +12,6 @@ export default (app: Probot) => {
     if (context.isBot) return;
     await handleIssueComment(context);
   });
-  app.on("issues.labeled", bountyController);
+  app.on("issues.labeled", handleBountyLabeled);
+  app.on("pull_request.closed", handleMergedBountyPullRequest);
 };

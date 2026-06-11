@@ -12,6 +12,7 @@ import {
 } from '../constants';
 import { sendTelegramNotification } from '../utils/telegram-notification';
 import { NOTIFICATION_TYPE } from '../enums';
+import communicationChannel from '../services/communication';
 const telegramifyMarkdown = require('telegramify-markdown');
 
 export const authRouter = new Hono<{ Bindings: Env }>();
@@ -25,6 +26,55 @@ const github = githubAuth({
 
 authRouter.use('/login', github);
 authRouter.use('/callback', github);
+
+const findExistingUserForGitHub = async (
+  db: Env['DB'],
+  githubUser: Record<string, unknown>,
+) => {
+  const githubId = String(githubUser.id ?? '').trim();
+  const email = String(githubUser.email ?? '')
+    .trim()
+    .toLowerCase();
+  const username = String(githubUser.login ?? '').trim();
+
+  if (githubId) {
+    const byGithubId = await db
+      .select()
+      .from(users)
+      .where(eq(users.githubId, githubId))
+      .limit(1);
+
+    if (byGithubId.length > 0) {
+      return byGithubId[0];
+    }
+  }
+
+  if (email) {
+    const byEmail = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    if (byEmail.length > 0) {
+      return byEmail[0];
+    }
+  }
+
+  if (username) {
+    const byUsername = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
+
+    if (byUsername.length > 0) {
+      return byUsername[0];
+    }
+  }
+
+  return null;
+};
 
 authRouter.get('/login', (c) => {
   return c.redirect('/');
@@ -46,14 +96,14 @@ authRouter.get('/callback', async (c) => {
   }
 
   try {
-    const existingUser = await c.env.DB.select()
-      .from(users)
-      .where(eq(users.githubId, githubUser.id.toString()))
-      .limit(1);
+    const matchedUser = await findExistingUserForGitHub(
+      c.env.DB,
+      githubUser as Record<string, unknown>,
+    );
 
     let user;
 
-    if (existingUser.length === 0) {
+    if (!matchedUser) {
       const result = await c.env.DB.insert(users)
         .values({
           githubId: githubUser.id.toString(),
@@ -77,16 +127,28 @@ authRouter.get('/callback', async (c) => {
       const message = telegramifyMarkdown(rawMessage.trim(), 'escape');
 
       await sendTelegramNotification(TELEGRAM_CHAT_ID, message);
+      if (user.email) {
+        void communicationChannel
+          .sendSignupEmail({
+            email: user.email,
+            username: user.username,
+            name: user.name,
+          })
+          .catch((error) => {
+            console.error('Failed to send signup email:', error);
+          });
+      }
     } else {
       const result = await c.env.DB.update(users)
         .set({
+          githubId: githubUser.id.toString(),
           username: githubUser.login,
           name: githubUser.name || null,
           email: githubUser.email || null,
           avatarUrl: githubUser.avatar_url || null,
           updatedAt: new Date(),
         })
-        .where(eq(users.githubId, githubUser.id.toString()))
+        .where(eq(users.id, matchedUser.id))
         .returning();
 
       user = result[0];

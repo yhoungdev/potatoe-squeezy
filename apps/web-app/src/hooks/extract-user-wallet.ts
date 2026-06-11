@@ -1,8 +1,17 @@
 import { useState, useEffect } from "react";
 import { UserService } from "@/services";
 
+type WalletRow = {
+  id: number;
+  userId: number;
+  chain: string;
+  address: string;
+  createdAt: string;
+  updatedAt: string;
+} | null;
+
 const useExtractUserWallet = (userName: string) => {
-  const [wallet, setWallet] = useState<string | null>(null);
+  const [wallet, setWallet] = useState<WalletRow>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,7 +24,7 @@ const useExtractUserWallet = (userName: string) => {
 
           return userData?.username === userName;
         });
-        setWallet(user?.wallets || null);
+        setWallet(user?.wallets ?? user?.addresses ?? null);
       } catch (err) {
         setError("Failed to fetch user wallet");
       } finally {

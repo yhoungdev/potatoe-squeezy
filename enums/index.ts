@@ -1,7 +1,1 @@
-import { AUTH_TOKEN } from "../constants";
-
-export enum Secrete_Enums {}
-
-export const TOKEN_ENUMS = {
-  AUTH_TOKEN,
-};
+export { Secrete_Enums, TOKEN_ENUMS } from "@potatoe/shared";

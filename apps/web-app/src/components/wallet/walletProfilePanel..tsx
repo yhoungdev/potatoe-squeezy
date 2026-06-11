@@ -2,11 +2,11 @@ import ProfilePanel from "../profile/profilePanel";
 import { useUserStore } from "@/store/user.store";
 
 function WalletProfilePanel() {
-  const userStore = useUserStore();
-  const users = userStore?.user?.users ?? {};
-  const address = userStore?.user?.wallets?.address ?? "";
+  const { user, wallet } = useUserStore();
+  const userData = user ?? {};
+  const address = wallet?.address ?? "";
 
-  const { avatarUrl, username, name } = users;
+  const { avatarUrl, username, name } = userData as any;
 
   return (
     <div>

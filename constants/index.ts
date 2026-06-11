@@ -1,2 +1,1 @@
-export const TOKEN = "";
-export const AUTH_TOKEN = "access_token";
+export { TOKEN, AUTH_TOKEN } from "@potatoe/shared";

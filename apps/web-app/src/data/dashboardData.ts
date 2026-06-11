@@ -4,7 +4,16 @@ export const DASHBOARDNAV = [
     icon: "🛖",
     path: "/app",
   },
-
+  {
+    title: "Bounties",
+    icon: "💰",
+    path: "/app/bounties",
+  },
+  {
+    title: "Board",
+    icon: "🏆",
+    path: "/app/leaderboard",
+  },
   {
     title: "Explore",
     icon: "🌍",

@@ -23,7 +23,9 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@potatoe/shared": ["../../packages/shared/src/index.ts"],
+      "@potatoe/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": ["src"],

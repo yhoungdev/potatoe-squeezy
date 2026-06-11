@@ -1,56 +1,108 @@
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import { useCallback, useEffect, useState } from "react";
 import { useUserStore } from "@/store/user.store";
 import { useNavigate } from "@tanstack/react-router";
+import { AuthService } from "@/services/auth.service";
+import UserService from "@/services/user.service";
 
 function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const token = Cookies.get("auth-token");
-    return !!token;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { user, clearUser } = useUserStore();
+  const { authUser, setAuthUser, setUser, setWallet, clearUser } =
+    useUserStore();
   const navigate = useNavigate();
 
+  const setAuthUserIfChanged = useCallback(
+    (nextUser: any | null) => {
+      const currentId = authUser?.id ?? null;
+      const nextId = nextUser?.id ?? null;
+      if (currentId === nextId) return;
+      setAuthUser(nextUser);
+    },
+    [authUser?.id, setAuthUser],
+  );
+
   useEffect(() => {
-    const token = Cookies.get("auth-token");
-    if (!token && isAuthenticated) {
-      handleLogout();
-    }
-  }, [isAuthenticated]);
+    let cancelled = false;
 
-  const handleLogin = (token: string) => {
-    Cookies.set("auth-token", token, {
-      secure: true,
-      sameSite: "lax",
-      expires: 7,
-    });
-    setIsAuthenticated(true);
-  };
+    const bootstrap = async () => {
+      try {
+        const token = localStorage.getItem("bearer_token");
+        if (!token) {
+          if (!cancelled) {
+            setAuthUserIfChanged(null);
+            setIsAuthenticated(false);
+          }
+          return;
+        }
 
-  const handleLogout = () => {
-    Cookies.remove("auth-token");
+        const profile = (await UserService.fetchUserProfile()) as any;
+        if (!cancelled) {
+          if (profile?.user) {
+            setAuthUserIfChanged(profile.user);
+            setWallet(profile.wallet ?? null);
+            setUser(profile.user);
+            setIsAuthenticated(true);
+          } else {
+            setAuthUserIfChanged(null);
+            setIsAuthenticated(false);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          localStorage.removeItem("bearer_token");
+          setAuthUserIfChanged(null);
+          setIsAuthenticated(false);
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    bootstrap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setAuthUserIfChanged, setUser, setWallet]);
+
+  const handleLogout = useCallback(async () => {
+    await AuthService.signOut();
+    localStorage.removeItem("bearer_token");
     clearUser();
-    setIsAuthenticated(false);
     navigate({ to: "/" });
-  };
+  }, [clearUser, navigate]);
 
-  const checkAuthStatus = () => {
-    const token = Cookies.get("auth-token");
-    const isValid = !!token;
-    setIsAuthenticated(isValid);
+  const checkAuthStatus = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("bearer_token");
+      if (!token) {
+        setAuthUserIfChanged(null);
+        setIsAuthenticated(false);
+        return false;
+      }
 
-    if (!isValid) {
-      handleLogout();
+      const profile = (await UserService.fetchUserProfile()) as any;
+      const ok = Boolean(profile?.user);
+      setAuthUserIfChanged(profile?.user || null);
+      setIsAuthenticated(ok);
+      if (ok) {
+        setWallet(profile.wallet ?? null);
+        setUser(profile.user);
+      }
+      return ok;
+    } catch {
+      localStorage.removeItem("bearer_token");
+      setAuthUserIfChanged(null);
+      setIsAuthenticated(false);
       return false;
     }
-    return true;
-  };
+  }, [setAuthUserIfChanged, setUser, setWallet]);
 
   return {
     isAuthenticated,
-    user,
-    login: handleLogin,
+    isLoading,
+    user: authUser,
     logout: handleLogout,
     checkAuthStatus,
   };

@@ -8,7 +8,8 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { toast } from "sonner";
-import { RPC_URL } from "@/constant";
+import { RPC_URL, SOLANA_EXPLORER_CLUSTER } from "@/constant";
+import { validateSolanaAddress } from "@potatoe/shared";
 
 interface TipSolParams {
   recipientAddress: string;
@@ -32,8 +33,14 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
       return false;
     }
 
-    if (!recipientAddress) {
-      toast.error("Invalid recipient address");
+    const normalizedRecipientAddress = recipientAddress.trim();
+
+    if (!validateSolanaAddress(normalizedRecipientAddress)) {
+      toast.error(
+        recipientName
+          ? `${recipientName} does not have a valid wallet address yet`
+          : "Invalid recipient address",
+      );
       return false;
     }
 
@@ -48,7 +55,7 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
     try {
       const connection = new Connection(RPC_URL, "confirmed");
 
-      const recipient = new PublicKey(recipientAddress);
+      const recipient = new PublicKey(normalizedRecipientAddress);
       const recipientLamports = Math.round(recipientAmount * LAMPORTS_PER_SOL);
       const feeLamports = Math.round(feeAmount * LAMPORTS_PER_SOL);
 
@@ -81,7 +88,7 @@ export function useTipSol({ recipientAddress, recipientName }: TipSolParams) {
       const signature = await sendTransaction(transaction, connection);
       await connection.confirmTransaction(signature, "confirmed");
 
-      const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+      const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=${SOLANA_EXPLORER_CLUSTER}`;
 
       return { success: true, transactionHash: signature, explorerUrl };
     } catch (error: any) {

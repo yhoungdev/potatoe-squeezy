@@ -7,10 +7,14 @@
  */
 const COMMANDS = {
   BOUNTY: "/bounty",
+  APPLY: "/apply",
   CLAIM: "/claim",
+  ACCEPT: "/accept",
+  REJECT: "/reject",
   CANCEL_BOUNTY: "/cancel-bounty",
   EDIT_BOUNTY: "/edit-bounty",
   HELP: "/help",
+  HUMAN: "/human",
 } as const;
 
 export default COMMANDS;

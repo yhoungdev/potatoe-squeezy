@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import CelebrateUser from "./celebrateUser";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProfilePanel from "@/components/profile/profilePanel";
-import WalletNotConnected from "@/components/fallbacks/wallet-no-connect";
 import { useWallet } from "@solana/wallet-adapter-react";
 import useExtractUserWallet from "@/hooks/extract-user-wallet";
+import { useUserStore } from "@/store/user.store";
 
 interface GitHubUser {
   login: string;
@@ -22,6 +22,9 @@ function UserProfileCard() {
 
   const { wallet } = useExtractUserWallet(username || "");
   const { address } = wallet || {};
+  const authUser = useUserStore((state) => state.authUser);
+  const isOwnProfile =
+    authUser?.username?.toLowerCase() === username?.toLowerCase();
 
   const { connected } = useWallet();
 
@@ -73,12 +76,8 @@ function UserProfileCard() {
     );
   }
 
-  if (!connected) {
-    return <WalletNotConnected />;
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center gap-6 mt-8 lg:flex-row">
+    <div className="  flex flex-col items-center gap-6 mt-8">
       <ProfilePanel
         name={userData.name || userData.login}
         username={userData.login}
@@ -86,7 +85,17 @@ function UserProfileCard() {
         userBio={userData.bio}
         withAction={false}
       />
-      <CelebrateUser username={userData.login} walletAddress={address} />
+      {!isOwnProfile ? (
+        <CelebrateUser
+          username={userData.login}
+          walletAddress={address}
+          isOwnProfile={isOwnProfile}
+        />
+      ) : (
+        <div className="w-full rounded-xl border border-white/10 bg-gray-900 px-6 py-8 text-center text-gray-300 lg:w-[450px]">
+          You are viewing your own profile. Zapping yourself is disabled.
+        </div>
+      )}
     </div>
   );
 }
