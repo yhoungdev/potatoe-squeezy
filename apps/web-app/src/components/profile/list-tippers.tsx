@@ -35,14 +35,9 @@ export default function ListTippers() {
           {tippers.map((tipper) => {
             const displayName = tipper.displayName?.trim() || tipper.username;
             const initials = displayName.slice(0, 2).toUpperCase();
-
-            return (
-              <Link
-                key={tipper.userId}
-                to="/app/dev/$username"
-                params={{ username: tipper.username }}
-                className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-4 transition-colors last:border-b-0 hover:bg-white/5"
-              >
+            const canOpenProfile = Boolean(tipper.profileUsername);
+            const rowContent = (
+              <>
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
@@ -64,7 +59,11 @@ export default function ListTippers() {
                       variant="caption"
                       className="truncate text-gray-400"
                     >
-                      @{tipper.username}
+                      {canOpenProfile
+                        ? `@${tipper.profileUsername}`
+                        : tipper.senderType === "agent"
+                          ? "Agent tipper"
+                          : tipper.username}
                     </Typography>
                   </div>
                 </div>
@@ -93,7 +92,29 @@ export default function ListTippers() {
                       : ""}
                   </Typography>
                 </div>
-              </Link>
+              </>
+            );
+
+            if (canOpenProfile && tipper.profileUsername) {
+              return (
+                <Link
+                  key={tipper.identityKey}
+                  to="/app/dev/$username"
+                  params={{ username: tipper.profileUsername }}
+                  className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-4 transition-colors last:border-b-0 hover:bg-white/5"
+                >
+                  {rowContent}
+                </Link>
+              );
+            }
+
+            return (
+              <div
+                key={tipper.identityKey}
+                className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-4 last:border-b-0"
+              >
+                {rowContent}
+              </div>
             );
           })}
         </div>

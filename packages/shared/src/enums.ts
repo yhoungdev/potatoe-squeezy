@@ -75,6 +75,7 @@ export enum API_ENDPOINTS {
 
   TRANSACTION_RECORDS = "/tx-records",
   TRANSACTION_TIPPERS = "/tx-records/tippers",
+  TRANSACTION_AGENT_SETTLEMENTS = "/tx-records/agent-settlements",
   LEADERBOARD_GLOBAL = "/leaderboard/global",
   LEADERBOARD_WEEKLY = "/leaderboard/weekly",
   LEADERBOARD_STREAKS = "/leaderboard/streaks",

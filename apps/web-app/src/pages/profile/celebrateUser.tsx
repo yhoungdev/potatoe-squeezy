@@ -271,14 +271,9 @@ function CelebrateUser({
               {publicTippers.tippers.map((tipper) => {
                 const displayName =
                   tipper.displayName?.trim() || tipper.username;
-
-                return (
-                  <Link
-                    key={tipper.userId}
-                    to="/app/dev/$username"
-                    params={{ username: tipper.username }}
-                    className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 transition-colors last:border-b-0 hover:bg-white/5"
-                  >
+                const canOpenProfile = Boolean(tipper.profileUsername);
+                const rowContent = (
+                  <>
                     <div className="flex min-w-0 items-center gap-3">
                       <Avatar className="h-9 w-9">
                         <AvatarImage
@@ -294,7 +289,11 @@ function CelebrateUser({
                           {displayName}
                         </p>
                         <p className="truncate text-xs text-gray-400">
-                          @{tipper.username}
+                          {canOpenProfile
+                            ? `@${tipper.profileUsername}`
+                            : tipper.senderType === "agent"
+                              ? "Agent tipper"
+                              : tipper.username}
                         </p>
                       </div>
                     </div>
@@ -315,7 +314,29 @@ function CelebrateUser({
                           : ""}
                       </p>
                     </div>
-                  </Link>
+                  </>
+                );
+
+                if (canOpenProfile && tipper.profileUsername) {
+                  return (
+                    <Link
+                      key={tipper.identityKey}
+                      to="/app/dev/$username"
+                      params={{ username: tipper.profileUsername }}
+                      className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 transition-colors last:border-b-0 hover:bg-white/5"
+                    >
+                      {rowContent}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <div
+                    key={tipper.identityKey}
+                    className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 last:border-b-0"
+                  >
+                    {rowContent}
+                  </div>
                 );
               })}
             </div>

@@ -27,10 +27,14 @@ export interface UserProfileResponse {
 }
 
 export interface PublicTipperRecord {
-  userId: number;
+  identityKey: string;
+  userId: number | null;
   username: string;
+  profileUsername: string | null;
   displayName: string | null;
   avatarUrl: string | null;
+  senderType: "human" | "agent";
+  senderAddress: string;
   totalAmount: string;
   tipCount: number;
   lastTippedAt: string | null;

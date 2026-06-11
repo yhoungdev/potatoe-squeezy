@@ -85,6 +85,20 @@
       "when": 1773974167584,
       "tag": "0011_flat_warbird",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1774684800000,
+      "tag": "0012_agent_sender_metadata",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1774654348021,
+      "tag": "0013_bright_bloodaxe",
+      "breakpoints": true
     }
   ]
 }

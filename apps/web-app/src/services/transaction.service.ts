@@ -6,6 +6,10 @@ interface TransactionRecord {
   amount: number;
   senderAddress: string;
   senderId: number | null;
+  senderType?: "human" | "agent" | null;
+  senderName?: string | null;
+  senderAvatarUrl?: string | null;
+  paymentProtocol?: "wallet" | "x402" | "mpp" | null;
   recipientAddress: string;
   recipientId: number | null;
   txHash: string;
@@ -14,10 +18,14 @@ interface TransactionRecord {
 }
 
 export interface TipperRecord {
-  userId: number;
+  identityKey: string;
+  userId: number | null;
   username: string;
+  profileUsername: string | null;
   displayName: string | null;
   avatarUrl: string | null;
+  senderType: "human" | "agent";
+  senderAddress: string;
   totalAmount: string;
   tipCount: number;
   lastTippedAt: string | null;

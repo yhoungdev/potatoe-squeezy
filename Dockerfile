@@ -11,9 +11,10 @@ ENV PATH="/root/.bun/bin:$PATH"
 
 COPY . .
 
-WORKDIR /app/apps/server
 RUN bun install --frozen-lockfile
+
+WORKDIR /app/apps/server
 
 EXPOSE 3000
 
-CMD ["bun", "run", "src/index.ts"]
+CMD ["bun", "run", "start"]
