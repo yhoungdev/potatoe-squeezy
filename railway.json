@@ -3,5 +3,8 @@
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "startCommand": "cd apps/server && bun run src/index.ts"
   }
 }
